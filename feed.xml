@@ -1,0 +1,852 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<rss version="2.0">
+  <channel>
+    <title>EreTIk's Box</title>
+    <link>https://kitere.github.io/</link>
+    <description>EreTIk's Box: Последние обновления</description>
+    <language>ru</language>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 10.0.17763.1</title>
+      <pubDate>Fri, 05 Oct 2018 12:21:29 +0300</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v10.0.17763.1</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v10.0.17763.1</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[<ul>
+<li><a href="https://kitere.github.io/download/dbg_10.0.17763.1_x86.msi">ver. 10.0.17763.1 x86</a> 
+<li><a href="https://kitere.github.io/download/dbg_10.0.17763.1_x64.msi">ver. 10.0.17763.1 x64</a> 
+<li><a href="https://kitere.github.io/download/dbg_10.0.17763.1_arm.msi">ver. 10.0.17763.1 ARM</a> 
+<li><a href="https://kitere.github.io/download/dbg_10.0.17763.1_arm64.msi">ver. 10.0.17763.1 ARM64</a> </li>
+</ul>]]></description>
+    </item>
+    <item>
+      <title>Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile: добавлены свежие ядра ОС, проект переехал (https://githomelab.ru/EreTIk/ioam)</title>
+      <pubDate>Mon, 01 Oct 2018 19:47:46 +0300</pubDate>
+      <link>https://githomelab.ru/EreTIk/ioam#ioam</link>
+      <guid isPermaLink="true">https://githomelab.ru/EreTIk/ioam#ioam</guid>
+      <category>kernel</category><category>python</category>
+      <description><![CDATA[Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile:
+<ul>
+    <li>Генериуется GitLab Flavored Markdown (а не HTML)</li>
+    <li>Таблицы "разрезаны" по 16 строк (для увеличения удобства просмотра и скроллинга)</li>
+    <li>В набор исходных файлов добавлены ядра с номерами сборок 17134 (версия 1803) и 17763 (версия 1809)</li>
+</ul>
+<p>&gt; <a href="https://githomelab.ru/EreTIk/ioam#ioam">обновлённые таблицы</a></p>]]></description>
+    </item>
+    <item>
+      <title>SandboxEscaper/PoC-LPE: что внутри?</title>
+      <pubDate>Wed, 29 Aug 2018 10:11:49 +0300</pubDate>
+      <link>https://habr.com/post/421593/</link>
+      <guid isPermaLink="true">https://habr.com/post/421593/</guid>
+      <category>Windows</category><category>LPE</category><category>ALPC</category>
+      <description><![CDATA[Перевод документа-описания из опубликованного <a href="https://github.com/SandboxEscaper/randomrepo/blob/master/PoC-LPE.rar">архива</a> (автор - <a href="http://sandboxescaper.blogspot.com/p/about-me.html">SandboxEscaper</a>).
+<p>&gt; <a href="https://habr.com/post/421593/">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Раскрытие памяти (Memory Disclosure) ядра в современных ОС</title>
+      <pubDate>Sun, 08 Jul 2018 17:10:41 +0300</pubDate>
+      <link>https://habr.com/post/415685/</link>
+      <guid isPermaLink="true">https://habr.com/post/415685/</guid>
+      <category>Windows</category><category>Linux</category><category>Memory Disclosure</category>
+      <description><![CDATA[Перевод вступительной части документа <a href="https://j00ru.vexillium.org/papers/2018/bochspwn_reloaded.pdf">Detecting Kernel Memory Disclosure with x86 Emulation and Taint Tracking</a> от Mateusz Jurczyk (Google Project Zero). В переведенной части документа:
+<ul>
+    <li>специфика языка программирования C (в рамках проблемы раскрытия памяти)</li>
+    <li>специфика работы ядер ОС Windows и Linux (в рамках проблемы раскрытия памяти)</li>
+    <li>значимость раскрытия памяти ядра и влияние на безопасность ОС</li>
+    <li>существующие методы и техники обнаружения и противодействия раскрытия памяти ядра</li>
+</ul>
+<p>&gt; <a href="https://habr.com/post/415685/">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Механизм Arbitrary Code Guard (ACG) на примере Microsoft Edge </title>
+      <pubDate>Wed, 16 May 2018 18:07:21 +0300</pubDate>
+      <link>https://habr.com/post/358650/</link>
+      <guid isPermaLink="true">https://habr.com/post/358650/</guid>
+      <category>Windows 10</category><category>ACG</category><category>Edge</category>
+      <description><![CDATA[Перевод части документа <a href="https://github.com/google/p0tools/raw/master/JITServer/JIT-Server-whitepaper.pdf">Bypassing Mitigations by Attacking JIT Server in Microsoft Edge</a> от Ivan Fratric (Google Project Zero). Переведена та часть, в которой находится описание механизма ACG и его применение в браузере Microsoft Edge.
+<p>&gt; <a href="https://habr.com/post/358650/">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>vbox_kd: перенос на githomelab.ru + поддержка VirtualBox API версии 5.2</title>
+      <pubDate>Fri, 11 May 2018 14:44:23 +0300</pubDate>
+      <link>https://kitere.github.io/kd/vbox_kd.html#UPD_11_05_2018</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/vbox_kd.html#UPD_11_05_2018</guid>
+      <category>WinDbg</category><category>VirtualBox</category>
+      <description><![CDATA[vbox_kd - небольшой набор скриптов для автоматизации запуска отладчика WinDbg при работе с VirtualBox
+<ul>
+    <li>Проект перенесен на <a href="https://githomelab.ru/EreTIk/vbox_kd">https://githomelab.ru/EreTIk/vbox_kd</a></li>
+    <li>Добавлена поддержка VirtualBox API версии 5.2</li>
+</ul>]]></description>
+    </item>
+    <item>
+      <title>Сюрпризы от Windows 10 build 17133: ObQueryNameString для ключей реестра перестала выдавать ошибку STATUS_INFO_LENGTH_MISMATCH</title>
+      <pubDate>Wed, 11 Apr 2018 17:57:28 +0300</pubDate>
+      <link>https://kitere.github.io/art/2B.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/2B.html</guid>
+      <category>kernel</category><category>Windows 10 (17133)</category>
+      <description><![CDATA[Функция ObQueryNameString для объектов ключей реестра при нехватке буфера имени перестала выдавать ошибку STATUS_INFO_LENGTH_MISMATCH.
+<p>&gt; <a href="https://kitere.github.io/art/2B.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Сюрпризы от Windows 10 build 17133: новый системный процесс Registry</title>
+      <pubDate>Thu, 05 Apr 2018 20:28:51 +0300</pubDate>
+      <link>https://kitere.github.io/art/2A.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/2A.html</guid>
+      <category>kernel</category><category>Windows 10 (17133)</category>
+      <description><![CDATA[Новый системный процесс Registry
+<p>&gt; <a href="https://kitere.github.io/art/2A.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Сюрпризы от Windows 10 build 17133: маска для NtBuildNumber</title>
+      <pubDate>Tue, 03 Apr 2018 20:55:32 +0300</pubDate>
+      <link>https://kitere.github.io/art/29.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/29.html</guid>
+      <category>kernel</category><category>Windows 10 (17133)</category>
+      <description><![CDATA[Используешь nt!NtBuildNumber? Проверь маску!
+<p>&gt; <a href="https://kitere.github.io/art/29.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Собственные данные в системном дампе падения Windows </title>
+      <pubDate>Sat, 10 Mar 2018 11:08:59 +0300</pubDate>
+      <link>https://habrahabr.ru/post/350406/</link>
+      <guid isPermaLink="true">https://habrahabr.ru/post/350406/</guid>
+      <category>kernel</category><category>python</category><category>WinDbg</category>
+      <description><![CDATA[<em>"Проба пера"</em> на <a href="https://habrahabr.ru/post/350406/">habrahabr.ru</a>.]]></description>
+    </item>
+    <item>
+      <title>Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile: Данные пере-генерированы для ядра версии 10.0.10586.0, обновлен скрипт генерации</title>
+      <pubDate>Wed, 01 Nov 2017 12:45:31 +0300</pubDate>
+      <link>https://kitere.github.io/art/1A.html#UPD_01_11_2017</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/1A.html#UPD_01_11_2017</guid>
+      <category>kernel</category><category>python</category>
+      <description><![CDATA[Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile. Скрипт переработан: работа с коллекцией файлов, печатаются только поддерживаемые классы информации
+<p>&gt; <a href="https://kitere.github.io/art/1A.html#UPD_01_11_2017">обновлённые таблицы</a></p>]]></description>
+    </item>
+    <item>
+      <title>&quot;Закат&quot; Legacy-фильтров файловых систем: что под капотом?</title>
+      <pubDate>Fri, 13 Oct 2017 16:27:06 +0300</pubDate>
+      <link>https://kitere.github.io/art/27.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/27.html</guid>
+      <category>kernel</category>
+      <description><![CDATA[Смотрим в IDA на реализацию блокировки Legacy-фильтров файловых систем.
+<p>&gt; <a href="https://kitere.github.io/art/27.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Что нового в Windows Debugger 10.0.15063.0</title>
+      <pubDate>Wed, 26 Apr 2017 20:21:12 +0300</pubDate>
+      <link>https://kitere.github.io/kd/new_10.0.15063.0.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/new_10.0.15063.0.html</guid>
+      <category>WinDbg</category>
+      <description><![CDATA[Беглый взгляд на новшества в новой версии отладчика (10.0.15063.0).
+<p>&gt; <a href="https://kitere.github.io/kd/new_10.0.15063.0.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 10.0.15063.0</title>
+      <pubDate>Wed, 26 Apr 2017 17:58:59 +0300</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v10.0.15063.0</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v10.0.15063.0</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[В связи с переездом на GitHub Pages промежуточные версии отладчика недоступны.]]></description>
+    </item>
+    <item>
+      <title>Открытие описателя объекта нити процесса SYSTEM из процесса с правами администратора (Windows 7). Обновлено про Pico-процессы для Windows 10.0.14393</title>
+      <pubDate>Fri, 30 Sep 2016 17:51:14 +0300</pubDate>
+      <link>https://kitere.github.io/art/25.html#UPD_30_09_2016</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/25.html#UPD_30_09_2016</guid>
+      <category>kernel</category><category>pico</category><category>WSL</category>
+      <description><![CDATA[<p>Обновлена информация по открытию Pico-процессов (подсистема Linux) из Win32-процессов (не Pico)</p>]]></description>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 10.0.14393</title>
+      <pubDate>Wed, 24 Aug 2016 14:29:13 +0300</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v10.0.14393</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v10.0.14393</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[В связи с переездом на GitHub Pages промежуточные версии отладчика недоступны.]]></description>
+    </item>
+    <item>
+      <title>Рассылка IRP о завершении работы системы (IRP_MJ_SHUTDOWN)</title>
+      <pubDate>Wed, 6 Jul 2016 13:19:30 +0300</pubDate>
+      <link>https://kitere.github.io/art/26.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/26.html</guid>
+      <category>kernel</category>
+      <description><![CDATA[Отлаживал рассылку IO-менеджером IRP_MJ_SHUTDOWN, в процессе набросал несколько скриптов для перечисления зарегистрированных устройств.
+<p>&gt; <a href="https://kitere.github.io/art/26.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Открытие описателя объекта нити процесса SYSTEM из процесса с правами администратора (Windows 7)</title>
+      <pubDate>Mon, 18 Apr 2016 14:16:34 +0300</pubDate>
+      <link>https://kitere.github.io/art/25.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/25.html</guid>
+      <category>kernel</category>
+      <description><![CDATA[Исходные данные: Windows 7, процесс, работающий от лица администратора и нить процесса SYSTEM
+<p>Проблема: при попытке открытия нити получаем STATUS_ACCESS_DENIED</p>
+<p>&gt; <a href="https://kitere.github.io/art/25.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile: Данные пере-генерированы для ядра версии 10.0.10586.0, обновлен скрипт генерации</title>
+      <pubDate>Wed, 17 Feb 2016 17:00:57 +0300</pubDate>
+      <link>https://kitere.github.io/art/1A.html#UPD_17_02_2016</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/1A.html#UPD_17_02_2016</guid>
+      <category>kernel</category><category>python</category>
+      <description><![CDATA[Данные пере-генерированы для ядра версии 10.0.10586.0, скрипт генерации переписан для современной версии pykd 0.3.x
+<p>&nbsp;</p>]]></description>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 10.0.10586.567</title>
+      <pubDate>Thu, 17 Dec 2015 18:24:13 +0300</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v10.0.10586.567</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v10.0.10586.567</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[В связи с переездом на GitHub Pages промежуточные версии отладчика недоступны.]]></description>
+    </item>
+    <item>
+      <title>vbox_kd - небольшой набор скриптов для автоматизации запуска отладчика WinDbg при работе с VirtualBox</title>
+      <pubDate>Wed, 2 Dec 2015 14:52:18 +0300</pubDate>
+      <link>https://kitere.github.io/kd/vbox_kd.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/vbox_kd.html</guid>
+      <category>WinDbg</category><category>VirtualBox</category>
+      <description><![CDATA[vbox_kd - небольшой набор скриптов для автоматизации запуска отладчика WinDbg при работе с VirtualBox
+<ul>
+    <li><a href="https://kitere.github.io/kd/vbox_kd.html">описание</a></li>
+    <li><a href="https://vboxkd.codeplex.com/">набор скриптов на codeplex</a></li>
+</ul>]]></description>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 10.0.10240.9</title>
+      <pubDate>Wed, 12 Aug 2015 13:22:38 +0300</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v10.0.10240.9</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v10.0.10240.9</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[В связи с переездом на GitHub Pages промежуточные версии отладчика недоступны.]]></description>
+    </item>
+    <item>
+      <title>DSymLoad 0.1.0.4</title>
+      <pubDate>Thu, 30 Jul 2015 17:52:20 +0300</pubDate>
+      <link>https://kitere.github.io/tools/DSymLoad.html#moved_to_codeplex</link>
+      <guid isPermaLink="true">https://kitere.github.io/tools/DSymLoad.html#moved_to_codeplex</guid>
+      <category>DSymLoad</category><category>HIEW</category><category>HEM</category><category>Source Code</category>
+      <description><![CDATA[Опубликован исходный код на <a href="https://dsymload.codeplex.com">dsymload.codeplex.com</a>
+<ul>
+<li>Исправлено: игнорирование SYMFLAG_TLSREL-символов</li>
+<li>Реализовано: определение директории WinDbg (поддерживаются: Windows Kits 8, 8.1 и 10)</li></ul>]]></description>
+    </item>
+    <item>
+      <title>Новый механизм подсчета ссылок на объект в Windows 8.1</title>
+      <pubDate>Wed, 17 Jun 2015 18:36:46 +0300</pubDate>
+      <link>https://kitere.github.io/art/24.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/24.html</guid>
+      <category>kernel</category><category>Windows 8.1</category><category>WinDbg</category>
+      <description><![CDATA[Небольшое дополнение к статье Alex Ionescu <a href="http://www.alex-ionescu.com/?p=196">The Case Of The Bloated Reference Count: Handle Table Entry Changes in Windows 8.1</a>: динамическая трассирока счетчика.
+<p>&gt; <a href="https://kitere.github.io/art/24.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>WinDbg 10.0.10075 получил поддержку .NatVis-файлов</title>
+      <pubDate>Thu, 11 Jun 2015 13:26:05 +0300</pubDate>
+      <link>https://kitere.github.io/kd/windbg_natvis.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/windbg_natvis.html</guid>
+      <category>WinDbg</category><category>NatVis</category>
+      <description><![CDATA[В WinDbg 10.0.10075 наконец-то появилась поддержка .natvis-файлов (файлы для custom-представления переменных сложных типов).
+<p>&nbsp;</p>
+<p>&nbsp;&nbsp;&nbsp; std::string TestString;<br/>&nbsp;&nbsp;&nbsp; TestString = "test!";<br/>&nbsp;&nbsp;&nbsp; std::vector&amp;lt;int&amp;gt; TestVector(2);<br/>&nbsp;&nbsp;&nbsp; TestVector[0] = 0;<br/>&nbsp;&nbsp;&nbsp; TestVector[1] = -100000;<br/></p>
+<p>0:000&gt; dv<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; argc = 1<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; argv = 0x00000000`00336e90<br/>&nbsp;&nbsp;&nbsp;&nbsp; TestString = "test!"<br/>&nbsp;&nbsp;&nbsp;&nbsp; TestVector = { size=2 }</p>
+<p>&gt; <a href="https://kitere.github.io/kd/windbg_natvis.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>WinDbg 10.0.10041.3 не совместим с Windows 10 10074</title>
+      <pubDate>Wed, 10 Jun 2015 13:42:52 +0300</pubDate>
+      <link>https://kitere.github.io/kd/win10074_windbg10041_kdnic.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v10.0.10075</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[WinDbg 10.0.10041.3 не совместим с Windows 10 10074 при ethernet-отладке.]]></description>
+    </item>
+    <item>
+      <title>[PHDays] Автоматизация отладки в WinDbg </title>
+      <pubDate>Thu, 4 Jun 2015 16:24:17 +0300</pubDate>
+      <link>https://kitere.github.io/kd/phd5_windbg_pykd.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/phd5_windbg_pykd.html</guid>
+      <category>WinDbg</category><category>python</category>
+      <description><![CDATA[Доступна запись PHDays-выступления <a href="http://www.phdays.ru/program/40602/">Автоматизация отладки в WinDbg</a>.
+<p>Видео можно посмотреть на <a href="http://www.phdays.ru/broadcast/,">http://www.phdays.ru/broadcast/,</a>&nbsp; или скачать ts-файл выступления: <a href="https://kitere.github.io/download/phd5_windbg_pykd.ts">https://kitere.github.io/download/phd5_windbg_pykd.ts</a></p>]]></description>
+    </item>
+    <item>
+      <title>DefSound 0.1.6.0</title>
+      <pubDate>Thu, 16 Apr 2015 11:51:12 +0300</pubDate>
+      <link>https://defsound.codeplex.com/releases/view/614452</link>
+      <guid isPermaLink="true">https://defsound.codeplex.com/releases/view/614452</guid>
+      <category>DefSound</category><category>Source Code</category>
+      <description><![CDATA[Доступна новая версия утилиты DefSound 0.1.6.0<br/>Изменения:
+<br/>&nbsp;(+) не пропадает иконка при пересоздании процесса explorer.exe
+<p><br/><a href="https://defsound.codeplex.com/releases/view/614452">DefSound 0.1.6.0</a></p>]]></description>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 10.0.10041.0</title>
+      <pubDate>Wed, 25 Mar 2015 16:56:50 +0300</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v10.0.10041.0</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v10.0.10041.0</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[В связи с переездом на GitHub Pages промежуточные версии отладчика недоступны.]]></description>
+    </item>
+    <item>
+      <title>DefSound 0.1.5.0</title>
+      <pubDate>Thu, 19 Mar 2015 17:15:04 +0300</pubDate>
+      <link>https://defsound.codeplex.com/releases/view/612651</link>
+      <guid isPermaLink="true">https://defsound.codeplex.com/releases/view/612651</guid>
+      <category>DefSound</category><category>Source Code</category>
+      <description><![CDATA[Доступна новая версия утилиты DefSound 0.1.5.0<br/>Изменения:
+<br/>&nbsp;(+) отображение окна-подсказки при переключении звукового устройства по-умолчанию
+<p><br/><a href="https://defsound.codeplex.com/releases/view/612651">DefSound 0.1.5.0</a></p>]]></description>
+    </item>
+    <item>
+      <title>diabind 0.1.0.4</title>
+      <pubDate>Tue, 20 Jan 2015 15:15:29 +0300</pubDate>
+      <link>https://diabind.codeplex.com/releases/view/610894</link>
+      <guid isPermaLink="true">https://diabind.codeplex.com/releases/view/610894</guid>
+      <category>SourceCode</category><category>python</category><category>DIA</category>
+      <description><![CDATA[Доступна новая версия модуля diabind – 0.1.0.4<br/>Изменения:
+<br/>&nbsp;(+) перечисление и доступ в отладочным потокам (debug streams)
+<p><br/><a href="https://diabind.codeplex.com/releases/view/610894">diabind 0.1.0.4</a></p>]]></description>
+    </item>
+    <item>
+      <title>Отсутствие DACL'а у security descriptor'а и Lowbox-процессы (AppContainer)</title>
+      <pubDate>Tue, 23 Dec 2014 17:17:06 +0300</pubDate>
+      <link>https://kitere.github.io/art/23.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/23.html</guid>
+      <category>kernel</category><category>Windows 8</category>
+      <description><![CDATA[А вы тоже "знаете", что отсутствие DACL'а у security descriptor'а дает безоговорочный полный доступ к объекту?
+<p>&gt; <a href="https://kitere.github.io/art/23.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>diabind 0.1.0.3</title>
+      <pubDate>Fri, 5 Dec 2014 23:20:47 +0300</pubDate>
+      <link>http://diabind.codeplex.com/releases/view/168983</link>
+      <guid isPermaLink="true">http://diabind.codeplex.com/releases/view/168983</guid>
+      <category>SourceCode</category><category>python</category><category>DIA</category>
+      <description><![CDATA[Доступна новая версия модуля diabind – 0.1.0.3<br/>Изменения:
+<br/>&nbsp;(+) добавлена поддержка Python 3.4 (что потребовало переработать исключения)
+<br/>&nbsp;(+) в утилите diaview.pyw (PySide-GUI) добавлена возможность поиска по RVA и отображения строки и файлов исходного кода
+<br/>&nbsp;(*) проект конвертирован в Visual Studio 2013
+<p><br/><a href="http://diabind.codeplex.com/releases/view/168983">diabind 0.1.0.3</a></p>]]></description>
+    </item>
+    <item>
+      <title>DefSound 0.1.4.0</title>
+      <pubDate>Thu, 18 Sep 2014 17:19:09 +0400</pubDate>
+      <link>https://kitere.github.io/tools/DefSound.html#moved_to_codeplex</link>
+      <guid isPermaLink="true">https://kitere.github.io/tools/DefSound.html#moved_to_codeplex</guid>
+      <category>DefSound</category><category>Source Code</category>
+      <description><![CDATA[Наконец-то я привел в порядок утилиту DefSound и перенес ее на <a href="https://defsound.codeplex.com/">codeplex</a>.
+<p>Новое в 0.1.4.0:<br/>* исходный код переработан и сконвертирован для сборки Visual Studio 12 (2013) Express<br/>* частично интегрирован код Nobody (nobody-kolomna(ta)yandex(tod)ru)<br/>* в командной строке появилась возможность указывать устройство по строковому описанию<br/>* в командной строке появилась возможность указывать специальный индекс устройства -1, который означает следующее устройство<br/>* в режиме работы иконки в системном трее обработан двойной клик левой кнопки мыши: переключение на следующее устройство</p>
+<p><strong>P.S.</strong> Большое спасибо всем, кто писал замечания и пожелания по утилите. И тем, кто не поленился написать просто "спасибо". Во многом именно благодаря всем вам, утилита переведена в полноценный open source и готова к дальнейшему развитию.</p>]]></description>
+    </item>
+    <item>
+      <title>Функция PathAppend и реализация ATL::CPathT::Append в Microsoft Visual Studio 9.0</title>
+      <pubDate>Fri, 11 Jul 2014 15:54:52 +0400</pubDate>
+      <link>https://kitere.github.io/art/22.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/22.html</guid>
+      <category>ATL</category>
+      <description><![CDATA[Проблемы использования ATL из Microsoft Visual Studio 9.0 при работе на Windows 7 Checked Build
+<p>&gt; <a href="https://kitere.github.io/art/22.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>FltSetInformationFile vs ZwSetInformationFile при переименовании файлов</title>
+      <pubDate>Tue, 6 May 2014 15:23:03 +0400</pubDate>
+      <link>https://kitere.github.io/art/21.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/21.html</guid>
+      <category>kernel</category><category>WinDbg</category>
+      <description><![CDATA[Грабли, на которые я наступил при портировании переименования файлов на Flt-функции
+<p>&gt; <a href="https://kitere.github.io/art/21.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Alternate Data Streams на ReFS</title>
+      <pubDate>Wed, 23 Apr 2014 17:40:02 +0400</pubDate>
+      <link>https://kitere.github.io/art/20.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/20.html</guid>
+      <category>ReFS</category><category>Windows 8</category><category>Windows 8.1</category>
+      <description><![CDATA[Личный опыт получения ошибки ERROR_FILE_SYSTEM_LIMITATION при работе с ADS на ReFS
+<p>&gt; <a href="https://kitere.github.io/art/20.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Новый бит маски доступа к объекту нити (thread) в Windows 8.1: THREAD_RESUME</title>
+      <pubDate>Tue, 25 Feb 2014 15:00:41 +0400</pubDate>
+      <link>https://kitere.github.io/art/1F.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/1F.html</guid>
+      <category>kernel</category><category>Windows 8.1</category>
+      <description><![CDATA[В Windows 8.1 NtResumeThread проверяет наличие новой маски доступа: THREAD_RESUME
+<p>&gt; <a href="https://kitere.github.io/art/1F.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Нотификация проверки цифровой подписи файла драйвера</title>
+      <pubDate>Thu, 13 Feb 2014 18:01:40 +0400</pubDate>
+      <link>https://kitere.github.io/art/1E.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/1E.html</guid>
+      <category>kernel</category><category>Windows 8.1</category>
+      <description><![CDATA[Описание новой (Windows 8.1) нотификации проверки цифровой подписи файла: SeRegisterImageVerificationCallback/SeUnregisterImageVerificationCallback
+<p>&gt; <a href="https://kitere.github.io/art/1E.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Потроха отладчика в помощь при исследовании внутренностей ядра</title>
+      <pubDate>Thu, 26 Dec 2013 17:08:09 +0400</pubDate>
+      <link>https://kitere.github.io/art/1D.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/1D.html</guid>
+      <category>kernel</category><category>WinDbg</category>
+      <description><![CDATA[Заметка о том, как исследование внутренностей отладчика может помочь в понимании внутренностей ядра
+<p>&gt; <a href="https://kitere.github.io/art/1D.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>WinDbg 6.3.9600: новые возможности отладки </title>
+      <pubDate>Thu, 19 Dec 2013 19:05:44 +0400</pubDate>
+      <link>https://kitere.github.io/kd/WinDbg_6.12_vs_6.3.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDbg_6.12_vs_6.3.html</guid>
+      <category>WinDbg</category>
+      <description><![CDATA[Небольшой обзор изменений WinDbg между версиями 6.12.xxx.yyy и 6.3.9600.yyy
+<p>&gt; <a href="https://kitere.github.io/kd/WinDbg_6.12_vs_6.3.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 6.3.9600.16384</title>
+      <pubDate>Wed, 30 Oct 2013 12:55:35 +0400</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v6.3.9600.16384</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v6.3.9600.16384</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[В связи с переездом на GitHub Pages промежуточные версии отладчика недоступны.]]></description>
+    </item>
+    <item>
+      <title>Deadlock при использовании ObOpenObjectByPointer для ключей реестра на Win XP SP2</title>
+      <pubDate>Thu, 19 Sep 2013 21:23:31 +0400</pubDate>
+      <link>https://kitere.github.io/art/1C.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/1C.html</guid>
+      <category>kernel</category>
+      <description><![CDATA[Взаимо-блокировка при использовании функции nt!ObOpenObjectByPointer для ключей реестра на Win XP SP2
+<p>&gt; <a href="https://kitere.github.io/art/1C.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>diaview: пример использования MS DIA из питона (diabind)</title>
+      <pubDate>Thu, 19 Sep 2013 01:29:39 +0400</pubDate>
+      <link>https://kitere.github.io/art/1B.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/1B.html</guid>
+      <category>SourceCode</category><category>python</category><category>DIA</category>
+      <description><![CDATA[diaview.py: GUI-скрипт получения отладочной информации с использованием diabind
+<p>&gt; <a href="https://kitere.github.io/art/1B.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 6.3.9389.0</title>
+      <pubDate>Tue, 10 Sep 2013 13:05:04 +0400</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v6.3.9389.0</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v6.3.9389.0</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[В связи с переездом на GitHub Pages промежуточные версии отладчика недоступны.]]></description>
+    </item>
+    <item>
+      <title>diabind: DIA (Debug Interface Access) SDK для Python </title>
+      <pubDate>Fri, 26 Jul 2013 13:23:46 +0400</pubDate>
+      <link>https://kitere.github.io/tools/diabind.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/tools/diabind.html</guid>
+      <category>SourceCode</category><category>python</category><category>DIA</category>
+      <description><![CDATA[Модуль, позволяющий&nbsp;работать с DIA SDK из языка Python
+<p>&gt; <a href="https://kitere.github.io/tools/diabind.html">Описание</a></p>]]></description>
+    </item>
+    <item>
+      <title>Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile</title>
+      <pubDate>Thu, 11 Jul 2013 17:25:53 +0400</pubDate>
+      <link>https://kitere.github.io/art/1A.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/1A.html</guid>
+      <description><![CDATA[Таблицы-шпаргалки, отражающие соответствие класса информации о файле и требуемых масках доступа для функций NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile.
+<p><a href="https://kitere.github.io/art/1A.html">полный текст<br/></a></p>]]></description>
+      <category>kernel</category><category>python</category>
+    </item>
+    <item>
+      <title>Нюансы использования FsRtlIsNameInExpression</title>
+      <pubDate>Mon, 3 Jun 2013 23:55:43 +0400</pubDate>
+      <link>https://kitere.github.io/art/19.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/19.html</guid>
+      <category>kernel</category>
+      <description><![CDATA[Функция FsRtlIsNameInExpression возвращает результат сравнения строк. И не только...
+<p>&gt; <a href="https://kitere.github.io/art/19.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Создание процесса из драйвера режима ядра: Windows 8</title>
+      <pubDate>Tue, 2 Apr 2013 10:43:34 +0400</pubDate>
+      <link>https://kitere.github.io/art/18.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/18.html</guid>
+      <category>kernel</category><category>Windows 8</category>
+      <description><![CDATA[<p>Функция создания процесса теперь экспортируется из ядра Windows.</p>
+<p>&gt; <a href="https://kitere.github.io/art/18.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>hiew7_ord.py</title>
+      <pubDate>Mon, 18 Mar 2013 18:17:17 +0400</pubDate>
+      <link>https://kitere.github.io/download/hiew7_ord.py</link>
+      <guid isPermaLink="true">https://kitere.github.io/download/hiew7_ord.py</guid>
+      <category>HIEW</category><category>python</category>
+      <description><![CDATA[Забыл выложить тело файла <a href="https://kitere.github.io/download/hiew7_ord.py">hiew7_ord.py</a>, исправляюсь...]]></description>
+    </item>
+    <item>
+      <title>Скрипт обновления файла ординалов для HIEW</title>
+      <pubDate>Wed, 13 Mar 2013 19:43:11 +0400</pubDate>
+      <link>https://kitere.github.io/art/17.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/17.html</guid>
+      <category>HIEW</category><category>python</category>
+      <description><![CDATA[Python-скрипт для обновления hiew7.ord: <a href="https://kitere.github.io/download/hiew7_ord.py" target=_blank>hiew7_ord.py</a>
+<p>&gt; <a href="https://kitere.github.io/art/17.html">полное описание</a></p>]]></description>
+    </item>
+    <item>
+      <title>Дескриптор безопасности объекта нити или почему при создании процесса игнорируется имперсонированность нити</title>
+      <pubDate>Mon, 11 Mar 2013 20:18:53 +0400</pubDate>
+      <link>https://kitere.github.io/art/16.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/16.html</guid>
+      <category>kernel</category><category>python</category>
+      <description><![CDATA[<p style="MARGIN: 12pt 0in" class=MsoNormal>Небольшой тест дексрипторов безопасности создаваемых нитей.</p>
+<p>&gt; <a href="https://kitere.github.io/art/16.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Неожиданный статус в рекурсивном вызове реестровой функции из Cm-callback'а</title>
+      <pubDate>Fri, 7 Dec 2012 18:29:15 +0400</pubDate>
+      <link>https://kitere.github.io/art/15.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/15.html</guid>
+      <category>kernel</category>
+      <description><![CDATA[<p style="MARGIN: 12pt 0in" class=MsoNormal>Небольшое расследование получения неожиданного значения статуса рекурсивного вызова реестровой <SPAN style="mso-ansi-language: EN-US" lang=EN-US>Zw</SPAN>-функции из <SPAN style="mso-ansi-language: EN-US" lang=EN-US>Cm</SPAN>-<SPAN style="mso-ansi-language: EN-US" lang=EN-US>callback</SPAN>'а</p>
+<p>&gt; <a href="https://kitere.github.io/art/15.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Расширение !alpc для WinDbg</title>
+      <pubDate>Tue, 13 Nov 2012 21:54:39 +0400</pubDate>
+      <link>https://kitere.github.io/kd/alpc_extension.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/alpc_extension.html</guid>
+      <category>WinDbg</category><category>WinDbg Extention</category><category>[A]LPC</category>
+      <description><![CDATA[Описание расширения !alpc для отладчика, включая некоторые недокументированные команды.
+<p>&gt; <a href="https://kitere.github.io/kd/alpc_extension.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>BSOD: KeStackAttachProcess + ObReferenceObjectByHandle</title>
+      <pubDate>Wed, 3 Oct 2012 16:55:57 +0400</pubDate>
+      <link>https://kitere.github.io/art/14.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/14.html</guid>
+      <category>kernel</category>
+      <description><![CDATA[Небольшая заметка о том, почему небезопасно использовать связку вызовов KeStackAttachProcess + ObReferenceObjectByHandle.
+<p>&gt; <a href="https://kitere.github.io/art/14.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания новой версии WinDBG: 6.2.9200.16384 (совместим с Windows 8 RTM, build 9200)</title>
+      <pubDate>Tue, 25 Sep 2012 19:43:11 +0400</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html#v6.2.9200.16384</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html#v6.2.9200.16384</guid>
+      <category>WinDbg</category><category>Download</category>
+      <description><![CDATA[В связи с переездом на GitHub Pages промежуточные версии отладчика недоступны.]]></description>
+    </item>
+    <item>
+      <title>О подписи исполняемых файлов... в очередной раз</title>
+      <pubDate>Tue, 11 Sep 2012 14:54:57 +0400</pubDate>
+      <link>https://kitere.github.io/art/13.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/13.html</guid>
+      <description><![CDATA[Краткий рассказ о том как я на собтсвенном опыте узнал, что для подписи исполняемых модулей пользовательского режима нужно указывать опцию /ph
+<p>&gt; <a href="https://kitere.github.io/art/13.html">полный текст</a></p>]]></description>
+    </item>
+    <item>
+      <title>Модуль UnDecSym (UnDecorate Symbol Name) для Python </title>
+      <pubDate>Fri, 3 Aug 2012 15:54:24 +0400</pubDate>
+      <link>https://kitere.github.io/tools/UnDecSym.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/tools/UnDecSym.html</guid>
+      <category>SourceCode</category><category>python</category>
+      <description><![CDATA[Модуль для python, который умеет раз-декорировать (undecorate) имя C++ символа
+<p>&gt; <a href="https://kitere.github.io/tools/UnDecSym.html">Описание</a></p>]]></description>
+    </item>
+    <item>
+      <title>Визуализация графа вызовов на основе лога команды wt</title>
+      <pubDate>Thu, 12 Jul 2012 18:30:09 +0400</pubDate>
+      <link>https://kitere.github.io/kd/wtTree.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/wtTree.html</guid>
+      <category>WinDbg</category><category>Debug Tips</category><category>SourceCode</category><category>python</category>
+      <description><![CDATA[Небольшой <a href="https://kitere.github.io/download/wtTree.py">py-скипт</a> для визуализации графа вызовов на основе результатов команды wt:
+<p><img src="https://kitere.github.io/images/wtTree_CreateFileW.png"></p>
+<p>&gt; <a href="https://kitere.github.io/kd/wtTree.html">полный тескт</a></p>]]></description>
+    </item>
+    <item>
+      <title>Аппаратная точка останова на запись и инструкция CMPXCHG</title>
+      <pubDate>Thu, 29 Mar 2012 23:09:54 +0400</pubDate>
+      <link>https://kitere.github.io/art/12.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/12.html</guid>
+      <category>WinDbg</category><category>Debug Tips</category><category>SourceCode</category>
+      <description><![CDATA[Срабатывает ли аппаратная точка останова на запись после инструкции CMPXCHG, если в результате значение в памяти не изменилось?<br/>&gt; <a href="https://kitere.github.io/art/12.html">полный текст</a><br/>]]></description>
+    </item>
+    <item>
+      <title>Фильтрация создания описателей для объекта любого типа</title>
+      <pubDate>Mon, 19 Mar 2012 23:05:09 +0400</pubDate>
+      <link>https://kitere.github.io/art/11.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/11.html</guid>
+      <category>kernel</category>
+      <description><![CDATA[Результаты небольшого эксперимента по фильтрации Ob-callback'ами создания описателей произвольного типа: 
+<p>&gt; <a href="https://kitere.github.io/art/11.html">фильтруем создание описателей на ALPC-порты</a><br/></p>]]></description>
+    </item>
+    <item>
+      <title>Логотип Windows 8 Consumer Preview</title>
+      <pubDate>Fri, 2 Mar 2012 14:47:41 +0400</pubDate>
+      <link>https://kitere.github.io/other/W8ConsPrev_logo.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/other/W8ConsPrev_logo.html</guid>
+      <category>other</category><category>Windows 8</category>
+      <description><![CDATA[Windows 8 Consumer Preview обзавелась <a href="https://kitere.github.io/other/W8ConsPrev_logo.html">логотипом</a>]]></description>
+    </item>
+    <item>
+      <title>Debug Engine (DbgEng): что нового Windows 8 Developer Preview</title>
+      <pubDate>Fri, 10 Feb 2012 19:17:31 +0400</pubDate>
+      <link>https://kitere.github.io/kd/Win8DevPrev_WinDbg_FullDump.html#UPD_10_02_2012</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/Win8DevPrev_WinDbg_FullDump.html#UPD_10_02_2012</guid>
+            <description><![CDATA[Хотя официальная документация не менялась, есть пост в блоге Microsoft: <a href="http://blogs.msdn.com/b/andrew_richards/archive/2011/09/24/debugger-engine-dbgeng-updates-in-windows-8-developer-preview.aspx">"Debugger Engine (DbgEng) updates in the Windows 8 Developer Preview"</a>]]></description>
+      <category>WinDbg</category><category>Windows 8</category><category>DbgEng</category>
+    </item>
+    <item>
+      <title>Полный дамп падения с Windows 8 Developer Preview - повод обновить WinDbg</title>
+      <pubDate>Thu, 9 Feb 2012 17:03:53 +0400</pubDate>
+      <link>https://kitere.github.io/kd/Win8DevPrev_WinDbg_FullDump.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/Win8DevPrev_WinDbg_FullDump.html</guid>
+      <description><![CDATA[Как выяснилось, <a href="https://kitere.github.io/kd/Win8DevPrev_WinDbg_FullDump.html">старый WinDbg (6.12.0002.633 AMD64) не открывает полные дампы памяти с Windows 8 Developer Preview</a>]]></description>
+      <category>WinDbg</category><category>Windows 8</category><category>Dump analysis</category>
+    </item>
+    <item>
+      <title>Verifier и динамический импорт в ядре</title>
+      <pubDate>Thu, 15 Dec 2011 00:32:50 +0400</pubDate>
+      <link>https://kitere.github.io/art/10.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/10.html</guid>
+      <description><![CDATA[Подводные камни при использовании динамического импорта и Verifier в ядре. Рассмотрены разница реализаций систем до Vista и Vista и старше.
+<p>&gt; <a href="https://kitere.github.io/art/10.html">полный текст</a></p>]]></description>
+      <category>kernel</category><category>verifier</category>
+    </item>
+    <item>
+      <title>ntdebugging: Debug Tips</title>
+      <pubDate>Thu, 21 Jul 2011 20:06:20 +0400</pubDate>
+      <link>https://kitere.github.io/kd/cmd.html#debug_ninja_s_twitter_debug_tips</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/cmd.html#debug_ninja_s_twitter_debug_tips</guid>
+      <description><![CDATA[&nbsp;В блоге <strong>ntdebugging</strong> появилась отличная подборка приемов работы с WinDbg: <a href="http://blogs.msdn.com/b/ntdebugging/archive/2011/07/20/updated-archive-of-the-debug-ninja-s-twitter-debug-tips.aspx">Updated Archive of the Debug Ninja's Twitter Debug Tips</a>. Такую статью стоит добавить в закладки :)]]></description>
+      <category>WinDbg</category><category>Debug Tips</category><category>external links</category>
+    </item>
+    <item>
+      <title>Соглашение о вызовах на x64-платформе и обход проверки цифровой подписи модуля при установке OB-callback'а</title>
+      <pubDate>Wed, 13 Jul 2011 10:47:43 +0400</pubDate>
+      <link>https://kitere.github.io/art/0F.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/0F.html</guid>
+      <description><![CDATA[Один из подходов для обхода проверки цифровой подписи на платформе AMD64 при регистрации функции обратного вызова ObRegisterCallbacks(...).
+<p>&gt; <a href="https://kitere.github.io/art/0F.html">полный текст</a></p>]]></description>
+      <category>kernel</category><category>AMD64</category><category>Code Signing</category><category>SourceCode</category>
+    </item>
+    <item>
+      <title>Реализация клиентского RPC-вызова из драйвера режима ядра: запуск и останов системных сервисов</title>
+      <pubDate>Thu, 28 Apr 2011 00:36:26 +0400</pubDate>
+      <link>https://kitere.github.io/art/0D.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/0D.html</guid>
+      <description><![CDATA[В статье описывается практический пример использования kernel-библиотеки msrpc.sys, появившейся на ОС Windows Vista. В качестве задачи реализован запуск и останов системных сервисов из драйвера режима ядра.
+<p>&gt; <a href="https://kitere.github.io/art/0D.html">полный текст</a></p>]]></description>
+      <category>SourceCode</category><category>kernel</category><category>RPC</category>
+    </item>
+    <item>
+      <title>Обновлен класс загрузки драйвера из ресурсов TResourceDrv</title>
+      <pubDate>Thu, 28 Apr 2011 00:29:45 +0400</pubDate>
+      <link>https://kitere.github.io/art/06.html#UPD_28_04_2011</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/06.html#UPD_28_04_2011</guid>
+      <description><![CDATA[Класс загрузки драйвера из ресурсов был немного переработан до версии 0.1.1.0.&nbsp;Основное изменение заключается в том, что добавлена опция: не выгружать драйвер при уничтожении объекта. 
+<p>&gt; <a href="https://kitere.github.io/art/06.html#UPD_28_04_2011">описание</a></p>
+<p>&gt; <a href="https://kitere.github.io/download/ResourceDrv-0.1.1.0.rar">скачать TResourceDrv версии 0.1.1.0</a></p>]]></description>
+      <category>SourceCode</category><category>Driver</category>
+    </item>
+    <item>
+      <title>Особенность инициализации расширения отладчика WinDbg: вызовы DebugExtensionInitialize / DebugExtensionUninitialize</title>
+      <pubDate>Mon, 14 Mar 2011 17:53:32 +0300</pubDate>
+      <link>https://kitere.github.io/kd/DExtReInit.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/DExtReInit.html</guid>
+      <description><![CDATA[Описание тонкостей вызова функций инициализации / де-инициализации внешних расширений для WinDbg: вызов функций DebugExtensionInitialize(...) - DebugExtensionUninitialize(). Проблема <em>"вложенной"</em> инициализации. 
+<p>&gt; <a href="https://kitere.github.io/kd/DExtReInit.html">полный текст</a></p>]]></description>
+      <category>WinDbg</category><category>WinDbg Extention</category><category>SourceCode</category>
+    </item>
+    <item>
+      <title>Таблица системных сервисов (SSTD) на x64 системах: поиск и трактовка содержимого</title>
+      <pubDate>Fri, 18 Feb 2011 01:25:57 +0300</pubDate>
+      <link>https://kitere.github.io/art/0C.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/0C.html</guid>
+      <description><![CDATA[В статье достаточно подробно описывается формат таблицы системных сервисов SSDT на x64 платформе (AMD64): рассмотрены тонкости хранения и формирования SSDT в операционной системе Windows 2003 Server/XP Professional x64 и на системах Windows Vista и старше. Так же приведен метод эвристического поиска SSDT. 
+<p>&gt; <a href="https://kitere.github.io/art/0C.html">полный текст</a></p>]]></description>
+      <category>kernel</category>
+    </item>
+    <item>
+      <title>Проект PYKD обзавелся русскоязычным блогом</title>
+      <pubDate>Fri, 21 Jan 2011 19:21:24 +0300</pubDate>
+      <link>http://pykd.blogspot.com/</link>
+      <guid isPermaLink="true">http://pykd.blogspot.com/</guid>
+      <description><![CDATA[У расширения <a href="http://pykd.codeplex.com/">PYKD (Python extension for WinDbg)</a> появился свой блог на русском языке: <a href="http://pykd.blogspot.com/">pykd.blogspot.com</a>]]></description>
+      <category>WinDbg</category><category>python</category><category>external links</category>
+    </item>
+    <item>
+      <title>Поиск скрытых процессов python’вским скриптом в WinDbg</title>
+      <pubDate>Fri, 24 Dec 2010 16:49:17 +0300</pubDate>
+      <link>https://kitere.github.io/art/0B.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/0B.html</guid>
+      <description><![CDATA[Небольшая статья, показывающая как можно использовать python в WinDbg для поиска скрытых процессов. В качестве расширения к отладчику, исполняющее python используется <a href="http://pykd.codeplex.com/">pykd.pyd</a>. Детектируемый метод скрытия - удаление процесса из списка PsActiveProcessHead, используется phide2 (29A#8)
+<p>&gt; <a href="https://kitere.github.io/art/0B.html">полный текст<br/></a></p>]]></description>
+      <category>SourceCode</category><category>WinDbg</category><category>python</category><category>kernel</category>
+    </item>
+    <item>
+      <title>DSymLoad: Загрузка отладочных символов в HIEW</title>
+      <pubDate>Mon, 22 Nov 2010 15:28:42 +0300</pubDate>
+      <link>https://kitere.github.io/tools/DSymLoad.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/tools/DSymLoad.html</guid>
+      <description><![CDATA[Утилита DSymLoad: Загрузка отладочных символов в HIEW:
+<ul>
+<li>NameTGen.exe - генерация namet-файла для импорта в HIEW</li>
+<li>DSymLoad.HEM - внешний модуль HIEW'а для загрузки отладочной информации</li></ul>
+<p><a href="https://kitere.github.io/tools/DSymLoad.html">Описание</a>, <a href="https://kitere.github.io/download/DSymLoad.rar">Архив с DSymLoad</a></p>]]></description>
+      <category>Util</category><category>DSymLoad</category><category>dbghelp.dll</category><category>HIEW</category>
+    </item>
+    <item>
+      <title>Подводные камни использования флага IO_OPEN_TARGET_DIRECTORY (SL_OPEN_TARGET_DIRECTORY)</title>
+      <pubDate>Mon, 11 Oct 2010 16:41:37 +0400</pubDate>
+      <link>https://kitere.github.io/art/09.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/09.html</guid>
+      <description><![CDATA[Статья описывает использование флага <strong>IO_OPEN_TARGET_DIRECTORY</strong> при вызове функции nt!IoCreateFile[Ex] и подводные камни, выявленные при тестировании на системах Windows XP и 7.
+<p>&gt; <a href="https://kitere.github.io/art/09.html">полный текст</a></p>]]></description>
+      <category>kernel</category><category>file system</category><category>Source Code</category>
+    </item>
+    <item>
+      <title>Открытие ключа реестра текущего пользователя</title>
+      <pubDate>Thu, 23 Sep 2010 00:53:53 +0400</pubDate>
+      <link>https://kitere.github.io/art/0A.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/0A.html</guid>
+      <description><![CDATA[Открытие ключа реестра текущего пользователя: RegOpenKeyEx(HKEY_CURRENT_USER, ...) или RegOpenCurrentUser(). В статье описываются подводные камни использования предопределенных ключей реестра.
+<p>&gt; <a href="https://kitere.github.io/art/0A.html">полный текст</a></p>]]></description>
+      <category>Registry</category><category>Impersonation</category><category>Source Code</category>
+    </item>
+    <item>
+      <title>Заголовочный файл PolicyConfig.h адаптирован для Windows 7</title>
+      <pubDate>Wed, 22 Sep 2010 14:46:06 +0400</pubDate>
+      <link>https://kitere.github.io/art/07.html#UPD_22_09_2010</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/07.html#UPD_22_09_2010</guid>
+      <description><![CDATA[Заголовочный файл <a href="https://kitere.github.io/download/PolicyConfig.h">PolicyConfig.h</a> был изменен: добавлено описание для Windows 7.
+<p>&nbsp;<a href="https://kitere.github.io/art/07.html#UPD_22_09_2010">Описание изменеий</a></p>]]></description>
+      <category>COM</category><category>DefSound</category><category>Windows 7</category><category>Source Code</category><category>Default Audio</category>
+    </item>
+    <item>
+      <title>Расширение к WinDbg KdExtMod - новая версия 0.1.0.1</title>
+      <pubDate>Fri, 13 Aug 2010 22:51:39 +0400</pubDate>
+      <link>https://kitere.github.io/download/KdExtMod.rar</link>
+      <description><![CDATA[Доспупна для скачивания новая версия (0.1.0.1) расширения к WinDbg KdExtMod
+      <ul>
+        <li>исправлена x32-сборка</li>
+        <li>добавлена обработка ошибок чтения памяти</li>
+      <ul>
+<p>&gt;&nbsp;<a href="https://kitere.github.io/download/KdExtMod.rar">скачать расширение</a></p>]]></description>
+      <category>WinDbg</category><category>PE</category><category>kd-extention</category><category>pedump</category><category>kdextmod</category>
+    </item>
+    <item>
+      <title>Печать таблицы системных сервисов: скрипты для WinDbg</title>
+      <pubDate>Wed, 11 Aug 2010 15:35:48 +0400</pubDate>
+      <link>https://kitere.github.io/kd/scripts.html</link>
+      <description>
+        <![CDATA[Добавлены два <a href="https://kitere.github.io/kd/scripts.html">скрипта&nbsp;к WinDbg</a> для просмотра списка системных сервисов:
+        <ul>
+          <li><a href="https://kitere.github.io/download/DCMD/SSDT_Print_Live.rar">скрипт</a> для режима отладки ядра</li>
+          <li><a href="https://kitere.github.io/download/DCMD/SSDT_Print_ntoskrnl.rar">скрипт</a> для режима загрузки ядра Windows как дампа падения</li>
+        </ul>]]>
+      </description>
+      <category>WinDbg</category><category>script file</category><category>SSTD</category><category>system services</category>
+    </item>
+    <item>
+      <title>Таблица разрешенных символов в именах файлов для разных файловых систем</title>
+      <pubDate>Wed, 11 Aug 2010 14:31:47 +0400</pubDate>
+      <link>https://kitere.github.io/art/08.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/08.html</guid>
+      <description><![CDATA[Таблица – шпаргалка, по которой можно определять возможность использования конкретного символа в файловой системе Windows. 
+      <p>Актуальность таблицы проверена на линейке Windows 2000 – Windows 7.</p>
+      <p>&gt;&nbsp;<a href="https://kitere.github.io/art/08.html">полный текст</a></p>]]></description>
+      <category>kernel</category><category>file system</category><category>validate file name</category>
+    </item>
+    <item>
+      <title>Описатели объектов Windows: взгляд из ядра</title>
+      <pubDate>Wed, 7 Jul 2010 16:37:45 +0400</pubDate>
+      <link>https://kitere.github.io/art/03.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/03.html</guid>
+      <description><![CDATA[Небольшая заметка об использовании описателей из ядра. Основное внимание уделено описателям ядра (Kernel Handles)
+<p>&gt;&nbsp;<a href="https://kitere.github.io/art/03.html">полный текст</a></p>]]></description>
+      <category>kernel</category><category>handle</category>
+    </item>
+    <item>
+      <title>Создание PE-файла по загруженному в память образу: расширение к WinDbg </title>
+      <pubDate>Thu, 6 May 2010 21:31:47 +0400</pubDate>
+      <link>https://kitere.github.io/kd/pedump.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/pedump.html</guid>
+      <description><![CDATA[Описание расширения для WinDbg, которое дампит PE-файл по загруженному образу в памяти.
+<p>&gt;&nbsp;<a href="https://kitere.github.io/kd/pedump.html">полный текст</a></p>
+<p>&gt;&nbsp;<a href="https://kitere.github.io/download/KdExtMod.rar">скачать расширение</a></p>]]></description>
+      <category>WinDbg</category><category>PE</category><category>kd-extention</category>
+    </item>
+    <item>
+      <title>Debugger Markup Language (DML): краткий обзор</title>
+      <pubDate>Tue, 4 May 2010 16:57:16 +0400</pubDate>
+      <link>https://kitere.github.io/kd/dml.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/dml.html</guid>
+      <description><![CDATA[Небольшой обзор использования Debugger Markup Language (<strong>DML</strong>): языка разметки отладчика WinDbg.
+<p>&gt;&nbsp;<a href="https://kitere.github.io/kd/dml.html">полный текст</a></p>]]></description>
+      <category>WinDbg</category><category>DML</category>
+    </item>
+    <item>
+      <title>Доступна версия 0.1.1.0 утилиты установки аудио устройства по умолчанию: DefSound</title>
+      <pubDate>Mon, 19 Apr 2010 03:09:56 +0400</pubDate>
+      <link>https://kitere.github.io/DefSound.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/DefSound.html</guid>
+      <description><![CDATA[Собрана и доступна для скачивания новая версия 0.1.1.0 утилиты установки аудио устройства по умолчанию DefSound. 
+<p><a href="https://kitere.github.io/DefSound.html">Описание</a></p>
+<p><a href="https://kitere.github.io/download/DefSound.rar">Скачать утилиту</a></p>]]></description>
+      <category>DefSound</category><category>Util</category><category>Source Code</category>
+    </item>
+    <item>
+      <title>Получение таблицы обработчиков RPC-сервера: скрипт для WinDbg</title>
+      <pubDate>Tue, 13 Apr 2010 14:02:58 +0400</pubDate>
+      <link>https://kitere.github.io/kd/RpcServer_IfHandle.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/RpcServer_IfHandle.html</guid>
+      <description><![CDATA[Описание скрипта для WinDbg, который позволяет получить список функций-обработчиков RPC-сервера на примере <strong>services.exe</strong>
+<p>&gt;&nbsp;<a href="https://kitere.github.io/kd/RpcServer_IfHandle.html">полный текст</a></p>]]></description>
+      <category>WinDbg</category><category>RPC</category><category>services.exe</category><category>script file</category>
+    </item>
+    <item>
+      <title>Противодействие splice-перехватам системных библиотек: обходим Hacker Defender с помощью ONTL</title>
+      <pubDate>Fri, 26 Mar 2010 20:06:46 +0300</pubDate>
+      <link>https://kitere.github.io/art/02.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/02.html</guid>
+      <description><![CDATA[В данной статье я хочу описать способ противодействия перехватам в системной библиотеке. Обходить будем известный <I>"учебный" rootkit</I> <a href="http://www.rootkit.com/board_project_fused.php?did=proj5" target=_blank>Hacker Defender</a>. 
+<p>&gt;&nbsp;<a href="https://kitere.github.io/art/02.html">полный текст</a></p>]]></description>
+      <category>hook</category><category>splice</category><category>ONTL</category><category>Source Code</category>
+    </item>
+    <item>
+      <title>Прямые ссылки для скачивания отладчика WinDBG</title>
+      <pubDate>Fri, 26 Mar 2010 20:04:36 +0300</pubDate>
+      <link>https://kitere.github.io/kd/WinDBG_Download.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/WinDBG_Download.html</guid>
+      <description><![CDATA[С недавнего времени, Microsoft уже не дает скачать отладчик WinDBG отдельно. Для получения последней версии необходимо качать весь образ <a href="http://www.microsoft.com/whdc/DevTools/WDK/WDKpkg.mspx" target=_blank>WDK</a>. Это не всегда удобно, поэтому я выкладываю на своем ресурсе ссылки для прямого скачивания дистрибутивов: 
+<ul>
+<li><a href="https://kitere.github.io/download/dbg_6.12.2.633_x86.msi">ver. v6.12.2.633 x32</a> 
+<li><a href="https://kitere.github.io/download/dbg_6.12.2.633_amd64.msi">ver. v6.12.2.633 amd64</a></li></ul>
+<p>&gt;&nbsp;<a href="https://kitere.github.io/kd/WinDBG_Download.html">страница для скачивания</a></p>]]></description>
+      <category>WinDbg</category><category>Download</category>
+    </item>
+    <item>
+      <title>Установка устройства аудио-воспроизведения по умолчанию, используя недокументированный COM-интерфейс IPolicyConfig</title>
+      <pubDate>Fri, 26 Mar 2010 20:02:33 +0300</pubDate>
+      <link>https://kitere.github.io/art/07.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/07.html</guid>
+      <description><![CDATA[Как выяснилось, установить устройство воспроизведения по умолчанию документированным способом не возможно. Пришлось вооружиться стандартным боекомплектом: <B>IDA</B> и <B>WinDBG</B>. 
+<p>&gt;&nbsp;<a href="https://kitere.github.io/art/07.html">полный текст</a></p>]]></description>
+      <category>COM</category><category>DefSound</category><category>reverse</category><category>Source Code</category>
+    </item>
+    <item>
+      <title>Анализ splice-перехватов функций системных вызов или использование XDE-дизассемблера в "мирных" целях</title>
+      <pubDate>Fri, 26 Mar 2010 20:00:27 +0300</pubDate>
+      <link>https://kitere.github.io/art/05.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/05.html</guid>
+      <description><![CDATA[В этой статье я хочу привести пример использования <a href=" http://vx.netlux.org/vx.php?id=ex01" target=_blank>XDE - дизассемблера от Z0mbie</a> в целях анализа кода системных функций.
+<p>&gt;&nbsp;<a href="https://kitere.github.io/art/05.html">полный текст</a></p>]]></description>
+      <category>hook</category><category>splice</category><category>XDE</category><category>Source Code</category>
+    </item>
+    <item>
+      <title>Класс загрузки драйвера, расположенного в ресурсах: TResourceDrv</title>
+      <pubDate>Fri, 26 Mar 2010 19:56:56 +0300</pubDate>
+      <link>https://kitere.github.io/art/06.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/art/06.html</guid>
+      <description><![CDATA[Часто приходится писать небольшие утилиты, которым необходима поддержка со стороны ядра. Для этого нужно писать отдельный драйвер. Но "таскать" драйвер с файлом утилиты некрасиво. Что бы не писать постоянно один и тот же код по распаковке модуля драйвера на <br/>носитель и его загрузке в систему я написал небольшой класс <a href="https://kitere.github.io/download/RsrcDrv.rar">TResourceDrv</a>. 
+<p>&gt;&nbsp;<a href="https://kitere.github.io/art/06.html">полный текст</a></p>]]></description>
+      <category>Source Code</category><category>Driver</category>
+    </item>
+  </channel>
+</rss>
