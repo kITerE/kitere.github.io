@@ -1,0 +1,97 @@
+Microsoft (R) COFF/PE Dumper Version 9.00.30729.01
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file msrpc.sys
+
+File Type: DLL
+
+  Section contains the following exports for msrpc.sys
+
+    00000000 characteristics
+    4549A065 time date stamp Thu Nov 02 10:38:13 2006
+        0.00 version
+           1 ordinal base
+          66 number of functions
+          66 number of names
+
+    ordinal hint RVA      name
+
+          1    0 00028014 DllInitialize = _DllInitialize@4
+          2    1 00006006 DllUnload = _DllUnload@0
+          3    2 00006013 I_RpcAllocate = _MIDL_user_allocate@4
+          4    3 00006097 I_RpcCompleteAndFree = _I_RpcCompleteAndFree@12
+          5    4 00006087 I_RpcExceptionFilter = _I_RpcExceptionFilter@4
+          6    5 000061C0 I_RpcFreeBuffer = _I_RpcFreeBuffer@4
+          7    6 0000896F I_RpcFreePipeBuffer = _I_RpcFreePipeBuffer@4
+          8    7 0000624C I_RpcGetBuffer = _I_RpcGetBuffer@4
+          9    8 000061E8 I_RpcGetBufferWithObject = _I_RpcGetBufferWithObject@8
+         10    9 0000610E I_RpcGetCompleteAndFreeRoutine = _I_RpcGetCompleteAndFreeRoutine@0
+         11    A 0001426B MesBufferHandleReset = _MesBufferHandleReset@24
+         12    B 00015597 MesDecodeBufferHandleCreate = _MesDecodeBufferHandleCreate@12
+         13    C 00015461 MesDecodeIncrementalHandleCreate = _MesDecodeIncrementalHandleCreate@12
+         14    D 00015535 MesEncodeDynBufferHandleCreate = _MesEncodeDynBufferHandleCreate@12
+         15    E 000154C3 MesEncodeFixedBufferHandleCreate = _MesEncodeFixedBufferHandleCreate@16
+         16    F 000153FE MesEncodeIncrementalHandleCreate = _MesEncodeIncrementalHandleCreate@16
+         17   10 0001411B MesHandleFree = _MesHandleFree@4
+         18   11 0001417C MesIncrementalHandleReset = _MesIncrementalHandleReset@24
+         19   12 0001561B MesInqProcEncodingId = _MesInqProcEncodingId@12
+         20   13 00013E18 NDRCContextBinding = _NDRCContextBinding@4
+         21   14 00013E2B NDRCContextMarshall = _NDRCContextMarshall@8
+         22   15 00013FA3 NDRCContextUnmarshall = _NDRCContextUnmarshall@16
+         23   16 00015DDE NdrAllocate = _NdrAllocate@8
+         24   17 00016751 NdrAsyncClientCall = _NdrAsyncClientCall
+         25   18 00016AEA NdrClientCall2 = _NdrClientCall2
+         26   19 00017684 NdrClientContextMarshall = _NdrClientContextMarshall@12
+         27   1A 00019A3D NdrClientContextUnmarshall = _NdrClientContextUnmarshall@12
+         28   1B 00015B90 NdrClientInitialize = _NdrClientInitialize@16
+         29   1C 000160A0 NdrClientInitializeNew = _NdrClientInitializeNew@16
+         30   1D 00014729 NdrMesProcEncodeDecode = _NdrMesProcEncodeDecode
+         31   1E 00014A57 NdrMesProcEncodeDecode2 = _NdrMesProcEncodeDecode2
+         32   1F 000151A7 NdrMesSimpleTypeAlignSize = _NdrMesSimpleTypeAlignSize@4
+         33   20 0001528C NdrMesSimpleTypeDecode = _NdrMesSimpleTypeDecode@12
+         34   21 000151E3 NdrMesSimpleTypeEncode = _NdrMesSimpleTypeEncode@16
+         36   22 00014CA8 NdrMesTypeAlignSize = _NdrMesTypeAlignSize@16
+         35   23 00015719 NdrMesTypeAlignSize2 = _NdrMesTypeAlignSize2@20
+         38   24 00014F23 NdrMesTypeDecode = _NdrMesTypeDecode@16
+         37   25 000159A0 NdrMesTypeDecode2 = _NdrMesTypeDecode2@20
+         40   26 00014D96 NdrMesTypeEncode = _NdrMesTypeEncode@16
+         39   27 0001586A NdrMesTypeEncode2 = _NdrMesTypeEncode2@20
+         41   28 0001507D NdrMesTypeFree2 = _NdrMesTypeFree2@20
+         42   29 000062DE RpcAsyncCancelCall = _RpcAsyncCancelCall@8
+         43   2A 0001672A RpcAsyncCompleteCall = _RpcAsyncCompleteCall@8
+         44   2B 00006264 RpcAsyncGetCallStatus = _RpcAsyncGetCallStatus@4
+         45   2C 000163DE RpcAsyncInitializeHandle = _RpcAsyncInitializeHandle@8
+         46   2D 000063FF RpcBindingBind = _RpcBindingBind@12
+         47   2E 0000631F RpcBindingCopy = _RpcBindingCopy@8
+         48   2F 00006621 RpcBindingCreateW = _RpcBindingCreateW@16
+         49   30 00006394 RpcBindingFree = _RpcBindingFree@4
+         50   31 000063CE RpcBindingReset = _RpcBindingReset@4
+         51   32 000064FE RpcBindingSetAuthInfoExW = _RpcBindingSetAuthInfoExW@28
+         52   33 000066E2 RpcBindingSetAuthInfoW = _RpcBindingSetAuthInfoW@24
+         53   34 00006709 RpcBindingSetOption = _RpcBindingSetOption@12
+         54   35 00006439 RpcBindingUnbind = _RpcBindingUnbind@4
+         55   36 0000606C RpcExceptionFilter = _RpcExceptionFilter@4
+         56   37 000068A9 RpcRaiseException = _RpcRaiseException@4
+         57   38 00013FE5 RpcSsDestroyClientContext = _RpcSsDestroyClientContext@4
+         58   39 00006B7C RpcStringFreeW = _RpcStringFreeW@4
+         59   3A 00006C83 UuidCompare = _UuidCompare@12
+         60   3B 00006BA7 UuidCreate = _UuidCreateSequential@4
+         61   3C 00006BED UuidCreateNil = _UuidCreateNil@4
+         62   3D 00006BA7 UuidCreateSequential = _UuidCreateSequential@4
+         63   3E 00006D19 UuidEqual = _UuidEqual@12
+         64   3F 00006C2A UuidFromStringW = _UuidFromStringW@8
+         65   40 00006C05 UuidIsNil = _UuidIsNil@8
+         66   41 00006BB8 UuidToStringW = _UuidToStringW@8
+
+  Summary
+
+        1000 .data
+        1000 .edata
+        3000 .rdata
+        1000 .reloc
+        1000 .rsrc
+        1000 .text
+        1000 INIT
+       20000 PAGEKRPC
+        1000 PAGERPCD

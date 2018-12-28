@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Deadlock при использовании ObOpenObjectByPointer для ключей реестра на Win XP SP2</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, ObOpenObjectByPointer, CmLoadKey, NtLoadKey, NtUnloadKey, CmpLockRegistry, ExAcquireResourceSharedLite, deadlock" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Deadlock при использовании ObOpenObjectByPointer для ключей реестра на Win XP SP2
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+На описываемую далее взаимо-блокировку я наталкивался минимум дважды, и теперь 
+решил описать суть проблемы. Есть полезная документированная функция 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff550985(v=vs.85).aspx">ObOpenObjectByPointer</a>, 
+которая позволяет создавать описатели на объекты ядра по указателю на объект. 
+Она, в ходе своего исполнения, вызывает security-обработчик для целевого типа 
+объекта. Это и сыграло решающую роль в формировании описываемого deadlock'а.
+                </p>
+            <br />
+                <p>
+Схема воспроизведения достаточно проста: на машине с Windows XP SP2 запускаем 
+драйвер, который постоянно вызывает <b>ObOpenObjectByPointer</b> и процесс, 
+который в бесконечном цикле загружает и выгружает hiv'ы реестра. Достаточно 
+быстро система просто замирает. В частности, рабочая нить драйвера находится в 
+следующем состоянии:
+                </p>
+            <br />
+                <div class="code">
+b28a5a60 80502b17 82365d90 82365d20 804fad6c nt!KiSwapContext+0x2f
+b28a5a6c 804fad6c 00000000 805591e0 82365d20 nt!KiSwapThread+0x6b
+b28a5a94 80534d40 00000000 00000000 00000000 nt!KeWaitForSingleObject+0x1c2
+b28a5ad0 805352da b28a5b98 825bc680 b28a5b8c nt!ExpWaitForResource+0xd4
+b28a5af0 80629d19 805591e0 00000001 80634df3 nt!ExAcquireResourceSharedLite+0xca
+b28a5afc 80634df3 b28a5b98 825bc680 b28a5b8c nt!CmpLockRegistry+0x27
+b28a5b34 805be714 e1fc47c8 00000001 b28a5b68 nt!CmpSecurityMethod+0x17
+b28a5b70 805beaf5 e1fc47c8 b28a5b98 e1fc47c4 nt!ObGetObjectSecurity+0x96
+b28a5b9c 805bb8c2 e1fc47c8 b28a5cd4 00000001 nt!ObCheckObjectAccess+0x29
+b28a5c38 805bbf13 00000001 825c6830 e1fc47c8 nt!ObpIncrementHandleCount+0x1e8
+b28a5c98 805ba6d8 00000001 e1fc47c8 00000000 nt!ObpCreateHandle+0x161
+b28a5d68 f8cc14ed e1fc47c8 00000200 00000000 nt!ObOpenObjectByPointer+0xa4
+b28a5dac 805ce794 00000000 00000000 00000000 openkey!WorkThreadRoutine+0x5d
+b28a5ddc 805450ce f8cc1490 00000000 00000000 nt!PspSystemThreadStartup+0x34
+00000000 00000000 00000000 00000000 00000000 nt!KiThreadStartup+0x16
+                </div>
+            <br />
+                <p>
+Фактически, нить ожидает глобальный ресурс реестра (Cm-блокировка). Смотрим, 
+кто же захватил этот ресурс:
+                </p>
+            <br />
+                <div class="code">
+1: kd> !locks 805591e0
+
+Resource @ nt!CmpRegistryLock (0x805591e0)    Exclusively owned
+    Contention Count = 1975
+    NumberOfSharedWaiters = 8
+     Threads: 81f88c90-01&lt;*&gt; 82104b30-01    82365d20-01    81f95b08-01    
+              82169798-01    825c48b8-01    82367480-01    824aa250-01    
+              824026c8-01    
+1 total locks, 1 locks currently held
+1: kd> .thread 81f88c90
+Implicit thread is now 81f88c90
+1: kd> kb
+  *** Stack trace for last set context - .thread/.cxr resets it
+ChildEBP RetAddr  Args to Child              
+b283d940 80502b17 81f88d00 81f88c90 804fad6c nt!KiSwapContext+0x2f
+b283d94c 804fad6c 00000000 825bc7d8 81f88c90 nt!KiSwapThread+0x6b
+b283d974 80534d40 00000000 00000000 00000000 nt!KeWaitForSingleObject+0x1c2
+b283d9b0 80535198 e1e6c360 e1e6c378 825bc680 nt!ExpWaitForResource+0xd4
+b283d9d0 805bb735 825bc7d8 00000001 8251f368 nt!ExAcquireResourceExclusiveLite+0x8e
+b283da60 805bbf13 00000000 8236f6b0 e1e6c378 nt!ObpIncrementHandleCount+0x5b
+b283dac0 805ba515 00000000 e1e6c378 825bc680 nt!ObpCreateHandle+0x161
+b283db10 8062358d 00000000 825bc680 80000600 nt!ObOpenObjectByName+0x267
+b283dbe4 8054060c b283dca4 0002001f b283dc7c nt!NtOpenKey+0x1af
+b283dbe4 804ff9fd b283dca4 0002001f b283dc7c nt!KiFastCallEntry+0xfc
+b283dc68 80639d44 b283dca4 0002001f b283dc7c nt!ZwOpenKey+0x11
+b283dca8 806310a7 e1d48628 00000020 e1d37d38 nt!CmpRemoveFromHiveFileList+0x48
+b283dcc0 80620b5c e1d48628 00000020 e1d91518 nt!CmUnloadKey+0x55
+b283dd58 8054060c 0012fee0 0012fef8 7c90eb94 nt!NtUnloadKey+0x18c
+                </div>
+            <br />
+                <p>
+Как видно из стека вызовов, нить эксклюзивно захватившая глобальный ресурс 
+реестра выгружает hive. И в свою очередь эта нить ожидает захвата ресурса 
+дерева объектов (Ob-блокировка):
+                </p>
+            <br />
+                <div class="code">
+1: kd> !locks 825bc7d8
+
+Resource @ 0x825bc7d8    Exclusively owned
+    Contention Count = 9195
+    NumberOfExclusiveWaiters = 1
+     Threads: 82365d20-01&lt;*&gt;
+     Threads Waiting On Exclusive Access:
+              81f88c90       
+
+1 total locks, 1 locks currently held
+1: kd> .thread 82365d20
+Implicit thread is now 82365d20
+1: kd> kb
+  *** Stack trace for last set context - .thread/.cxr resets it
+ChildEBP RetAddr  Args to Child              
+b28a5a60 80502b17 82365d90 82365d20 804fad6c nt!KiSwapContext+0x2f
+b28a5a6c 804fad6c 00000000 805591e0 82365d20 nt!KiSwapThread+0x6b
+b28a5a94 80534d40 00000000 00000000 00000000 nt!KeWaitForSingleObject+0x1c2
+b28a5ad0 805352da b28a5b98 825bc680 b28a5b8c nt!ExpWaitForResource+0xd4
+b28a5af0 80629d19 805591e0 00000001 80634df3 nt!ExAcquireResourceSharedLite+0xca
+b28a5afc 80634df3 b28a5b98 825bc680 b28a5b8c nt!CmpLockRegistry+0x27
+b28a5b34 805be714 e1fc47c8 00000001 b28a5b68 nt!CmpSecurityMethod+0x17
+b28a5b70 805beaf5 e1fc47c8 b28a5b98 e1fc47c4 nt!ObGetObjectSecurity+0x96
+b28a5b9c 805bb8c2 e1fc47c8 b28a5cd4 00000001 nt!ObCheckObjectAccess+0x29
+b28a5c38 805bbf13 00000001 825c6830 e1fc47c8 nt!ObpIncrementHandleCount+0x1e8
+b28a5c98 805ba6d8 00000001 e1fc47c8 00000000 nt!ObpCreateHandle+0x161
+b28a5d68 f8cc14ed e1fc47c8 00000200 00000000 nt!ObOpenObjectByPointer+0xa4
+b28a5dac 805ce794 00000000 00000000 00000000 openkey!WorkThreadRoutine+0x5d
+b28a5ddc 805450ce f8cc1490 00000000 00000000 nt!PspSystemThreadStartup+0x34
+00000000 00000000 00000000 00000000 00000000 nt!KiThreadStartup+0x16
+                </div>
+            <br />
+                <p>
+Что и приводит нас к начальной нити, вызвавшей <b>ObOpenObjectByPointer</b>. 
+Это и есть классический пример взаимо-блокировки, когда два синхро-объекта 
+захватываются в разных нитях в разном порядке.
+                </p>
+            <br />
+                <p>
+В коде WRK 1.2 эту ситуацию можно отследить по исходным кодам. И так же по 
+исходным кодам можно убедиться, что ядро никогда не вызывает функции, 
+приводящие к Ob-блокировке, не захватив предварительно Cm-блокировку.
+                </p>
+            <br />
+                <p>
+В конце хочется сказать, что в WinXP SP3 ситуация в корне изменилась. По коду 
+нет вызовов, приводящих к захвату Ob-блокировки при захваченной Cm-блокировке. 
+Поэтому на WinXP SP3 и старше можно смело использовать 
+<b>ObOpenObjectByPointer</b> для объектов ключей реестра.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

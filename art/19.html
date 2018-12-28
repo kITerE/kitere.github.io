@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Нюансы использования FsRtlIsNameInExpression</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, FsRtlIsNameInExpression, FsRtlIsDbcsInExpression, RtlpIsNameInExpressionPrivate, RtlRaiseStatus" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Нюансы использования FsRtlIsNameInExpression
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Разработчикам драйверов режима ядра доступна функция 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff546850(v=vs.85).aspx">FsRtlIsNameInExpression</a>. 
+Эта функция позволяет сравнивать строковое имя с шаблоном, содержащим wildcard'ы.
+                </p>
+            <br />
+                <p>
+Сразу настораживает, что такая не простая функция не возвращает статус 
+<b>NTSTATUS</b>, если происходит ошибка ее исполнения. Взглянем на эту функцию в 
+Windows 8 (build 9200) под дизассемблером (можно параллельно смотреть в код WRK, 
+там ситуация аналогична, Windows 8 выбрана как более актуальная сборка ядра). 
+Сразу бросается в глаза, что если задан параметр IgnoreCase и не задан 
+UpcaseTable, то функция делает локальную копию строки Name в верхнем регистре 
+вызовом 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff563005(v=vs.85).aspx">RtlUpcaseUnicodeString</a>. 
+Куда же попадает статус ошибки, если перевод в верхний регистр не успешен? 
+В вызов RtlRaiseStatus! 
+То есть генерируется исключение, к которому должен быть готов вызывающий код. 
+Но об этом нет ни слова на странице описания функции. Конечно, именно этот 
+случай легко обойти: в вызывающем коде переводить строку в верхний регистр и 
+указывать сравнение с учетом регистра. Но стоит посмотреть немного глубже. Далее 
+управление передается в неэкспортируемую функцию RtlpIsNameInExpressionPrivate. 
+По одной из веток исполнения этой функции происходит вызов 
+ExAllocatePoolWithTag. Если выделение памяти не удастся, то вызовется 
+RtlRaiseStatus(STATUS_NO_MEMORY).
+                </p>
+            <br />
+                <p>
+Вывод из всего вышесказанного простой: вызывать функцию 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff546850(v=vs.85).aspx">FsRtlIsNameInExpression</a> 
+нужно всегда внутри блоки обработки исключений.
+                </p>
+            <br />
+                <p>
+P.S. Функция 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff546803(v=vs.85).aspx">FsRtlIsDbcsInExpression</a> 
+обладает тем же подводным камнем: может бросить исключение.
+                </p>
+            <br />
+                <p>
+Если посмотреть на описание соседних функций FsRtlXxx то, для некоторых явно 
+указано, что они бросают исключение, например:
+                </p>
+                <ul>
+<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff545675(v=vs.85).aspx">FsRtlAllocatePoolWithTag</a> (<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff545651(v=vs.85).aspx">FsRtlAllocatePool</a>)</li>
+<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff545665(v=vs.85).aspx">FsRtlAllocatePoolWithQuotaTag</a> (<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff545659(v=vs.85).aspx">FsRtlAllocatePoolWithQuota</a>)</li>
+<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff545587(v=vs.85).aspx">FsRtlAddLargeMcbEntry</a> (<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff545592(v=vs.85).aspx">FsRtlAddMcbEntry</a>)</li>
+<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff547045(v=vs.85).aspx">FsRtlNotifyInitializeSync</a></li>
+                </ul>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

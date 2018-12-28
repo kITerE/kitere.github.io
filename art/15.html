@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Неожиданный статус в рекурсивном вызове реестровой функции из Cm-callback'а</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, CmpCallCallBacks, cmregistercallback, uninitialized variable" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Неожиданный статус в рекурсивном вызове реестровой функции из Cm-callback'а
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+        <br />
+            <div class="epigraph">
+<p>Буратино дали три яблока. Два он съел.</p>
+<p>Сколько яблок осталось у Буратино?</p>
+<p>Никто не знает сколько у него уже было яблок до этого</p>
+            </div>
+            <br />
+                <p>
+А вот авторы ядра Windows XP, видимо, не знают этот поучительный анекдот. 
+Отлаживал я фильтр реестра, реализованный на Cm-callback'ах. В коде фильтра было 
+получение значения ключей реестра. А суть проблемы заключалась в том, иногда 
+вместо статуса Zw-функции возвращалось значение, даже отдаленно не напоминающее 
+статус, например: 0x80569d3c. Самое обидное, что повторный вызов давал уже 
+нормальное значение статуса.
+                </p>
+            <br />
+                <p>
+После некоторого времени, потраченного на трассировку выяснилось, что такой 
+статус возвращается из функции nt!CmpCallCallBacks, при этом это точно не статус 
+из какого-либо callback'а. А теперь внимательно взглянем на функцию:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+0: kd> uf nt!CmpCallCallBacks
+nt!CmpCallCallBacks:
+80569d3c 8bff            mov     edi,edi
+80569d3e 55              push    ebp
+80569d3f 8bec            mov     ebp,esp
+80569d41 83ec14          sub     esp,14h
+80569d44 8365fc00        and     dword ptr [ebp-4],0
+80569d48 53              push    ebx
+80569d49 56              push    esi
+80569d4a 57              push    edi
+80569d4b bba0935580      mov     ebx,offset nt!CmpCallBackVector (805593a0)
+
+nt!CmpCallCallBacks+0x14:
+80569d50 53              push    ebx
+80569d51 e8b6150a00      call    nt!ExReferenceCallBackBlock (8060b30c)
+80569d56 8bf8            mov     edi,eax
+80569d58 85ff            test    edi,edi
+80569d5a 745f            je      nt!CmpCallCallBacks+0x7f (80569dbb)
+
+nt!CmpCallCallBacks+0x20:
+80569d5c 57              push    edi
+80569d5d e8be130a00      call    nt!ExGetCallBackBlockContext (8060b120)
+80569d62 8bf0            mov     esi,eax
+80569d64 64a124010000    mov     eax,dword ptr fs:[00000124h]
+80569d6a 8945f4          mov     dword ptr [ebp-0Ch],eax
+80569d6d 8d45ec          lea     eax,[ebp-14h]
+80569d70 50              push    eax
+80569d71 56              push    esi
+80569d72 e86bffffff      call    nt!CmpCheckRecursionAndRecordThreadInfo (80569ce2)
+80569d77 84c0            test    al,al
+80569d79 7432            je      nt!CmpCallCallBacks+0x71 (80569dad)
+
+nt!CmpCallCallBacks+0x3f:
+80569d7b ff750c          push    dword ptr [ebp+0Ch]
+80569d7e ff7508          push    dword ptr [ebp+8]
+80569d81 ff7630          push    dword ptr [esi+30h]
+80569d84 57              push    edi
+80569d85 e882130a00      call    nt!IopGetRelationsTaggedCount (8060b10c)
+80569d8a ffd0            call    eax
+80569d8c 83c610          add     esi,10h
+80569d8f 8bce            mov     ecx,esi
+80569d91 8945f8          mov     dword ptr [ebp-8],eax
+80569d94 ff1518814d80    call    dword ptr [nt!_imp_ExAcquireFastMutex (804d8118)]
+80569d9a 8b4df0          mov     ecx,dword ptr [ebp-10h]
+80569d9d 8b45ec          mov     eax,dword ptr [ebp-14h]
+80569da0 8901            mov     dword ptr [ecx],eax
+80569da2 894804          mov     dword ptr [eax+4],ecx
+80569da5 8bce            mov     ecx,esi
+80569da7 ff151c814d80    call    dword ptr [nt!_imp_ExReleaseFastMutex (804d811c)]
+
+nt!CmpCallCallBacks+0x71:
+80569dad 57              push    edi
+80569dae 53              push    ebx
+80569daf e85a160a00      call    nt!ExDereferenceCallBackBlock (8060b40e)
+80569db4 8b45f8          mov     eax,dword ptr [ebp-8]
+80569db7 85c0            test    eax,eax
+80569db9 7c12            jl      nt!CmpCallCallBacks+0x91 (80569dcd)
+
+nt!CmpCallCallBacks+0x7f:
+80569dbb 8345fc04        add     dword ptr [ebp-4],4
+80569dbf 83c304          add     ebx,4
+80569dc2 817dfc90010000  cmp     dword ptr [ebp-4],190h
+80569dc9 7285            jb      nt!CmpCallCallBacks+0x14 (80569d50)
+
+nt!CmpCallCallBacks+0x8f:
+80569dcb 33c0            xor     eax,eax
+
+nt!CmpCallCallBacks+0x91:
+80569dcd 5f              pop     edi
+80569dce 5e              pop     esi
+80569dcf 5b              pop     ebx
+80569dd0 c9              leave
+80569dd1 c20800          ret     8
+                </pre>
+            <br />
+                <p>
+И представим ситуацию: у нас есть один зарегистрированный callback, который 
+рекурсивно вызвал функцию реестра. Мы доходим до адреса 80569d72, проверяем, что 
+рекурсия и идем в ветку 80569dad, где есть следующий код:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+80569db4 8b45f8          mov     eax,dword ptr [ebp-8]
+80569db7 85c0            test    eax,eax
+80569db9 7c12            jl      nt!CmpCallCallBacks+0x91 (80569dcd)
+...
+nt!CmpCallCallBacks+0x91:
+80569dcd 5f              pop     edi
+80569dce 5e              pop     esi
+80569dcf 5b              pop     ebx
+80569dd0 c9              leave
+80569dd1 c20800          ret     8
+                </pre>
+            <br />
+                <p>
+И все бы хорошо, но переменная ebp-8 не была проинициализирована. Забавно, но 
+чаще всего возвращается значение, которое соответствует адресу начала функции 
+nt!CmpCallCallBacks. Именно трассировкой этого значения в eax и было 
+локализовано место ошибки.
+                </p>
+            <br />
+                <p>
+На последок был написан патч к прологу функции, решающий эту проблему:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+31C0      xor          eax,eax
+C8140000  enter        00014,0
+8945FC    mov          [ebp][-4],eax
+8945F8    mov          [ebp][-8],eax
+                </pre>
+            <br />
+                <p>
+Все мои тестовые машины с XP (SP3 включительно, правда не обновлялась она уже 
+прилично) подвержены этой проблеме. А вот Win2k3 SP1 R2 и WRK имеют 
+инициализацию проблемной переменной в начале функции.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

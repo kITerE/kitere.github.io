@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Новый бит маски доступа к объекту нити (thread) в Windows 8.1: THREAD_RESUME</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, ResumeThread, NtResumeThread, THREAD_SUSPEND_RESUME, THREAD_RESUME" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Новый бит маски доступа к объекту нити (thread) в Windows 8.1: THREAD_RESUME
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+До Windows 8.1 операции приостановки и возобновления нити контролировались одной 
+маской доступа, что отражает статья 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms686769(v=vs.85).aspx">Thread Security and Access Rights</a>:
+                </p>
+            <br />
+                <div class="quote">
+THREAD_SUSPEND_RESUME (0x0002) Required to suspend or resume a thread (see SuspendThread and ResumeThread).
+                </div>
+            <br />
+                <p>
+И это подтверждалось телом функции NtResumeThread (6.2.9200.16384):
+                </p>
+            <br />
+                <pre class="brush: asm;">
+mov          edx,2
+mov          rcx,r10
+call         ObReferenceObjectByHandleWithTag
+                </pre>
+            <br />
+                <p>
+Но в ядре Windows 8.1 маска доступа сменилась (6.3.9600.16384):
+                </p>
+            <br />
+                <pre class="brush: asm;">
+mov          edx,000001000
+mov          rcx,r10
+call         ObReferenceObjectByHandleWithTag
+test         eax,eax
+js          .00000001`403B2F3C
+...
+; .00000001`403B2F3C:
+add          rsp,040
+pop          rbx
+retn
+                </pre>
+            <br />
+                <p>
+Что характерно, новое ядро полностью потеряло совместимость со старой маской 
+доступа. Новую константу 0x1000 можно найти в wdm.h от WDK 8.1:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+#define THREAD_RESUME                    (0x1000)  
+                </pre>
+            <br />
+                <p>
+MSDN про новый флаг ничего не рассказывает, но есть косвенное упоминание у 
+Alex Ionescu в статье 
+<a target="_blank" href="http://www.alex-ionescu.com/?p=116">The Evolution of Protected Processes Part 2: Exploit/Jailbreak Mitigations, Unkillable Processes and Protected Services</a>:
+                </p>
+            <br />
+                <div class="quote">
+and THREAD_RESUME are the rights normally given, the latter being another new Windows 8.1 access bit
+                </div>
+            <br />
+                <p>
+Остается только порадоваться, что теперь операции приостановки и возобновления 
+нити являются разными с точки зрения безопасности.
+                </p>
+            <br />
+                <p>
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

@@ -735,6 +735,7 @@
       <title>Печать таблицы системных сервисов: скрипты для WinDbg</title>
       <pubDate>Wed, 11 Aug 2010 15:35:48 +0400</pubDate>
       <link>https://kitere.github.io/kd/scripts.html</link>
+      <guid isPermaLink="true">https://kitere.github.io/kd/scripts.html</guid>
       <description>
         <![CDATA[Добавлены два <a href="https://kitere.github.io/kd/scripts.html">скрипта&nbsp;к WinDbg</a> для просмотра списка системных сервисов:
         <ul>

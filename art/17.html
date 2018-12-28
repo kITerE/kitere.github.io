@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Скрипт обновления файла ординалов для HIEW</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, HIEW, python, pefile, pykd, hiew8.ini, AutoloadOrdinals, hiew7.ord" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Скрипт обновления файла ординалов для HIEW
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Те, кто использует для <s>развлечения ;)</s> работы
+<a target="_blank" href="http://hiew.ru/">HIEW</a>,
+знают, что в его директории есть текстовый файл hiew7.ord, который 
+содержит соответствие ординалов импортов символическим именам. А видеть вызовы 
+по именам намного приятнее, чем видеть вызовы численных ординалов. Но постоянно 
+пополнять этот файл руками не очень приятно, поэтому я решил поделится своим 
+py-скриптом, который обновляет этот файл: 
+<a target="_blank" href="../download/hiew7_ord.py">hiew7_ord.py</a>
+                </p>
+            <br />
+                <p>
+Для запуска, кроме самого python'а, понадобится:
+                </p>
+<ul>
+<li><a target="_blank" href="http://code.google.com/p/pefile/">pefile</a>. Используется для разбора формата PE-файла.</li>
+<li><a target="_blank" href="http://pykd.codeplex.com/">pykd</a> версии 0.2.0.18 или старше. Используется для получения символических имен экспортов, когда имя не указано в экспорте (например, mfc90u.dll v9.0.30729.1).</li>
+</ul>
+            <br />
+                <p>
+Скрипт принимает следующие параметры командной строки:
+                </p>
+<ul>
+<li><b>Целевой путь</b>, обязательный параметр. В этом параметре необходимо указать путь к PE-файлу или директории, содержащей PE-файлы. Если указана директория, то в ней будет произведен поиск всех PE-файлов, вложенные поддиректории не обрабатываются.</li>
+<li><b>Путь к входному файлу hiew7.ord</b>, не обязательный параметр. По умолчанию используется файл hiew7.ord.</li>
+<li><b> Путь к выходному файлу hiew7.ord</b>, не обязательный параметр. По умолчанию используется файл hiew7.ord. Может совпадать с путем к входному файлу hiew7.ord.</li>
+</ul>
+            <br />
+                <p>
+Во время своей работы, после обработки очередного PE-файла, скрипт ищет нужную 
+секцию в hiew7.ord. Если секции нет, то добавляется новая (предпоследней). Если 
+секция существует, то она обновляется данными из обработанного PE-файла.
+                </p>
+            <br />
+                <p>
+P.S. По умолчанию, автоматическая подгрузка файла hiew7.ord выключена в файле 
+hiew8.ini. Это легко <i>исправляется</i> установкой в файле hiew8.ini параметра 
+<b>AutoloadOrdinals</b> в значение On.
+                </p>
+<br /><hr /><br />
+<p><a href="../download/hiew7_ord.py">Скачать скрипт hiew7_ord.py</a></p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

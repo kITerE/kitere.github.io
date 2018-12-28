@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Создание процесса из драйвера режима ядра: Windows 8</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, Windows 8, PsCaptureUserProcessParameters, _PsCaptureUserProcessParameters@8, ZwCreateUserProcess, _ZwCreateUserProcess@44, condrv.sys" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Создание процесса из драйвера режима ядра: Windows 8
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Думаю, бывало и не раз у многих, что при написании драйвера режима ядра 
+возникало желание создать настоящий процесс и делегировать часть задач ему. Но 
+до недавнего момента это было табуировано MS'ом: нужные функции просто не 
+экспортировались для драйверов из ядра ОС, оставались "грязные хаки"... И вот 
+вышла Windows 8, в линейке которой (x86/AMD64-сборки 8102, 8250, 8400 и, 
+ 9200) у ntoskrnl.exe появились пара "секретных" экспортов: безымянные 
+экспорты с ординалами 1 и 2. Но при наличии символов ядро охотно раскроет свой 
+секрет (ниже приведен отрывок из вывода команды "dumpbin /EXPORTS ntoskrnl.exe"):
+                </p>
+                <div class="code">
+...
+          1      0035E96D [NONAME] _PsCaptureUserProcessParameters@8
+          2      000F7470 [NONAME] _ZwCreateUserProcess@44
+...
+                </div>
+            <br />
+                <p>
+Набросав несложный скрипт, легко ищется виновник этого торжества: 
+<b>condrv.sys</b>: "Console Driver". Заглянув внутрь PE-файла можно найти 
+использование этих функций: запуск процесса 
+"\SystemRoot\System32\Conhost.exe" с нужными параметрами. Поймать его работу в 
+динамике тоже достаточно просто, достаточно просто запустить cmd.exe:
+                </p>
+                <div class="code">
+1: kd&gt; !thread
+THREAD 82b47300  Cid 0ee8.0eec  Teb: 7f56f000 Win32Thread: 00000000 RUNNING on processor 1
+Not impersonating
+DeviceMap                 91bf9408
+Owning Process            82ba54c0       Image:         cmd.exe
+Attached Process          N/A            Image:         N/A
+Wait Start TickCount      16360          Ticks: 0
+Context Switch Count      15             IdealProcessor: 0             
+UserTime                  00:00:00.000
+KernelTime                00:00:00.015
+Win32 Start Address cmd!mainCRTStartup (0x00ae9de1)
+Stack Init 94574de0 Current 945749f4 Base 94575000 Limit 94572000 Call 0
+Priority 8 BasePriority 8 UnusualBoost 0 ForegroundBoost 0 IoPriority 2 PagePriority 5
+ChildEBP RetAddr  Args to Child              
+94574aa4 935e05b6 94574bac 94574b44 02000000 nt!ZwCreateUserProcess (FPO: [11,0,0])
+94574b74 935e0664 94574bac 1360de35 82b3fc28 condrv!CdpCreateProcess+0xba (FPO: [Non-Fpo])
+94574bf8 935e0935 00000001 006e20a8 82b3fc28 condrv!CdpLaunchServerProcess+0x80 (FPO: [Non-Fpo])
+94574c1c 935de35e 939b0de0 006e20a8 00000580 condrv!CdpServerFastIoctl+0x11b (FPO: [7,1,4])
+94574c40 810cba8b 82b3fc28 00000001 006e20a8 condrv!CdpFastIoDeviceControl+0x44 (FPO: [Non-Fpo])
+94574cf0 810d1ace 82b3fc54 00000000 00000000 nt!IopXxxControlFile+0x3d0 (FPO: [Non-Fpo])
+94574d24 80fc5c6c 0000000c 00000000 00000000 nt!NtDeviceIoControlFile+0x2a (FPO: [Non-Fpo])
+94574d24 77046f54 0000000c 00000000 00000000 nt!KiFastCallEntry+0x12c (FPO: [0,3] TrapFrame @ 94574d54)
+0063ee98 7704600a 74b4c21e 0000000c 00000000 ntdll!KiFastSystemCallRet (FPO: [0,0,0])
+0063ee9c 74b4c21e 0000000c 00000000 00000000 ntdll!NtDeviceIoControlFile+0xa (FPO: [10,0,0])
+0063eee0 74b4bfbb 0063ef18 0063ef0c 0000000c KERNELBASE!ConsoleLaunchServerProcess+0x59 (FPO: [Non-Fpo])
+0063f158 74b17dc1 000004c0 00000001 7f568000 KERNELBASE!ConsoleAllocate+0xe1 (FPO: [Non-Fpo])
+0063f190 74b1f140 74b00000 00000001 006e1a60 KERNELBASE!ConsoleInitialize+0x189 (FPO: [0,9,4])
+0063f3d4 74b0d90b 74b00000 00000000 0063f3fc KERNELBASE!_KernelBaseBaseDllInitialize+0x3a1 (FPO: [Non-Fpo])
+0063f3e8 7705ef28 74b00000 00000001 00000000 KERNELBASE!KernelBaseDllInitialize+0x14 (FPO: [Non-Fpo])
+0063f408 7705efcc 74b0d8f7 74b00000 00000001 ntdll!LdrxCallInitRoutine+0x14
+0063f450 7705fe72 74b0d8f7 74b00000 00000001 ntdll!LdrpCallInitRoutine+0x63 (FPO: [Non-Fpo])
+0063f544 7705fcef 006e1af8 006e1b60 006e1b60 ntdll!LdrpInitializeNode+0x2d4 (FPO: [SEH])
+0063f564 7706692d 006e1af8 0063f5e4 0063f587 ntdll!LdrpInitializeGraph+0x55 (FPO: [3,1,4])
+0063f58c 7705fcd4 006e18e8 0063f5e4 0063f5bb ntdll!LdrpInitializeGraph+0x70 (FPO: [3,1,4])
+0063f5bc 770601d9 0063f5e4 ffffffff 00000000 ntdll!LdrpPrepareModuleForExecution+0x188 (FPO: [Non-Fpo])
+0063f770 7705f367 7706398c 0063f79c 00000000 ntdll!LdrpLoadDll+0x3e6 (FPO: [SEH])
+0063f7a8 7706db5a 00000000 00000000 7706398c ntdll!LdrLoadDll+0x71 (FPO: [Non-Fpo])
+0063fba0 77060696 0063fc28 76ff0000 937b705a ntdll!LdrpInitializeProcess+0x13d8 (FPO: [Non-Fpo])
+0063fbf0 770605ec 7f568000 76ff0000 00000000 ntdll!_LdrpInitialize+0xa1 (FPO: [Non-Fpo])
+0063fc04 770605bc 00000000 00000000 00000000 ntdll!LdrpInitialize+0x1c (FPO: [0,0,0])
+0063fc14 00000000 0063fc28 76ff0000 00000000 ntdll!LdrInitializeThunk+0x12 (FPO: [Non-Fpo])
+                </div>
+            <br />
+                <p>
+Параметры этих функций уже давно можно найти в интернете, ntoskrnl.lib из DDK 
+для Windows 8 содержит эти функции. Теперь дело за малым: будем ждать описание 
+функций в MSDN =))
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

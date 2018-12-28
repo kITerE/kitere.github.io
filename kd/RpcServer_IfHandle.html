@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Получение таблицы обработчиков RPC-сервера: скрипт для WinDbg</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, RPC-server, RPC сервер, скрипт WinDbg" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Получение таблицы обработчиков RPC-сервера: скрипт для WinDbg
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+<a href="../download/DCMD/RpcServer_IfHandle.rar"><img src="../images/download.png" alt="Download RpcServer_IfHandle" align="right" /></a>
+              <br />
+                <p>
+Довольно часто, во время исследования внутренних механизмов Windows, возникает 
+необходимость исследования RPC-NDR взаимодействия процессов. В этой небольшой 
+заметке я расскажу о скрипте для WinDbg, который может упростить жизнь при 
+исследовании RPC-сервера.
+                </p>
+              <br />
+                <p>
+Для примера возьмем RPC сервер 
+<a href="http://msdn.microsoft.com/en-us/library/ms685150%28VS.85%29.aspx" target="_blank">Service Control Manager (SCM)</a>. 
+<b>Задача:</b> получить список функций RPC-сервера <b><i>ntsvcs/svcctl</i></b>. В 
+качестве экспериментального стенда я использовал виртуальную машину VMWare 
+с установленной MS Windows 2003 SP2 и подключенным отладчиком WinDbg.
+                </p>
+              <br />
+                <p>
+Итак, дожидаемся запуска процесса <b>services.exe</b> и устанавливаем точку 
+останова на регистрацию нового RPC-сервера:
+                </p>
+            <br />
+                <div class="code">
+ba e 1 RPCRT4!RpcServerRegisterIfEx
+                </div>
+              <br />
+                <p>
+Первый параметр функции <b>rpcrt4!RpcServerRegisterIfEx(...)</b> – указатель на 
+<b>_RPC_SERVER_INTERFACE</b>. Это и есть интересующий нас адрес. В этой 
+структуре нас интересуют 2-а поля: 
+                </p>
+                <ul>
+<li> <b><i>DispatchTable</i></b> – указатель на структуру <b>RPC_DISPATCH_TABLE</b>, в первом ULONG’е которой хранится количество функций обработчиков.</li>
+<li> <b><i>InterpreterInfo</i></b> – указатель на структуру <b>_MIDL_SERVER_INFO_</b>. Второе поле структуры MIDL-информации (смещение sizeof(PVOID)) содержится адрес массива обработчиков RPC-сервера.</li>
+                </ul>
+<br /><p><img src="../images/RpcServer_IfHandle.jpg" alt="" /></p>
+            <br />
+                <p>
+Итак, вызываем скрипт, который отобразит нам список функций-обработчиков 
+RPC-сервера <b>services.exe</b>. Думаю не нужно объяснять как получить первый 
+параметр функции, находясь на ее первой инструкции, лишь напомню, что в стеке 
+в начале будет лежать адрес возврата, поэтому пропускаем его:
+                </p>
+            <br />
+                <div class="code">
+kd&gt; $$&gt;a&lt; D:\Projects\DCMD\RpcServer_IfHandle.dcmd (poi(@esp+@$ptrsize))
+
+RPC-Server Routine Table 0x01001660, number of Routines 47(0x2f)
+                </div>
+            <br />
+                <p>
+Таблица получена, теперь, можно ее распечатать. При наличие символов смысл 
+каждого обработчика становится ясен:
+                </p>
+            <br />
+                <div class="code">
+kd> dps 0x01001660 L 0x2f
+01001660  0100276b services!RCloseServiceHandle
+01001664  010075bf services!RControlService
+01001668  01012ba3 services!RDeleteService
+0100166c  01015792 services!RLockServiceDatabase
+01001670  01016ac4 services!RQueryServiceObjectSecurity
+01001674  01016bc5 services!RSetServiceObjectSecurity
+01001678  01002ad7 services!RQueryServiceStatus
+0100167c  010057f7 services!RSetServiceStatus
+01001680  01006a61 services!RUnlockServiceDatabase
+01001684  010078f3 services!RNotifyBootConfigStatus
+01001688  0100553c services!RI_ScSetServiceBitsW
+0100168c  0100de85 services!RChangeServiceConfigW
+01001690  01013786 services!RCreateServiceW
+01001694  01015804 services!REnumDependentServicesW
+01001698  0100de48 services!REnumServicesStatusW
+0100169c  0100295c services!ROpenSCManagerW
+010016a0  01002820 services!ROpenServiceW
+010016a4  01006fc3 services!RQueryServiceConfigW
+010016a8  0101564f services!RQueryServiceLockStatusW
+010016ac  01005e78 services!RStartServiceW
+010016b0  01012c9f services!RGetServiceDisplayNameW
+010016b4  01012d21 services!RGetServiceKeyNameW
+010016b8  01015f75 services!RI_ScSetServiceBitsA
+010016bc  0101591d services!RChangeServiceConfigA
+010016c0  01015ad8 services!RCreateServiceA
+010016c4  01015bc7 services!REnumDependentServicesA
+010016c8  0100ddc8 services!REnumServicesStatusA
+010016cc  01004ff2 services!ROpenSCManagerA
+010016d0  0100502f services!ROpenServiceA
+010016d4  0100730d services!RQueryServiceConfigA
+010016d8  01015cac services!RQueryServiceLockStatusA
+010016dc  01009573 services!RStartServiceA
+010016e0  01015cee services!RGetServiceDisplayNameA
+010016e4  01015dba services!RGetServiceKeyNameA
+010016e8  01014c27 services!RI_ScGetCurrentGroupStateW
+010016ec  010158ed services!REnumServiceGroupW
+010016f0  010159e3 services!RChangeServiceConfig2A
+010016f4  010138f5 services!RChangeServiceConfig2W
+010016f8  01015c45 services!RQueryServiceConfig2A
+010016fc  01013bac services!RQueryServiceConfig2W
+01001700  01005ba8 services!RQueryServiceStatusEx
+01001704  0100785b services!REnumServicesStatusExA
+01001708  01007456 services!REnumServicesStatusExW
+0100170c  01008000 services!RI_ScSendTSMessage
+01001710  01015e86 services!RCreateServiceWOW64A
+01001714  01013741 services!RCreateServiceWOW64W
+01001718  010130b5 services!RI_ScQueryServiceTagInfo
+                </div>
+            <br />
+                <p>
+<a href="../download/DCMD/RpcServer_IfHandle.rar">Скачать dcmd-файл, содержащий описанный выше скрипт</a>
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

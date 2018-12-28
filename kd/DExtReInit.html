@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Особенность инициализации расширения отладчика WinDbg: вызовы DebugExtensionInitialize / DebugExtensionUninitialize</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, WinDbg, DebugExtensionInitialize, DebugExtensionUninitialize" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Особенность инициализации расширения отладчика WinDbg: вызовы DebugExtensionInitialize / DebugExtensionUninitialize
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Уже достаточно давно для расширений к WinDbg используются механизмы 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff540540%28VS.85%29.aspx">Debugger Engine</a>. 
+Это достаточно мощный и дружелюбный набор COM-интерфейсов для работы с 
+отладочными средствами в операционной системе Windows. Но для того, что бы 
+использовать эти инструменты в расширении WinDbg, необходимо собрать отдельный 
+PE-модуль (DLL). У такого модуля должны быть определены, в числе прочих, 
+функции обратного вызова:
+                </p>
+            <br />
+<ul>
+  <li>
+    <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff540476%28VS.85%29.aspx">DebugExtensionInitialize(...)</a>: 
+    обратный вызов инициализации расширения отладчика
+  </li>
+  <li>
+    <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff540495%28VS.85%29.aspx">DebugExtensionUninitialize()</a>: 
+    обратный вызов де-инициализации расширения отладчика
+  </li>
+</ul>
+            <br />
+                <p>
+В комментариях к функции DebugExtensionInitialize(...) довольно недвусмысленно 
+сказано, что:
+                </p>
+            <br />
+                <div class="quote">
+Implementations of this function should initialize any global variables 
+required by the extension DLL
+                </div>
+            <br />
+                <p>
+То есть для расширения WinDbg это можно считать неким DllMain’ом. Но вот 
+только не все так безоблачно. При подготовке очередного релиза 
+<a target="_blank" href="http://pykd.codeplex.com/">PYKD</a> была невнятная 
+ошибка. После достаточно большого количества проведенных тестов, было выявлено, 
+что пары вызовов 
+&lt;DebugExtensionInitialize(...) - DebugExtensionUninitialize()&gt; могут быть 
+вложенными. Для теста я набросал примитивный пример 
+<a href="../download/DExtSmpl.rar">DExtSmpl</a> следующего содержания:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+static volatile long g_RefCounter = 0;
+extern "C" HRESULT CALLBACK DebugExtensionInitialize(
+  OUT PULONG Version,
+  OUT PULONG Flags
+)
+{
+  *Version = DEBUG_EXTENSION_VERSION( 1, 0 );
+  *Flags = 0;
+  InterlockedIncrement(&amp;g_RefCounter);
+  return S_OK;
+}
+
+extern "C" VOID CALLBACK DebugExtensionUninitialize()
+{
+  InterlockedDecrement(&amp;g_RefCounter);
+}
+extern "C" HRESULT CALLBACK test(
+  IN  PDEBUG_CLIENT4 pClient,
+  IN  PCSTR /* szArguments */
+)
+{
+  TComPtr&lt;IDebugControl&gt; pControl;
+  HRESULT hRes= pControl.QueryFrom(pClient);
+  if (FAILED(hRes))
+    return hRes;
+  pControl->Output(
+    DEBUG_OUTPUT_NORMAL,
+    "initialized %u times\n",
+    g_RefCounter);
+  return S_OK;
+}
+                </pre>
+            <br />
+                <p>
+У WinDbg есть понятие рабочего пространства, которое можно сохранить загрузить 
+для определенной конфигурации отладки. В числе прочих параметров, WinDbg 
+сохраняет в рабочем пространстве список используемых внешних расширений. В этом 
+достаточно просто убедиться, если сразу после старта отладочной сессии набрать 
+команду 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff562212%28VS.85%29.aspx">.chain</a>. 
+Это вполне логично: как правило, человек, сидящий за WinDbg, использует одни и 
+те же внешние расширения. И если поставить точки останова на реализациях 
+DebugExtensionInitialize(...) и DebugExtensionUninitialize(), то при старте 
+отладочной сессии <i>с "закэшированным"</i> расширением, можно увидеть вызов 
+(реальное событие - старт отлаживаемого процесса в WinDbg):
+                </p>
+            <br />
+                <div class="code">
+DExtSmpl!DebugExtensionInitialize
+dbgeng!ExtensionInfo::Load+0x611
+dbgeng!ExtensionInfo::CheckAdd+0x78
+dbgeng!ParseBangCmd+0x36a
+dbgeng!ProcessCommands+0x539
+dbgeng!ProcessCommandsAndCatch+0x20
+dbgeng!Execute+0x28d
+dbgeng!DebugClient::ExecuteWide+0x8b
+windbg!ProcessCommand+0x1e9
+windbg!ProcessEngineCommands+0xb0
+windbg!EventCallbacks::CreateProcessW+0x27
+dbgeng!CreateProcessEventApcData::Dispatch+0xb2
+dbgeng!ApcDispatch+0x27
+dbgeng!SendEvent+0xef
+dbgeng!NotifyCreateProcessEvent+0x844
+dbgeng!LiveUserTargetInfo::ProcessDebugEvent+0x222
+dbgeng!LiveUserTargetInfo::WaitForEvent+0x795
+dbgeng!WaitForAnyTarget+0x92
+dbgeng!RawWaitForEvent+0x351
+dbgeng!DebugClient::WaitForEvent+0xcf
+windbg!EngineLoop+0x167
+kernel32!BaseThreadInitThunk+0xd
+ntdll!RtlUserThreadStart+0x1d
+                </div>
+            <br />
+                <p>
+Соответственно, при вызове !test получаем следующий вывод:
+                </p>
+            <br />
+                <div class="code">
+<font color="red"><b>initialized 1 times</b></font>
+                </div>
+            <br />
+                <p>
+Затем, грузим расширение вручную с использованием команды "!load DExtSmpl". И 
+видим, что DebugExtensionInitialize(...) вызывается <b>повторно</b>:
+                </p>
+            <br />
+                <div class="code">
+DExtSmpl!DebugExtensionInitialize
+dbgeng!ExtensionInfo::Load+0x611
+dbgeng!ExtensionInfo::CheckAdd+0x78
+dbgeng!ParseBangCmd+0x36a
+dbgeng!ProcessCommands+0x563
+dbgeng!ProcessCommandsAndCatch+0x20
+dbgeng!Execute+0x28d
+dbgeng!DebugClient::ExecuteWide+0x8b
+windbg!ProcessCommand+0x189
+windbg!ProcessEngineCommands+0xb0
+windbg!EngineLoop+0x3d6
+kernel32!BaseThreadInitThunk+0xd
+ntdll!RtlUserThreadStart+0x1d
+                </div>
+            <br />
+                <p>
+Как было написано ранее, точки останова стоят и на DebugExtensionInitialize(...) 
+и на DebugExtensionUninitialize(), но здесь мы наблюдаем повторный вызов 
+DebugExtensionInitialize(...) без соответствующего вызова 
+DebugExtensionUninitialize(). В этом легко убедиться, снова вызвав 
+команду !test:
+                </p>
+            <br />
+                <div class="code">
+<font color="red"><b>initialized 2 times</b></font>
+                </div>
+            <br />
+                <p>
+При следующем вызове "!load DExtSmpl" бибилотека не инициализируется очередной 
+раз. Но как только будет введена команда "!unload DExtSmpl" мы увидим 
+<b>первый</b> вызов DebugExtensionUninitialize(). Команда !test дает ожидаемый 
+результат:
+                </p>
+            <br />
+                <div class="code">
+<font color="red"><b>initialized 1 times</b></font>
+                </div>
+            <br />
+                <p>
+Если после выгрузки снова выполнить пару команд 
+"!load DExtSmpl" - "!unload DExtSmpl", то мы снова увидим парный вызов 
+DebugExtensionInitialize(...) - DebugExtensionUninitialize().
+                </p>
+            <br />
+                <p>
+А теперь усложним схему загрузки и использования DExtSmpl.dll:
+                </p>
+            <br />
+                <div class="code">
+&gt; !test
+<font color="red"><b>initialized 1 times</b></font>
+&gt; !DExtSmpl.test
+<font color="red"><b>initialized 2 times</b></font>
+&gt; !DExtSmpl.dll.test
+<font color="red"><b>initialized 3 times</b></font>
+&gt; !DExtSmpl.test
+<font color="red"><b>initialized 3 times</b></font>
+&gt; !test
+<font color="red"><b>initialized 3 times</b></font>
+&gt; !load C:\WinDbg\winext\DExtSmpl.dll; !test
+<font color="red"><b>initialized 4 times</b></font>
+&gt; !test
+<font color="red"><b>initialized 4 times</b></font>
+&gt; !unload C:\WinDbg\winext\DExtSmpl.dll; !test
+Unloading C:\WinDbg\winext\DExtSmpl.dll extension DLL
+<font color="red"><b>initialized 3 times</b></font>
+&gt; !unload DExtSmpl.dll; !test
+Unloading DExtSmpl.dll extension DLL
+<font color="red"><b>initialized 2 times</b></font>
+                </div>
+            <br />
+                <p>
+Естественно, что все это время в процесс WinDbg была загружена только одна 
+копия DExtSmpl.dll. Судя по всему, библиотеки расширения контролируются по 
+имени, которое было явно или неявно указано при загрузке, а не адресу 
+отображенного модуля (что кажется самым очевидным и логичным).
+                </p>
+            <br />
+                <p>
+Следовательно, если в расширении есть глобальные данные, которые нужно 
+инициализировать только один раз, то при реализации не обойтись без внутреннего 
+счетчика, который бы точно указывал на то, что вызов DebugExtensionInitialize(...) 
+(или DebugExtensionUninitialize()) вызывается первый (или последний) раз 
+соответственно.
+                </p>
+            <br /><hr /><br />
+                <p>
+Описанное выше тестовое расширение можно скачать <a href="../download/DExtSmpl.rar">одним архивом</a>
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

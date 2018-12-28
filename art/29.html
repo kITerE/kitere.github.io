@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Сюрпризы от Windows 10 build 17133: маска для NtBuildNumber</title>
+<meta name="keywords" content="EreTIk, kernel, Windows Windows 10, Windows 10 build 17133, NtBuildNumber, 0x3FFF, 3FFF" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Сюрпризы от Windows 10 build 17133: маска для NtBuildNumber
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Этой небольшой заметкой хочу открыть серию, которая будет описывать сюрпризы 
+Windows 10 build 17133 для Kernel- разработчика.
+                </p>
+
+            <br />
+                <p>
+Есть такая недокументированная (но экспортируемая) переменная ядра: NtBuildNumber. 
+Эта переменная, как нетрудно догадаться из названия, содержит номер 
+сборки ядра Windows. Засада в том, что в этой переменной старшие биты отведены 
+под флаги, а для получения номера сборки нужно на значение этой переменной 
+наложить маску. 
+<a target="_blank" href="https://books.google.com/books?id=WZdCAwAAQBAJ&pg=PT510&lpg=PT510&dq=NtBuildNumber+0x3FFF">В Windows Internals 5 Edition</a>, 
+например, предлагают производить операцию логического и с константой 0x3FFF. И 
+именно так (раньше) поступала системная функция 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-psgetversion">PsGetVersion</a>:
+                </p>
+            <br />
+                <div class="code">
+0:000&gt; u PsGetVersion L b
+ntoskrnl!PsGetVersion:
+00000000`0051b9f0 4885c9          test    rcx,rcx
+00000000`0051b9f3 7406            je      ntoskrnl!PsGetVersion+0xb (00000000`0051b9fb)
+00000000`0051b9f5 c70105000000    mov     dword ptr [rcx],5
+00000000`0051b9fb 4885d2          test    rdx,rdx
+00000000`0051b9fe 7406            je      ntoskrnl!PsGetVersion+0x16 (00000000`0051ba06)
+00000000`0051ba00 c70202000000    mov     dword ptr [rdx],2
+00000000`0051ba06 4d85c0          test    r8,r8
+00000000`0051ba09 740e            je      ntoskrnl!PsGetVersion+0x29 (00000000`0051ba19)
+00000000`0051ba0b 8b050f3c0900    mov     eax,dword ptr [ntoskrnl!NtBuildNumber (00000000`005af620)]
+00000000`0051ba11 25ff3f0000      and     eax,3FFFh
+00000000`0051ba16 418900          mov     dword ptr [r8],eax
+                </div>
+                <div class="code">
+0:000&gt; lm vm ntoskrnl
+start             end                 module name
+00000000`00400000 00000000`00897000   ntoskrnl
+    Loaded symbol image file: ntoskrnl.exe
+    Image name: ntoskrnl.exe
+    Timestamp:        Tue Oct 19 18:24:13 2010 (4CBDB81D)
+    CheckSum:         0046165F
+    ImageSize:        00497000
+    File version:     5.2.3790.4789
+    Product version:  5.2.3790.4789
+    File flags:       0 (Mask 3F)
+    File OS:          40004 NT Win32
+    File type:        1.0 App
+    File date:        00000000.00000000
+    Translations:     0409.04b0
+    CompanyName:      Microsoft Corporation
+    ProductName:      Microsoft® Windows® Operating System
+    InternalName:     ntkrnlmp.exe
+    OriginalFilename: ntkrnlmp.exe
+    ProductVersion:   5.2.3790.4789
+    FileVersion:      5.2.3790.4789 (srv03_sp2_gdr.101019-0340)
+    FileDescription:  NT Kernel &amp; System
+    LegalCopyright:   © Microsoft Corporation. All rights reserved.
+                </div>
+            <br />
+                <p>
+А проблема достаточно очевидна: маска 3FFFh меньше номера сборки новой 
+Windows 10 - 17133:
+                </p>
+                <div class="code">
+0:000&gt; ? 3FFF
+Evaluate expression: 16383 = 00000000`00003fff
+                </div>
+            <br />
+                <p>
+Поэтому, если у вас в закромах остался старый код, использующий 
+недокументированную nt!NtBuildNumber, то может пришла пора переписать его на 
+вызов 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-rtlgetversion">RtlGetVersion</a>?
+Если же использование nt!NtBuildNumber для вас милее, то нужно заменить маску
+на 0xFFFFFFF. В ядре 10.0.17133, например, уже нет внутренних ссылок 
+на NtBuildNumber:
+                </p>
+                <div class="code">
+0:000&gt; uf PsGetVersion
+ntoskrnl!PsGetVersion:
+0053e12e 8bff            mov     edi,edi
+0053e130 55              push    ebp
+0053e131 8bec            mov     ebp,esp
+0053e133 8b4508          mov     eax,dword ptr [ebp+8]
+0053e136 85c0            test    eax,eax
+0053e138 7406            je      ntoskrnl!PsGetVersion+0x12 (0053e140)  Branch
+
+ntoskrnl!PsGetVersion+0xc:
+0053e13a c7000a000000    mov     dword ptr [eax],0Ah
+
+ntoskrnl!PsGetVersion+0x12:
+0053e140 8b450c          mov     eax,dword ptr [ebp+0Ch]
+0053e143 85c0            test    eax,eax
+0053e145 7518            jne     ntoskrnl!PsGetVersion+0x31 (0053e15f)  Branch
+
+ntoskrnl!PsGetVersion+0x19:
+0053e147 8b4510          mov     eax,dword ptr [ebp+10h]
+0053e14a 85c0            test    eax,eax
+0053e14c 7516            jne     ntoskrnl!PsGetVersion+0x36 (0053e164)  Branch
+
+ntoskrnl!PsGetVersion+0x20:
+0053e14e 8b4d14          mov     ecx,dword ptr [ebp+14h]
+0053e151 85c9            test    ecx,ecx
+0053e153 0f854b490800    jne     ntoskrnl!PsGetVersion+0x84976 (005c2aa4)  Branch
+
+ntoskrnl!PsGetVersion+0x2b:
+0053e159 32c0            xor     al,al
+0053e15b 5d              pop     ebp
+0053e15c c21000          ret     10h
+
+ntoskrnl!PsGetVersion+0x31:
+0053e15f 832000          and     dword ptr [eax],0
+0053e162 ebe3            jmp     ntoskrnl!PsGetVersion+0x19 (0053e147)  Branch
+
+ntoskrnl!PsGetVersion+0x36:
+0053e164 c700ed420000    mov     dword ptr [eax],42EDh
+0053e16a ebe2            jmp     ntoskrnl!PsGetVersion+0x20 (0053e14e)  Branch
+
+ntoskrnl!PsGetVersion+0x84976:
+005c2aa4 a1f8926800      mov     eax,dword ptr [ntoskrnl!CmCSDVersionString (006892f8)]
+005c2aa9 8901            mov     dword ptr [ecx],eax
+005c2aab a1fc926800      mov     eax,dword ptr [ntoskrnl!CmCSDVersionString+0x4 (006892fc)]
+005c2ab0 894104          mov     dword ptr [ecx+4],eax
+005c2ab3 e9a1b6f7ff      jmp     ntoskrnl!PsGetVersion+0x2b (0053e159)  Branch
+                </div>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

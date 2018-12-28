@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Открытие ключа реестра текущего пользователя: RegOpenKeyEx(HKEY_CURRENT_USER, ...) или RegOpenCurrentUser()</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, RegOpenKeyEx, RegCreateKeyEx, RegOpenCurrentUser, HKEY_CURRENT_USER, RegDisablePredefinedCache, PredefinedHandleTable, predefined handle, registry" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Открытие ключа реестра текущего пользователя: RegOpenKeyEx(HKEY_CURRENT_USER, ...) или RegOpenCurrentUser()
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Пожалуй, самый распространенный способ открытия ключа реестра это вызов функции 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms724897(VS.85).aspx">advapi32!RegOpenKeyEx(...)</a>. 
+В конце MSDN’новской статьи (в секции <b>Remarks</b>), посвященной этой функции 
+можно увидеть следующие строки:
+                </p>
+            <br />
+                <div class="quote">
+If your service or application impersonates different users, do not use this 
+function with HKEY_CURRENT_USER. Instead, call the RegOpenCurrentUser function.
+                </div>
+            <br />
+                <p>
+Далее пойдет речь о том, почему нужно с осторожностью использовать 
+<b>HKEY_CURRENT_USER</b> в процессах, работающих с олицетворением пользователей. 
+Но в начале немного прописных истин.
+                </p>
+            <br />
+                <p>
+На NT-уровне работа с реестром происходит в общем пространстве имен дерева 
+объектов ядра. Но почему-то Win32 <b>Reg</b>-функции библиотеки advapi32.dll 
+вводят дополнительный уровень абстракции: предопределенные корневые ключи реестра 
+HKEY_XXX_XXX. Можно построить упрощенную таблицу предопределенных ключей:
+                </p>
+<table border="1">
+  <tr>
+    <td><b>HKEY_CLASSES_ROOT</b></td> <td>"\REGISTRY\MACHINE\SOFTWARE\CLASSES" </td>
+  </tr>
+  <tr>
+    <td><b>HKEY_CURRENT_USER</b></td> <td>"\REGISTRY\USER\&lt;USER_SID&gt;"</td>
+  </tr>
+  <tr>
+    <td><b>HKEY_LOCAL_MACHINE</b></td> <td>"\REGISTRY\MACHINE"</td>
+  </tr>
+  <tr>
+    <td><b>HKEY_USERS</b></td> <td>"\REGISTRY\USER"</td>
+  </tr>
+  <tr>
+    <td><b>HKEY_CURRENT_CONFIG</b></td> <td>"\REGISTRY\MACHINE\SYSTEM\CURRENTCONTROLSET\HARDWARE PROFILES\CURRENT"</td>
+  </tr>
+</table>
+<p>где &lt;USER_SID&gt; - SID текущего пользователя.</p>
+            <br />
+                <p>
+Как и следовало бы ожидать, Win32-подсистема не открывает эти ключи, каждый раз, 
+когда процесс вызывает открытия/создание ключа <b>Reg</b>-функцией. Что бы 
+избежать накладного вызова системного сервиса, Win32-подсистема кэширует первое 
+успешное открытие предопределенного ключа для всего процесса. Для этого используется массив 
+<b>PredefinedHandleTable</b> (не экспортируемый символ). Это массив структур, 
+содержащих 3-и поля: закэшированный описатель ключа, адрес функции открытия 
+этого ключа и BOOLEAN-флаг запрета кэширования. По-молчанию все предопределенные 
+ключи разрешено кэшировать.
+                </p>
+            <br />
+                <p>
+Для того что бы избежать проблем при открытии ключа пользователя, MSDN 
+рекомендует вместо вызова advapi32!RegOpenKeyEx(HKEY_CURRENT_USER, ...) использовать 
+функцию <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms724894%28VS.85%29.aspx">advapi32!RegOpenCurrentUser(...)</a>. 
+Она не кэширует свой результат и всегда приводит к вызову ntdll!RtlOpenCurrentUser(...), 
+который в свою очередь вызывает функцию ядра nt!NtOpenKey(...). Фактически, 
+первый вызов advapi32!RegOpenKeyEx(HKEY_CURRENT_USER, ...) тоже приводит к исполнению 
+функции ntdll!RtlOpenCurrentUser(...). Именно эта функция (<b>ntdll!RtlOpenCurrentUser(...)</b>), 
+если не удается открыть ключ "\REGISTRY\USER\&lt;USER_SID&gt;", пытается открыть "\REGISTRY\USER\.DEFAULT".
+                </p>
+            <br />
+                <p>
+Что бы продемонстрировать подводные камни использования предопределенного ключа 
+HKEY_CURRENT_USER, я набросал небольшую программку 
+<a href="../download/RgImpUsr.rar">RgImpUsr</a>. Запускать ее нужно, указав в 
+командной строке PID процесса, работающего под другим пользователем. Возможен 
+опциональный второй параметр. Суть утилиты сведена к функции <b>OpenAndPrintUserSoftwareKey()</b>. 
+Эта функция открывает под-ключ Software ключа пользователя 2-мя способами: 
+используя преопределенный ключ HKEY_CURRENT_USER и функцией advapi32!RegOpenCurrentUser(). 
+После каждого успешного открытия функция печатает NT-имя открытого объекта ключа 
+реестра, полученное вызовом ntdll!NtQueryObject(..., ObjectNameInformation, ...).
+                </p>
+            <br />
+                <p>
+Общая логика ее работы довольно проста:
+                </p>
+<ul>
+  <li>если указан второй опциональный параметр (важен факт его наличия, его значение не анализируется), то вызываем <b>OpenAndPrintUserSoftwareKey()</b></li>
+  <li>олицетворяем текущую нить токеном указанного в командной строке процесса, вызовом <a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa378612%28VS.85%29.aspx">advapi32!ImpersonateLoggedOnUser(...)</a></li>
+  <li>вызываем <b>OpenAndPrintUserSoftwareKey()</b> в олицетворенной нити</li>
+  <li>возвращаемся к исходному пользователю процесса вызовом <a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa379317%28VS.85%29.aspx">advapi32!RevertToSelf()</a></li>
+  <li>вызываем <b>OpenAndPrintUserSoftwareKey()</b> в <b>не</b>-олицетворенной нити</li>
+</ul>
+            <br />
+                <p>
+А теперь запустим утилиту от лица SYSTEM (использует реестр <b>.DEFAULT</b>) и 
+укажем в качестве параметра процесс, работающий от лица пользователя S-1-5-21-XXX. 
+На выходе получим следующий результат:
+                </p>
+            <br />
+                <div class="code">
+*** Impersonated
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\S-1-5-21-XXX\Software
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\S-1-5-21-XXX\Software
+
+*** Original
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\S-1-5-21-XXX\Software
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\.DEFAULT\Software
+                </div>
+            <br />
+                <p>
+А теперь повторим вызов, изменив логику работы, указав 2-ой опциональный параметр:
+                </p>
+            <br />
+                <div class="code">
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\.DEFAULT\Software
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\.DEFAULT\Software
+
+*** Impersonated
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\.DEFAULT\Software
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\S-1-5-21-XXX\Software
+
+*** Original
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\.DEFAULT\Software
+HKEY_CURRENT_USER\Software is:
+\REGISTRY\USER\.DEFAULT\Software
+                </div>
+
+            <br />
+                <p>
+Как видно из вышеприведенных результатов, описатель, полученный вызовом 
+advapi32!RegOpenKeyEx(HKEY_CURRENT_USER, ...), <b><i>застревает</i></b> в кэше массива 
+<b>PredefinedHandleTable</b>. Именно повторное использование 
+HKEY_CURRENT_USER (до и после олицетворения нити) приводит к открытию ошибочного 
+ключа. Это так же чревато тем, что открытый и закэшированный ключ другого 
+пользователю может привести к тому, что при выходе пользователя из системы его 
+реестр так и останется подгруженным в ветку "\REGISTRY\USER". Поэтому стоит быть  
+очень осторожным при использовании HKEY_CURRENT_USER, если ваш процесс олицетворяет 
+свои нити токенами других пользователей.
+                </p>
+            <br />
+                <p>
+Кроме использования функции <b>advapi32!RegOpenCurrentUser(...)</b> так же предоставляет 
+2-е дополнительные <b>Reg</b>-функции:
+                </p>
+<ul>
+  <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms724854%28VS.85%29.aspx">advapi32!RegDisablePredefinedCache()</a> - 
+      запрет кэширования ключа <b>HKEY_CURRENT_USER</b>. Функция устанавливает BOOLEAN-флаг запрета кэширования для ключа HKEY_CURRENT_USER в таблице <b>PredefinedHandleTable</b> равным TRUE.
+      Если описатель был предварительно открыт, то он закрывается</li>
+  <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms724855%28VS.85%29.aspx">advapi32!RegDisablePredefinedCacheEx()</a> - 
+      Функция проводит теже действия, что и advapi32!RegDisablePredefinedCache(), но для всех предопределенных ключей. 
+      Функция присутствует на ОС Windows Vista и старше</li>
+</ul>
+            <br /><hr /><br />
+                <p>
+Скачать demo-утилиту <a href="../download/RgImpUsr.rar">RgImpUsr с исходным кодом</a>.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; vbox_kd - небольшой набор скриптов для автоматизации запуска отладчика WinDbg при работе с VirtualBox</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg, kd, VirtualBox, VirtualKD" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; vbox_kd - небольшой набор скриптов для автоматизации запуска отладчика WinDbg при работе с VirtualBox
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+За последнее время я практически полностью перешел на VirtualBox в качестве 
+гипервизора. Этому, в числе прочего, сильно поспособствовали:
+                </p>
+<ul>
+    <li><a target="_blank" href="http://virtualkd.sysprogs.org/tutorials/install/manualvm">вливание кода интеграции с VirtualKD в основной репозиторий</a></li>
+    <li>сносная работоспособность <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/hh439346(v=vs.85).aspx">отладки Windows через сеть</a> на современных версиях ОС Windows (8 и старше)</li>
+</ul>
+            <br />
+                <p>
+Отладку Windows через сеть я использую, что бы не 
+<a target="_blank" href="http://virtualkd.sysprogs.org/tutorials/install/">нажимать F8 при каждой загрузке систем Win8 и старше</a>. 
+И чем дальше, тем больше в качестве гостевой ОС используется Win8+. А vmmon.exe 
+не автоматизирует запуск/останов отладчиков для машин без VirtualKD.
+                </p>
+            <br />
+                <p>
+Это и подтолкнуло к созданию набора из двух скриптов - 
+<a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd">vbox_kd</a>. 
+Первый 
+<a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd/blob/master/vbox_kd_set_VM_connect_options.cmd">vbox_kd_set_VM_connect_options.cmd</a> 
+- подготовительный, он сохраняет информацию о том, с какой командной строкой нужно запускать WinDbg.
+                </p>
+                <p>
+Например для машины "Windows 8.1 x64", которая будет отлаживаться через сеть, нужно выполнить следующую команду:
+                </p>
+                <div class="code">
+vbox_kd_set_VM_connect_options.cmd "Windows 8.1 x64" "net:port=50004,key=aaa.bbb.ccc.ddd"
+                </div>
+                <p>
+А для машины "Windows 7", которая будет отлаживаться с использованием VirtualKD:
+                </p>
+                <div class="code">
+vbox_kd_set_VM_connect_options.cmd "Windows 7" "com:pipe,resets=0,reconnect,port=$(pipename)"
+                </div>
+            <br />
+                <p>
+Второй скрипт 
+<a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd/blob/master/vbox_kd_monitor.pyw">vbox_kd_monitor.pyw</a> 
+запускает VirtualBox.exe и следит за состояниями виртуальных машин. 
+Если запускается машина, для которой был предварительно вызван 
+<a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd/blob/master/vbox_kd_set_VM_connect_options.cmd">vbox_kd_set_VM_connect_options.cmd</a>, 
+то будет запущен WinDbg. При завершении сеанса виртуальной машины будет 
+завершен и WinDbg.
+                </p>
+            <br />
+                <p>
+Для корректной работы скриптов нужно исправить пути в 
+<a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd/blob/master/vbox_kd.ini">vbox_kd.ini</a>, 
+если VirtualBox или WinDbg установлены не по стандартному пути. 
+А так же VirtualBox должен быть установлен с поддержкой скриптинга Python 
+(по умолчанию ставится инсталлятором).
+                </p>
+            <br />
+                <a name="UPD_11_05_2018"></a>
+                <h2>Updated (11.05.2018)</h2>
+<ul>
+<li>Проект перенесен на githomelab.ru</li>
+<li>Добавлена поддержка VirtualBox API версии 5.2</li>
+</ul>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

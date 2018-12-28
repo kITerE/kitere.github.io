@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Некоторые параметры командной строки отладчика</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Некоторые параметры командной строки отладчика
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Ниже приведены некоторые параметры командной строки отладчика:
+                </p>
+            <br /><hr /><br />
+<div class="code">WinDbg.exe -I</div>
+<p>Установка WinDbg отладчиком по-умолчанию</p>
+            <br /><hr /><br />
+<div class="code">WinDbg -z DUMP_FILE</div>
+<p>Открытие dump-файла падения с именем DUMP_FILE. В качестве файла можно указать обыкновенный PE-файл</p>
+            <br /><hr /><br />
+<p>Иногда бывает нужно скопировать файл с символами в директорию с исполняемым 
+файлом. Конечно, можно загрузить файл как dump-файл, набрать команду <b>lm</b> и 
+скопировать полное имя файла с символами. Но можно немного автоматизировать этот 
+процесс. Поэтому можно создать команду для 
+<a href="http://www.farmanager.com/" target="_blank">FAR’а</a>, которая выглядит 
+так:</p><br />
+<div class="code">@start WinDbg -z !.! -c ".reload; .copysym .\; q"</div>
+<p>Где <b>!.!</b> - метасимвол FAR’а, интерпретируемый как полный путь к 
+выбранному файлу. А для копирования файла символов использована 
+<a href="http://msdn.microsoft.com/en-us/library/ff562262%28VS.85%29.aspx" target="_blank">команда WinDbg .copysym</a>.
+Важно помнить, что WinDbg не перезаписывает существующий файл символов при 
+копировании.</p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

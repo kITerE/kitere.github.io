@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile, NtSetVolumeInformationFile, IopQueryOperationAccess, IopSetOperationAccess, IopQueryFsOperationAccess, IopSetFsOperationAccess, ACCESS_MASK" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <h2>Таблица переехала</h2>
+                <p>
+<a target="_blank" href="https://githomelab.ru/EreTIk/ioam#ioam">https://githomelab.ru/EreTIk/ioam</a>
+                <p>
+            <br />
+            <br />
+                <p>
+Необходимые маски доступа на объект файла при вызове NtQueryInformationFile, 
+NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile 
+определяются в зависимости от класса информации, который указан при вызове этих 
+функций. Поэтому я сгенерировал для себя (может кому-нибудь тоже будет полезно) 
+таблицы соответствий класса информации и требуемых масок доступа. Для сборки 
+был написан простенький скрипт 
+<a target="_blank" href="https://githomelab.ru/EreTIk/ioam/blob/master/ioam.py">ioam.py</a>, 
+который использует 
+<a target="_blank" href="https://githomelab.ru/pykd/pykd">pykd</a>.
+                </p>
+            <br />
+                <a name="UPD_01_10_2018"></a>
+                <h2>Updated (01.10.2018)</h2>
+                <p>
+Скрипт снова переработан и вместе с файлами-источниками информации (коллекцией 
+ntoskrnl.exe) выложен на GitLab. Фактически этот мини-проект (вместе со 
+сгенерирвоанной таблицей) переместился, новый адрес: 
+<a target="_blank" href="https://githomelab.ru/EreTIk/ioam#ioam">https://githomelab.ru/EreTIk/ioam</a>.
+                </p>
+                <p>
+Ключевые изменения:
+                </p>
+<ul>
+<li>Сразу генериуется GitLab Flavored Markdown (раньше формировалась заготовка HTML-файла)</li>
+<li>Таблицы "разрезаны" по 16 строк (для увеличения удобства просмотра и скроллинга)</li>
+<li>В набор исходных файлов добавлены ядра с номерами сборок 17134 (версия 1803) и 17763 (версия 1809)</li>
+</ul>
+            <br />
+                <a name="UPD_01_11_2017"></a>
+                <h2>Updated (01.11.2017)</h2>
+            <br />
+                <p>
+Скрипт был сильно переработан. Первым изменением стало то, что он стал 
+обрабатывать не один файл ядра, а директорию с некоторой коллекцией файлов. 
+Соответственно, таблица выросла, и в ней отражаются изменения для разных версий 
+ОС. Сама коллекция была выбрана не из всех доступных мне ядер, а только релизы и 
+только те, что отличаются между собой. Например оказалось, что service pack'и 
+Windows XP, Vist и 7 не отличаются между собой, поэтому в готовую таблицу попали 
+ядра без service pack'ов.
+                </p>
+                <p>
+Вторым изменением стало то, что наряду с массивом масок доступа скрипт стал 
+обрабатывать и массив минимального размера буфера. Это позволило убрать из 
+таблицы неподдерживаемые значения классов (для которых функция возвращает 
+STATUS_INVALID_INFO_CLASS). Иконка 
+<img src="../images/deny_rd_cr.png" alt="X" /> в таблице означает, что запрос 
+перестал поддерживаться.
+                </p>
+            <br />
+                <p>
+<strike>Результат работы скрипта:</strike>
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

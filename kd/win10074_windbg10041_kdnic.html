@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; WinDbg 10.0.10041.3 не совместим с Windows 10 10074</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg 10.0.10041.3, Windows 10 InsiderPreview 10074" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; WinDbg 10.0.10041.3 не совместим с Windows 10 10074
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+              <br />
+                <p>
+Сталкнулся недавно с такой проблемой: установил Windows 10 InsiderPreview для 
+kernel-отладки через ethernet, а WinDbg (достаточно свежий) ругается:
+                </p>
+              <br />
+                <div class="quote">
+Microsoft (R) Windows Debugger Version 10.0.10041.3 AMD64<br />
+Copyright (c) Microsoft Corporation. All rights reserved.<br />
+<br />
+Using NET for debugging<br />
+Opened WinSock 2.0<br />
+Waiting to reconnect...<br />
+KDNET protocol version unsupported.  You may need to upgrade your debugger.<br />
+Bad packet sent from 192.168.X.Y.<br />
+Run nslookup 192.168.X.Y from a command prompt to get the machine name.<br />
+KDNET protocol version unsupported.  You may need to upgrade your debugger.<br />
+Bad packet sent from 192.168.X.Y.<br />
+Run nslookup 192.168.X.Y from a command prompt to get the machine name.<br />
+...
+                </div>
+              <br />
+                <p>
+Обновление отладчика до <a href="WinDBG_Download.html#v10.0.10075">версии 10.0.10075</a> проблему решило.
+                </p>
+              <br />
+                <p>
+P.S. Целевая система:
+                </p>
+            <br />
+                <div class="quote">
+0: kd> vertarget
+Windows 10 Kernel Version 10074 MP (2 procs) Free x64<br />
+Built by: 10074.0.amd64fre.fbl_impressive.150424-1350
+                </div>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

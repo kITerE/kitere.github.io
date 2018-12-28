@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Описатели объектов Windows: взгляд из ядра</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, handle, описатель, KERNEL_HANDLE_MASK, OBJ_KERNEL_HANDLE, Zw-функции, Nt-функции" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Описатели объектов Windows: взгляд из ядра
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+        <br />
+            <br />
+                <p>
+Сразу хочу сказать, что эта небольшая заметка ориентирована на людей, имеющих 
+базовые знания об архитектуре объектов ядра Windows и механизма описателей.
+                </p>
+            <br />
+                <p>
+Итак, что такое описатель в NT-based ОС? Описатель (<b>handle</b>) это элемент 
+таблицы, содержащий маску предоставленного доступа (<b>granted access</b>) и 
+указатель на объект ядра. Таблица описателей для каждого процесса своя: 
+указатель на таблицу содержится в поле <b>nt!_EPROCESS.ObjectTable</b>. Из 
+этого следует, что описатель содержит в себе информацию о предоставленном 
+конкретному процессу доступе к объекту ядра. 
+                </p>
+            <br />
+                <p>
+Теперь проследим путь описателя при вызове системного сервиса, например 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff567072%28VS.85%29.aspx">NtReadFile</a>. 
+Для корректного вызова этого сервиса необходимо передать в параметрах описатель 
+на файловый объект с полученным доступом <b>FILE_READ_DATA</b>. Для проверки 
+корректности описателя и получения указателя на <b>nt!_FILE_OBJECT</b> 
+NtReadFile вызывает экспортируемую функцию ядра 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff558679%28VS.85%29.aspx">ObReferenceObjectByHandle</a>. 
+В самом начале этой функции стоит очень важное ветвление: если
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+if ((LONG)(ULONG_PTR) Handle &lt; 0) { ...
+                </pre>
+            <br />
+                <p>
+То <font color="red">(<b>*1</b>)</font> <b> ObReferenceObjectByHandle(...)</b> обрабатывает специальные 
+случаи:
+                </p>
+<ul>
+  <li>
+    значение описателя совпадает с <b>-1</b>: это псевдо-описатель, макрос 
+    <b>NtCurrentProcess()</b>. Он, как несложно догадаться, всегда указывает на 
+    текущий процесс
+  </li>
+  <li>
+    значение описателя совпадает с <b>-2</b>: это псевдо-описатель, макрос 
+    <b>NtCurrentThread()</b>. Он всегда указывает на текущую нить
+  </li>
+</ul>
+            <br />
+                <p>
+Если же выполняется условие <font color="red"><b>*1</b></font> и это не текущие 
+процесс/нить, то значит переданный нам описатель – 
+описатель ядра (<b>Kernel Handle</b>). Тут, по 
+ходу кода функции, сразу же проверяется что (AccessMode == KernelMode). Если 
+вызывающий код пытается получить объект по kernel-описателю, указав 
+AccessMode == UserMode, то сразу же возвращается ошибка 
+<b>STATUS_INVALID_HANDLE</b>. Это не документированная особенность описателей, 
+которая  приводит к частой ошибке тех, кто начинает писать код в ядре и не 
+понимает отличий в Zw-функций от Nt-функций. Пример, так сказать, просто 
+в яблочко: ветка 
+<a target="_blank" href="http://wasm.ru/forum/viewtopic.php?id=37575"> NtWriteFile STATUS_INVALID_HANDLE на форуме WASM’а</a>. 
+Обратимся к WRK и получим довольно прозрачное <i>определение</i> описателя ядра:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+    #define KERNEL_HANDLE_MASK ((ULONG_PTR)((LONG)0x80000000)) 
+    #define IsKernelHandle(H,M)                                \
+    (((KERNEL_HANDLE_MASK &amp; (ULONG_PTR)(H)) == KERNEL_HANDLE_MASK) &amp;&amp; \
+     ((M) == KernelMode) &amp;&amp;                                \
+     ((H) != NtCurrentThread())&amp;&amp;                         \
+     ((H) != NtCurrentProcess()))
+                </pre>
+            <br />
+                <p>
+Фактически: кernel-описатель это описатель, принадлежащий процессу 
+SYSTEM (<b>nt!PsInitialSystemProcess</b>). Таблица описателей системного процесса 
+создается один раз при старте системы, и ее адрес расположен в не экспортируемой 
+глобальной переменной ядра <b>nt!ObpKernelHandleTable</b>. Если же идет работа 
+с обычным описателем (не kernel), то используется таблица описателей текущего 
+процесса.
+                </p>
+            <br />
+                <p>
+А теперь рассмотрим разницу вызовов в ядре Zw-функций и Nt-функций. В 
+<b>ntdll.dll</b> вообще нет разницы между этими функциями, собственно экспорты 
+этой библиотеки указывают на один и тот же код. Наверное, это и порождает ошибки 
+при использовании вызовов системных сервисов из кода режима ядра. В ядре это 
+<b>разные</b> функции: конечно, они выполняют в итоге один и тот же код, но 
+все Zw-функции это вызов Nt-функций через специальный wrap’ер, меняющий режим 
+вызова текущей нити. Поле <b>PreviousMode</b> структуры <b>nt!_KTHREAD</b> текущей 
+нити принудительно меняется на <b>KernelMode</b>. После возврата восстанавливается старое значение. То 
+есть любой вызов функции <b>nt!ExGetPreviousMode()</b>, внутри этого wrap'ера, 
+будет возвращать <b>KernelMode</b>. На самом деле wrap'ер намного сложнее, чем 
+просто смена <b>PreviousMode</b>, в чем можно убедиться взлянув на функцию 
+<b>nt!KiServiceInternal</b>. Смена режима вызова текущей нити на amd64 Win7 
+выглядит следующим образом (<b>nt!KiServiceInternal+2A</b>):
+                </p>
+            <br />
+                <pre class="brush: asm;">
+    mov     rbx, gs:188h
+    prefetchw byte ptr [rbx+1D8h]
+    movzx   edi, [rbx+_KTHREAD.PreviousMode]
+    mov     [rbp+0E8h+var_140], dil
+    mov     [rbx+_KTHREAD.PreviousMode], 0
+                </pre>
+            <br />
+                <p>
+Об этом можно прочесть в MSDN'овской статье
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff565438%28VS.85%29.aspx">Using Nt and Zw Versions of the Native System Services Routines</a>.
+Теперь рассмотрим пути создания kernel-описателя. Самый простой и 
+<i>прозрачный</i> способ это создать описатель на объект в нити процесса 
+<b>SYSTEM</b>. Ваш код исполняется в системной нити в следующих случаях:
+                </p>
+<ul>
+  <li>
+    В DriverEntry (точке входа) драйвера. Даже если загрузку драйвера инициировал 
+    пользовательский процесс, система вызовет DriverEntry к нити процесса SYSTEM
+  </li>
+  <li>
+    Очевидный вариант: из нити, созданной функцией 
+    <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff559932%28VS.85%29.aspx">PsCreateSystemThread(..., <b>ProcessHandle == NULL</b>, ...)</a>
+  </li>
+  <li>
+    В коде функции Work Item’а: все обработчики, указные при инициализации, 
+    вызываются только в нитях процесса SYSTEM
+  </li>
+</ul>
+            <br />
+                <p>
+Это, конечно, не полный список, но об этих ситуациях нужно помнить в первую 
+очередь. Но можно создать kernel-описатель в любой нити любого 
+процесса. Для этого нужно в атрибутах создаваемого объекта 
+(<b>nt!_OBJECT_ATTRIBUTES.Attributes</b>) указать флаг <b>OBJ_KERNEL_HANDLE</b>. 
+Это и будет сигнализировать ядру о том, что запрашиваемый описатель должен быть 
+создан в таблице процесса SYSTEM. И в результате будет возвращен описатель с 
+маской <b>KERNEL_HANDLE_MASK</b>.
+                </p>
+            <br />
+                <p>
+Механизм описателей показался разработчикам из kernel team довольно удобным. Это 
+отразилось, к примеру, в том, что идентификаторы процессов и 
+нитей (<b>PID</b> и <b>TID</b>) являются описателями специальной таблицы 
+<b>nt!PspCidTable</b>. Именно поэтому функция 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff559935%28VS.85%29.aspx">PsGetCurrentProcessId()</a> 
+возвращает HANDLE, а не DWORD, как в user mod’е. В этом достаточно просто 
+убедиться, если заглянуть в WRK в код функций PspCreateThread и PspCreateProcess 
+соответственно:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+    ... 
+
+    CidEntry.Object = Thread;
+    CidEntry.GrantedAccess = 0;
+    Thread-&gt;Cid.UniqueThread = ExCreateHandle (PspCidTable, &amp;CidEntry);
+
+    ... 
+
+    CidEntry.Object = Process;
+    CidEntry.GrantedAccess = 0;
+    Process-&gt;UniqueProcessId = ExCreateHandle (PspCidTable, &amp;CidEntry);
+
+    ... 
+                </pre>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

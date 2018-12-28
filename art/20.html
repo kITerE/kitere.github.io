@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Alternate Data Streams на ReFS</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, ReFS, Resilient File System, ADS, named stream, RefsAddAllocationForResidentWrite, ERROR_FILE_SYSTEM_LIMITATION, STATUS_FILE_SYSTEM_LIMITATION" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Alternate Data Streams на ReFS
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+На днях пришлось столкнуться с ADS'ами на новой Resilient файловой системе (ReFS). 
+По публичным документам от Micosoft складывалось двоякое впечатление: 
+по одним данным ADS были убраны из ReFS, по другим - оставлены.
+                </p>
+            <br />
+                <p>
+Публикации публикациями, но можно проверить вызовом 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa364993(v=vs.85).aspx">::GetVolumeInformation(...)</a>.
+На моей тестовой Win8.1 я получил маску флагов 0x070400cf:
+                </p>
+<ul>
+  <li>FILE_CASE_SENSITIVE_SEARCH</li>
+  <li>FILE_CASE_PRESERVED_NAMES</li>
+  <li>FILE_UNICODE_ON_DISK</li>
+  <li>FILE_PERSISTENT_ACLS</li>
+  <li>FILE_SUPPORTS_SPARSE_FILES</li>
+  <li>FILE_SUPPORTS_REPARSE_POINTS</li>
+  <li><b>FILE_NAMED_STREAMS</b></li>
+  <li>FILE_SUPPORTS_OPEN_BY_FILE_ID</li>
+  <li>FILE_SUPPORTS_USN_JOURNAL</li>
+  <li>FILE_SUPPORTS_INTEGRITY_STREAMS</li>
+</ul>
+            <br />
+                <p>
+Казалось бы, вот оно счастье - флаг <b>FILE_NAMED_STREAMS</b>. Создаем тестовый 
+stream, пишем в него тестовую строку - все работает на ура. Вызываем 
+::CopyFile(...), указывая в качестве целевого пути stream и... все завершается с 
+ошибкой <b>ERROR_FILE_SYSTEM_LIMITATION</b>, 665 (<b>STATUS_FILE_SYSTEM_LIMITATION</b>, 0xC0000427). 
+Протрассировав вызов, который завершается ошибкой, мы придем к функции 
+<b>RefsAddAllocationForResidentWrite</b>, которая проверяет размер stream'а и, 
+если он [размер] превышает 0x20000 (128 килобайт), то генерируется указанная ошибка.
+                </p>
+            <br />
+                <p>
+P.S. Уже со знанием этого лимита мне удалось найти его описание в статье 
+<a target="_blank" href="http://technet.microsoft.com/en-us/library/hh831724.aspx">Resilient File System Overview на TechNet</a>:
+                </p>
+            <br />
+                <div class="quote">
+ReFS also supports alternate data streams (up to 128K for both Windows 8.1 and Windows Server 2012 R2), which enables Office document thumbnails, Mark of the Web (MOTW), and similar features available on Windows 8.1.
+                </div>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

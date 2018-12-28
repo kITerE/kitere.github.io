@@ -1,0 +1,411 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Новый механизм подсчета ссылок на объект в Windows 8.1</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver, PointerCount, RealPointerCount, _OBJECT_HEADER, _HANDLE_TABLE_ENTRY, RefCnt" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Новый механизм подсчета ссылок на объект в Windows 8.1
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+В Windows 8.1 появился новый механизм подсчета ссылок. Этот механизм описан в 
+статье Alex Ionescu 
+<a target="_blank" href="http://www.alex-ionescu.com/?p=196">The Case Of The Bloated Reference Count: Handle Table Entry Changes in Windows 8.1</a>. 
+Визуально новый механизм бросается в глаза черезмерно большим счетчиком ссылок 
+у объектов. Суть статьи Ionescu можно выделить в следующем:
+                </p>
+            <br />
+                <div class="quote">
+<ul>
+<li>Each time a new handle is opened to an object, the reference count goes up by 0x7FFF, or 32767, on x64 Windows. On x86 Windows, the same behavior is seen by the way, but with 0x1F instead.</li>
+<li>Each time an existing handle to an object is used, the reference count goes down by 1.</li>
+</ul>
+                </div>
+            <br />
+                <p>
+Вся статья строится на статическом анализе счетчиков ссылок и описателей 
+объектов. Но для тех, кто (как я) лучше понимает происходящее в динамике, 
+предлагаю ниже трассировку простого теста: CreateFile + WriteFile + CloseHandle.
+                </p>
+            <br />
+                <p>
+Файловый объект после создания (состояние счетчика "как раньше"):
+                </p>
+                <div class="code">
+kd&gt; !handle 0x74 3 ffffe0000070f080 
+
+PROCESS ffffe0000070f080
+    SessionId: 1  Cid: 0978    Peb: 7ffdf000  ParentCid: 0910
+    DirBase: 1846c000  ObjectTable: ffffc00007e24980  HandleCount: &lt;Data Not Accessible&gt;
+    Image: test.exe
+
+Handle Error reading handle count.
+
+0074: Object: ffffe0000212c910  GrantedAccess: 00120196 (Inherit) (Audit) Entry: ffffc00002e591d0
+Object: ffffe0000212c910  Type: (ffffe00000086dc0) File
+    ObjectHeader: ffffe0000212c8e0 (new version)
+        HandleCount: 1  PointerCount: 1
+        Directory Object: 00000000  Name: \Users\xx\AppData\Local\Temp\50214E8.tmp {HarddiskVolume2}
+kd&gt; !trueref ffffe0000212c910
+ffffe0000212c910: HandleCount: 1 PointerCount: 1 RealPointerCount: 1
+                </div>
+            <br />
+                <p>
+Ставим точку останова на изменение счетчика количества ссылок в объекте:
+                </p>
+                <div class="code">
+kd&gt; dt nt!_OBJECT_HEADER ffffe0000212c8e0 PointerCount
+   +0x000 PointerCount : 1
+kd&gt; ba w 4 ffffe0000212c8e0
+                </div>
+            <br />
+                <p>
+Ставим точку останова на изменение счетчика количества ссылок в элементе 
+таблицы описателей (захватывая соседние битовые поля):
+                </p>
+                <div class="code">
+kd&gt; dt nt!_HANDLE_TABLE_ENTRY ffffc00002e591d0
+   +0x000 VolatileLowValue : 0xe0000212`c8e00001
+   +0x000 LowValue         : 0xe0000212`c8e00001
+   +0x000 InfoTable        : 0xe0000212`c8e00001 _HANDLE_TABLE_ENTRY_INFO
+   +0x000 Unlocked         : 0y1
+   +0x000 RefCnt           : 0y0000000000000000 (0)
+   +0x000 Attributes       : 0y000
+   +0x000 ObjectPointerBits : 0y11100000000000000000001000010010110010001110 (0xe0000212c8e)
+   +0x008 HighValue        : 0x0000001e`00120196
+   +0x008 NextFreeHandleEntry : 0x0000001e`00120196 _HANDLE_TABLE_ENTRY
+   +0x008 LeafHandleValue  : _EXHANDLE
+   +0x008 GrantedAccessBits : 0y0000100100000000110010110 (0x120196)
+   +0x008 NoRightsUpgrade  : 0y0
+   +0x008 Spare            : 0y000000 (0)
+   +0x00c TypeInfo         : 0x1e
+kd&gt; ba w 8 ffffc00002e591d0
+                </div>
+            <br />
+                <p>
+И ставим еще одну точку останова на уничтожение объекта файла:
+                </p>
+                <div class="code">
+kd&gt; bp nt!IopDeleteFile "j @rcx==ffffe0000212c910 'k 5';'gc'"
+                </div>
+            <br />
+                <p>
+Первый останов - NtWriteFile сбрасывает поле Unlocked в элементе таблицы описателей:
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 1 hit
+nt!NtWriteFile+0x9ef:
+fffff802`ef629d6b 75e2            jne     nt!NtWriteFile+0x9d3 (fffff802`ef629d4f)
+kd&gt; dt nt!_HANDLE_TABLE_ENTRY ffffc00002e591d0
+   +0x000 VolatileLowValue : 0xe0000212`c8e00000
+   +0x000 LowValue         : 0xe0000212`c8e00000
+   +0x000 InfoTable        : 0xe0000212`c8e00000 _HANDLE_TABLE_ENTRY_INFO
+   +0x000 Unlocked         : 0y0
+   +0x000 RefCnt           : 0y0000000000000000 (0)
+   +0x000 Attributes       : 0y000
+   +0x000 ObjectPointerBits : 0y11100000000000000000001000010010110010001110 (0xe0000212c8e)
+   +0x008 HighValue        : 0x0000001e`00120196
+   +0x008 NextFreeHandleEntry : 0x0000001e`00120196 _HANDLE_TABLE_ENTRY
+   +0x008 LeafHandleValue  : _EXHANDLE
+   +0x008 GrantedAccessBits : 0y0000100100000000110010110 (0x120196)
+   +0x008 NoRightsUpgrade  : 0y0
+   +0x008 Spare            : 0y000000 (0)
+   +0x00c TypeInfo         : 0x1e
+                </div>
+            <br />
+                <p>
+Следующий останов - изменение счетчика в элементе таблицы описателей:
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 1 hit
+nt!ExSlowReplenishHandleTableEntry+0x32:
+fffff802`ef3651ea 418bc0          mov     eax,r8d
+kd&gt; k 3
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc7aa8 fffff802`ef629d8e nt!ExSlowReplenishHandleTableEntry+0x32
+01 ffffd000`20fc7ab0 fffff802`ef3d48b3 nt!NtWriteFile+0xa12
+02 ffffd000`20fc7bd0 00000000`77912772 nt!KiSystemServiceCopyEnd+0x13
+kd&gt; dt nt!_HANDLE_TABLE_ENTRY ffffc00002e591d0
+   +0x000 VolatileLowValue : 0xe0000212`c8e0fffe
+   +0x000 LowValue         : 0xe0000212`c8e0fffe
+   +0x000 InfoTable        : 0xe0000212`c8e0fffe _HANDLE_TABLE_ENTRY_INFO
+   +0x000 Unlocked         : 0y0
+   +0x000 RefCnt           : 0y0111111111111111 (0x7fff)
+   +0x000 Attributes       : 0y000
+   +0x000 ObjectPointerBits : 0y11100000000000000000001000010010110010001110 (0xe0000212c8e)
+   +0x008 HighValue        : 0x0000001e`00120196
+   +0x008 NextFreeHandleEntry : 0x0000001e`00120196 _HANDLE_TABLE_ENTRY
+   +0x008 LeafHandleValue  : _EXHANDLE
+   +0x008 GrantedAccessBits : 0y0000100100000000110010110 (0x120196)
+   +0x008 NoRightsUpgrade  : 0y0
+   +0x008 Spare            : 0y000000 (0)
+   +0x00c TypeInfo         : 0x1e
+                </div>
+            <br />
+                <p>
+Далее наблюдаем останов, при  котом происходит скачкообразное изменение 
+количества ссылок у объекта при разыменовывании описателя:
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 0 hit
+nt!NtWriteFile+0xa1f:
+fffff802`ef629d9b 4885c0          test    rax,rax
+kd&gt; !trueref ffffe0000212c910
+ffffe0000212c910: HandleCount: 1 PointerCount: 32769 RealPointerCount: 2
+
+kd&gt; k2
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc7ab0 fffff802`ef3d48b3 nt!NtWriteFile+0xa1f
+01 ffffd000`20fc7bd0 00000000`77912772 nt!KiSystemServiceCopyEnd+0x13
+Сразу видим новое значение количества ссылок после referenc'а описателя (32769 = 00000000`00008001).
+Следующий останов - NtWriteFile взводит обратно поле Unlocked в элементе таблицы описателей:
+kd&gt; g
+Breakpoint 1 hit
+nt!NtWriteFile+0xa32:
+fffff802`ef629dae 498d4d30        lea     rcx,[r13+30h]
+kd&gt; dt nt!_HANDLE_TABLE_ENTRY ffffc00002e591d0
+   +0x000 VolatileLowValue : 0xe0000212`c8e0ffff
+   +0x000 LowValue         : 0xe0000212`c8e0ffff
+   +0x000 InfoTable        : 0xe0000212`c8e0ffff _HANDLE_TABLE_ENTRY_INFO
+   +0x000 Unlocked         : 0y1
+   +0x000 RefCnt           : 0y0111111111111111 (0x7fff)
+   +0x000 Attributes       : 0y000
+   +0x000 ObjectPointerBits : 0y11100000000000000000001000010010110010001110 (0xe0000212c8e)
+   +0x008 HighValue        : 0x0000001e`00120196
+   +0x008 NextFreeHandleEntry : 0x0000001e`00120196 _HANDLE_TABLE_ENTRY
+   +0x008 LeafHandleValue  : _EXHANDLE
+   +0x008 GrantedAccessBits : 0y0000100100000000110010110 (0x120196)
+   +0x008 NoRightsUpgrade  : 0y0
+   +0x008 Spare            : 0y000000 (0)
+   +0x00c TypeInfo         : 0x1e
+                </div>
+            <br />
+                <p>
+Потом видим парные остановы изменения количества ссылок объекта при работе с IRP:
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 0 hit
+nt!ObfReferenceObject+0x25:
+fffff802`ef2e10c5 48ffc3          inc     rbx
+kd&gt; !trueref ffffe0000212c910
+ffffe0000212c910: HandleCount: 1 PointerCount: 32770 RealPointerCount: 3
+
+kd&gt; k3
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc79a0 fffff802`ef62a211 nt!ObfReferenceObject+0x25
+01 ffffd000`20fc79e0 fffff802`ef629acc nt!IopSynchronousServiceTail+0x2f1
+02 ffffd000`20fc7ab0 fffff802`ef3d48b3 nt!NtWriteFile+0x750
+                </div>
+                <div class="code">
+kd&gt; g
+Breakpoint 0 hit
+nt!IopCompleteRequest+0x35d:
+fffff802`ef2baaad 48ffc8          dec     rax
+kd&gt; !trueref ffffe0000212c910
+ffffe0000212c910: HandleCount: 1 PointerCount: 32769 RealPointerCount: 2
+
+kd&gt; k8
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc7400 fffff802`ef2bc384 nt!IopCompleteRequest+0x35d
+01 ffffd000`20fc7500 fffff800`00cc8b85 nt!IopfCompleteRequest+0x6a4
+02 ffffd000`20fc7610 fffff800`00ccad9c Ntfs!NtfsCommonWrite+0x2f58
+03 ffffd000`20fc7840 fffff800`0041cf3e Ntfs!NtfsFsdWrite+0x1dc
+04 ffffd000`20fc7900 fffff800`0041bae6 fltmgr!FltpLegacyProcessingAfterPreCallbacksCompleted+0x25e
+05 ffffd000`20fc7980 fffff802`ef62a08c fltmgr!FltpDispatch+0xb6
+06 ffffd000`20fc79e0 fffff802`ef629acc nt!IopSynchronousServiceTail+0x16c
+07 ffffd000`20fc7ab0 fffff802`ef3d48b3 nt!NtWriteFile+0x750
+                </div>
+            <br />
+                <p>
+Затем NtWriteFile "вернул" количество ссылок:
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 0 hit
+nt!ObDereferenceObjectDeferDeleteWithTag+0x27:
+fffff802`ef2b4ac3 48ffc8          dec     rax
+kd&gt; !trueref ffffe0000212c910
+ffffe0000212c910: HandleCount: 1 PointerCount: 32768 RealPointerCount: 1
+
+kd&gt; k3
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc79a0 fffff802`ef62a221 nt!ObDereferenceObjectDeferDeleteWithTag+0x27
+01 ffffd000`20fc79e0 fffff802`ef629acc nt!IopSynchronousServiceTail+0x301
+02 ffffd000`20fc7ab0 fffff802`ef3d48b3 nt!NtWriteFile+0x750
+                </div>
+            <br />
+                <p>
+Очередной останов - сброс флага Unlocked в элементе таблицы описателей (работы 
+системного вызова NtClose):
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 1 hit
+nt!ExMapHandleToPointer+0x3a:
+fffff802`ef646d4a 75e6            jne     nt!ExMapHandleToPointer+0x22 (fffff802`ef646d32)
+kd&gt; dt nt!_HANDLE_TABLE_ENTRY ffffc00002e591d0
+   +0x000 VolatileLowValue : 0xe0000212`c8e0fffe
+   +0x000 LowValue         : 0xe0000212`c8e0fffe
+   +0x000 InfoTable        : 0xe0000212`c8e0fffe _HANDLE_TABLE_ENTRY_INFO
+   +0x000 Unlocked         : 0y0
+   +0x000 RefCnt           : 0y0111111111111111 (0x7fff)
+   +0x000 Attributes       : 0y000
+   +0x000 ObjectPointerBits : 0y11100000000000000000001000010010110010001110 (0xe0000212c8e)
+   +0x008 HighValue        : 0x0000001e`00120196
+   +0x008 NextFreeHandleEntry : 0x0000001e`00120196 _HANDLE_TABLE_ENTRY
+   +0x008 LeafHandleValue  : _EXHANDLE
+   +0x008 GrantedAccessBits : 0y0000100100000000110010110 (0x120196)
+   +0x008 NoRightsUpgrade  : 0y0
+   +0x008 Spare            : 0y000000 (0)
+   +0x00c TypeInfo         : 0x1e
+kd&gt; k3
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc7af0 fffff802`ef6462e0 nt!ExMapHandleToPointer+0x3a
+01 ffffd000`20fc7b20 fffff802`ef3d48b3 nt!NtClose+0xa0
+02 ffffd000`20fc7c40 00000000`77912772 nt!KiSystemServiceCopyEnd+0x13
+                </div>
+            <br />
+                <p>
+Далее видим корректировку количества ссылок в элементе таблицы описателей:
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 1 hit
+nt!ExDestroyHandle+0x40:
+fffff802`ef646db0 4c8936          mov     qword ptr [rsi],r14
+kd&gt; dt nt!_HANDLE_TABLE_ENTRY ffffc00002e591d0
+   +0x000 VolatileLowValue : 0xe0000212`c8e00000
+   +0x000 LowValue         : 0xe0000212`c8e00000
+   +0x000 InfoTable        : 0xe0000212`c8e00000 _HANDLE_TABLE_ENTRY_INFO
+   +0x000 Unlocked         : 0y0
+   +0x000 RefCnt           : 0y0000000000000000 (0)
+   +0x000 Attributes       : 0y000
+   +0x000 ObjectPointerBits : 0y11100000000000000000001000010010110010001110 (0xe0000212c8e)
+   +0x008 HighValue        : 0x0000001e`00120196
+   +0x008 NextFreeHandleEntry : 0x0000001e`00120196 _HANDLE_TABLE_ENTRY
+   +0x008 LeafHandleValue  : _EXHANDLE
+   +0x008 GrantedAccessBits : 0y0000100100000000110010110 (0x120196)
+   +0x008 NoRightsUpgrade  : 0y0
+   +0x008 Spare            : 0y000000 (0)
+   +0x00c TypeInfo         : 0x1e
+kd&gt; k3
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc7ae0 fffff802`ef646360 nt!ExDestroyHandle+0x40
+01 ffffd000`20fc7b20 fffff802`ef3d48b3 nt!NtClose+0x120
+02 ffffd000`20fc7c40 00000000`77912772 nt!KiSystemServiceCopyEnd+0x13
+                </div>
+            <br />
+                <p>
+Элемент таблицы описателей нам больше не интересен:
+                </p>
+                <div class="code">
+kd&gt; bc1
+                </div>
+            <br />
+                <p>
+Следующий останов - NtClose корректирует количество ссылок на объект (в 
+заголовке объекта) с учетом закрытия описателя:
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 0 hit
+nt!NtClose+0x203:
+fffff802`ef646443 ba4f62486e      mov     edx,6E48624Fh
+kd&gt; dt nt!_OBJECT_HEADER ffffe0000212c8e0 PointerCount
+   +0x000 PointerCount : 1
+kd&gt; !trueref ffffe0000212c910
+ffffe0000212c910: HandleCount: 0 PointerCount: 1 RealPointerCount: 1
+
+                </div>
+            <br />
+                <p>
+Затем NtClose снимает последнюю ссылку с объекта:
+                </p>
+                <div class="code">
+kd&gt; g
+Breakpoint 0 hit
+nt!ObfDereferenceObjectWithTag+0x29:
+fffff802`ef2e1109 48ffcb          dec     rbx
+kd&gt; !trueref ffffe0000212c910
+ffffe0000212c910: HandleCount: 0 PointerCount: 0 RealPointerCount: 0
+
+kd&gt; k3
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc7ae0 fffff802`ef646450 nt!ObfDereferenceObjectWithTag+0x29
+01 ffffd000`20fc7b20 fffff802`ef3d48b3 nt!NtClose+0x210
+02 ffffd000`20fc7c40 00000000`77912772 nt!KiSystemServiceCopyEnd+0x13
+                </div>
+            <br />
+                <p>
+И последний останов - ожидаемое разрушение объекта:
+                </p>
+                <div class="code">
+kd&gt; g
+ # Child-SP          RetAddr           Call Site
+00 ffffd000`20fc7a78 fffff802`ef62af28 nt!IopDeleteFile
+01 ffffd000`20fc7a80 fffff802`ef2e116f nt!ObpRemoveObjectRoutine+0x64
+02 ffffd000`20fc7ae0 fffff802`ef646450 nt!ObfDereferenceObjectWithTag+0x8f
+03 ffffd000`20fc7b20 fffff802`ef3d48b3 nt!NtClose+0x210
+04 ffffd000`20fc7c40 00000000`77912772 nt!KiSystemServiceCopyEnd+0x13
+nt!IopDeleteFile:
+fffff802`ef645fbc 488bc4          mov     rax,rsp
+
+                </div>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

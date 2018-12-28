@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; &quot;Закат&quot; Legacy-фильтров файловых систем: что под капотом?</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver, IoBlockLegacyFsFilters, IopBlockLegacyFsFilters, IopAttachDeviceToDeviceStackSafe, IoRegisterFsRegistrationChangeMountAware, legacy file system filter" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; &quot;Закат&quot; Legacy-фильтров файловых систем: что под капотом?
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Если вдруг кто-то не знает, то Microsoft уже сделала (в Windows 10 версии 1607) 
+твердый шаг в сторону запрета Legacy-фильтров файловых систем: 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ifs/blocking-file-system-filter-drivers">Blocking legacy file system filter drivers</a>.
+                </p>
+                <p>
+Так как же реализован этот запрет? В качестве целевой системы рассмотрим 32-х 
+разрядную Windows 10 с номером сборки 16299.
+                </p>
+            <br />
+                <p>
+Для начала найдем перемененную, в которую читается значение IoBlockLegacyFsFilters 
+ключа реестра HKLM\SYSTEM\CurrentControlSet\Control\SessionManager\I/O System. 
+Это глобальная переменная <b>IopBlockLegacyFsFilters</b>:
+                </p>
+                <div class="code">
+INIT:00A0826C dd offset aSessionMana_12 ; &quot;Session Manager\\I/O System&quot;
+INIT:00A08270 dd offset aIoblocklegacyf ; &quot;IoBlockLegacyFsFilters&quot;
+INIT:00A08274 dd offset _IopBlockLegacyFsFilters
+                </div>
+            <br />
+                <p>
+Затем взглянем на использование <b>IopBlockLegacyFsFilters</b>:
+                </p>
+                <div class="code">
+.data:00665FB4 _IopBlockLegacyFsFilters dd ? ; DATA XREF: IopAttachDeviceToDeviceStackSafe(x,x,x)+8B
+.data:00665FB4                               ; IopAttachDeviceToDeviceStackSafe(x,x,x):loc_5A32DA
+.data:00665FB4                               ; IoRegisterFsRegistrationChangeMountAware(x,x,x)+12
+.data:00665FB4                               ; INIT:00A08274
+                </div>
+            <br />
+                <p>
+Рассмотрим в начале функцию IoRegisterFsRegistrationChangeMountAware, которая 
+является реализацией экспортируемой функции
+<a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff548499(v=vs.85).aspx">IoRegisterFsRegistrationChange(...)</a>.
+В ней мы обнаружим следующий псевдо-код:
+                </p>
+                <pre class="brush: cpp;">
+  if ( IopBlockLegacyFsFilters &amp;&amp; !IopIsKnownGoodLegacyFsFilter(&amp;DriverObject-&gt;DriverName) )
+  {
+                </pre>
+            <br />
+                <p>
+То есть для &quot;встроенных&quot; Legacy-фильтров файловых систем оставлено старое API. 
+И, как видно из листинга, <b><i>хороший</i></b> драйвер распознается по имени:
+                </p>
+                <pre class="brush: cpp;">
+bool IopIsKnownGoodLegacyFsFilter(_UNICODE_STRING *DriverObjectName)
+{
+  ULONG i = 0;
+  USHORT DriverObjectNameLength = DriverObjectName-&gt;Length;
+
+  do
+  {
+    if ( g_KnownGoodLegacyFsFilter[i].Length == DriverObjectNameLength
+      &amp;&amp; !memcmp(g_KnownGoodLegacyFsFilter[i].Buffer, DriverObjectName-&gt;Buffer, g_KnownGoodLegacyFsFilter[i].Length) )
+    {
+      break;
+    }
+    ++i;
+  }
+  while ( i &lt; 3 );
+  return i &lt; 3;
+}
+                </pre>
+            <br />
+                <p>
+Глобальный массив, названный мной g_KnownGoodLegacyFsFilter:
+                </p>
+                <div class="code">
+.text:004043F8 ; UNICODE_STRING g_KnownGoodLegacyFsFilter[3]
+.text:004043F8 g_KnownGoodLegacyFsFilter UNICODE_STRING &lt;24h, 26h, offset aFilesystemFltm&gt;
+.text:004043F8                 UNICODE_STRING &lt;20h, 22h, offset aFilesystemMsfs&gt;
+.text:004043F8                 UNICODE_STRING &lt;20h, 22h, offset aFilesystemNpfs&gt;
+                </div>
+                <div class="code">
+.text:0041E538 aFilesystemFltm:                        ; DATA XREF: .text:g_KnownGoodLegacyFsFilter
+.text:0041E538                 unicode 0, &lt;\FileSystem\FltMgr&gt;,0
+.text:0041E55E                 align 10h
+.text:0041E560 aFilesystemMsfs:                        ; DATA XREF: .text:g_KnownGoodLegacyFsFilter
+.text:0041E560                 unicode 0, &lt;\FileSystem\Msfs&gt;,0
+.text:0041E582                 align 4
+.text:0041E584 aFilesystemNpfs:                        ; DATA XREF: .text:g_KnownGoodLegacyFsFilter
+.text:0041E584                 unicode 0, &lt;\FileSystem\Npfs&gt;,0
+.text:0041E5A6                 align 4
+                </div>
+            <br />
+                <p>
+То есть банальный белый список по имени обьекта драйвера.
+                </p>
+            <br />
+                <p>
+Microsoft не ограничилась контролем функции IoRegisterFsRegistrationChange:
+еще одна проверка была вставлена в код функциии <b>IopAttachDeviceToDeviceStackSafe</b>,
+которая является реализацией 
+<a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff548236(v=vs.85).aspx">IoAttachDeviceToDeviceStackSafe(...)</a>.
+Взглянем на псевдо-код:
+                </p>
+                <pre class="brush: cpp;">
+  TargetDeviceAttachmentBase = IopGetDeviceAttachmentBase(TargetDevice);
+  TargetDeviceType = TargetDeviceAttachmentBase-&gt;DeviceType;
+  if ( (TargetDeviceType == FILE_DEVICE_DISK_FILE_SYSTEM
+     || TargetDeviceType == FILE_DEVICE_CD_ROM_FILE_SYSTEM
+     || TargetDeviceType == FILE_DEVICE_NETWORK_FILE_SYSTEM
+     || TargetDeviceType == FILE_DEVICE_TAPE_FILE_SYSTEM
+     || TargetDeviceType == FILE_DEVICE_DFS_FILE_SYSTEM)
+    &amp;&amp; (TargetDeviceAttachmentBase-&gt;Flags &amp; 0x10000000 || IopBlockLegacyFsFilters) )// DO_DAX_VOLUME (0x10000000)
+  {
+    if ( IopIsKnownGoodLegacyFsFilter(&amp;SourceDevice_-&gt;DriverObject-&gt;DriverName) )
+    {
+                </pre>
+            <br />
+                <p>
+Тут мы видим реализацию уточнения по DAX-томам, которое содержится в 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ifs/blocking-file-system-filter-drivers">Blocking legacy file system filter drivers</a>:
+                </p>
+                <div class="quote">
+Also, legacy file system filter drivers can’t attach to direct access (DAX) volumes.
+                </div>
+                <p>
+Стоит отметить, что в <b>IopAttachDeviceToDeviceStackSafe</b> Legacy-фильтрами 
+файловых систем считаются все, кто пытается при-attach'иться к устройствам с типом 
+файловой системы.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

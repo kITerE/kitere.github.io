@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Заметки о WinDbg</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg" />
+<link rel="stylesheet" type="text/css" href="style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; Заметки о WinDbg
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="index.htm">Стартовая страница</a></li>
+                <li><a href="Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="Downloads.html">Скачать</a></li>
+                <li><a href="Links.html">Внешние ссылки</a></li>
+                <li><a href="Overview.html">Обо всем</a></li>
+                <li><a href="Contacts.html">Контакты</a></li>
+                <li><a href="Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Данный раздел посвящен отладке с использованием WinDbg. Это, с одной стороны, мощное
+средство отладки. Обилие внутренних команд и макросов позволяет довольно глубоко
+заглянуть внутрь происходящего в системе. Но есть и "ложка дегтя", точнее их две:
+</p><ul><li>
+Невероятное количество глюков. Из-за их огромного количества у
+меня часто возникает ощущение, что в MS'е пользуются совершенно другим
+средством отладки.
+</li><li>
+Окно дизассемблера, которое невозможно использовать. Мало того, что 
+при дизассемблировании отладчик начинает "выдумывать" смещения, 
+относительно символов (что-то вроде _except_handler+0x102). Так еще и
+пользоваться прокруткой в окне дизассемблера просто невозможно. 
+</li></ul><p>
+В целом, я стараюсь пользоваться только окном команд. Ну и окна исходников, когда
+они доступны.
+                </p>
+            <br /><br />
+            <hr />
+            <br />
+                <h2>Проекты, связанные с отладкой с использованием WinDbg</h2>
+            <br /><h3> *** <a href="http://virtualkd.sysprogs.org/" target="_blank">Virtual KD</a></h3><br />
+                <p>
+Отличный проект, который упростит жизнь всем, при отладке виртуальной машины:
+<a href="http://virtualkd.sysprogs.org/" target="_blank">Virtual KD</a>.
+Booster для отладки виртуальных машин VMWare и VirtualBOX. Полность открытый
+исходный код, небольшое количество глюков, сборки под платформы x32 и x64. Для 
+желающих "пореверсить" протокол удаленного взаимодействия отладчика заботливо 
+предусмотрен режим сохранения логов транспорта.
+                </p>
+            <br /><h3> *** <a href="http://pykd.codeplex.com/" target="_blank">PYKD</a></h3><br />
+                <p>
+                </p>
+Автоматизация работы с WinDbg с использованием скриптов на языке Python - 
+<a href="http://pykd.codeplex.com/" target="_blank">PYKD</a>. Проект 
+развивается в 2-х направлениях: как расширение к WinDbg и как модуль работы с 
+<a href="http://msdn.microsoft.com/en-us/library/ff540540%28VS.85%29.aspx" target="_blank">Debugger Engine</a>. 
+Первое позволяет писать py-скрипты для исполнения их в отладчике, а второе 
+направление позволяет использовать отладочные средства Windows из интерпретатора 
+python.exe: запуск процесса под отладкой, анализ аварийных дампов памяти и т.п.
+                <p>
+Есть русскоязычный блог - 
+<a href="http://pykd.blogspot.com/" target="_blank">Python windbg extension</a>.
+                </p>
+            <br />
+                <p>
+На одной из страниц документации я веду (и пополняю время от времени) 
+<a href="http://pykd.codeplex.com/wikipage?title=docs_articles_links" target="_blank">список полезных ссылок по написанию расширений в WinDbg</a>
+                </p>
+            <br /><h3> *** <a href="http://kdar.codeplex.com/" target="_blank">KDAR</a></h3><br />
+                <p>
+Набор скриптов, для анализа "живой системы": 
+<a href="http://kdar.codeplex.com/" target="_blank">KDAR</a>.
+Проверяет множество узких мест ядра на предмет перехватов или иных аномалий. 
+Может использоваться для выявления rootkit'ов по kernel dump'ам или для анализа 
+установленных перехватов вполне легальными продуктами. Например, для выявления 
+несовместимостей не совсем честных перехватов :).
+                </p>
+                <p>
+Пока поддерживается только i386 платформа, но в будущем планируется перейти на 
+<a href="http://pykd.codeplex.com/" target="_blank">PYKD</a> и добавить полную 
+поддержку AMD64 (сейчас часть скриптов не рассчитаны на 64-х разрядную 
+платформу).
+                </p>
+            <br /><br />
+            <hr />
+            <br />
+                <h2>Мои скрипты, расширения и часто используемые команды </h2>
+            <br />
+                <p>
+                <a href="kd/new_10.0.15063.0.html">Что нового в Windows Debugger 10.0.15063.0</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/vbox_kd.html">vbox_kd - небольшой набор скриптов для автоматизации запуска отладчика WinDbg при работе с VirtualBox</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/windbg_natvis.html">WinDbg 10.0.10075 получил поддержку .NatVis-файлов</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/win10074_windbg10041_kdnic.html">WinDbg 10.0.10041.3 не совместим с Windows 10 10074</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/phd5_windbg_pykd.html">[PHDays] Автоматизация отладки в WinDbg</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/WinDbg_6.12_vs_6.3.html">WinDbg 6.3.9600: новые возможности отладки</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/alpc_extension.html">Расширение !alpc для WinDbg</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/wtTree.html">Визуализация графа вызовов на основе лога команды wt</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/Win8DevPrev_WinDbg_FullDump.html">Полный дамп падения с Windows 8 Developer Preview - повод обновить WinDbg</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/DExtReInit.html">Особенность инициализации расширения отладчика: вызовы DebugExtensionInitialize / DebugExtensionUninitialize</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/dml.html">Debugger Markup Language (DML): краткий обзор</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/cmd.html">Часто используемые команды отладчика</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/extlib.html">Библиотека kdek_ext.dll расширений отладчика WinDbg</a>
+                </p>
+            <br />
+                <p>
+                Создание PE-файла по загруженному в память образу, используя расширение к WinDbg: 
+                </p>
+                <p>
+                <a href="kd/pedump.html">!kdextmod.pedump</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/scripts.html">Скрипты для отладчика WinDbg</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/cmdline.html">Некоторые параметры командной строки отладчика</a>
+                </p>
+            <br />
+                <p>
+                <a href="kd/WinDBG_Download.html">Прямые ссылки для скачивания отладчика WinDBG</a>
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Преобразование DOS-пути в NT-формат: функция RtlDosPathNameToNtPathName_U</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, преобразование пути в NT-формат, RtlDosPathNameToNtPathName_U, работа с файлами Zw-функциями" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Преобразование DOS-пути в NT-формат: функция RtlDosPathNameToNtPathName_U
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Думаю, что многим приходилось писать программы, в которых использовались 
+Zw-(Nt-) функции работы с файлами. Одним из больших неудобств, при 
+разработке подобного софта, является обработка путей файлов и директорий, 
+вводимых пользователем. Не всегда удобно заставлять пользователя вводить 
+имена <i><b>\??\D:\dir00\file.ext</b></i>. Для решения подобного рода 
+проблем в ntdll.dll экспортируется функция RtlDosPathNameToNtPathName_U:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+NTSYSAPI BOOLEAN NTAPI RtlDosPathNameToNtPathName_U(
+    __in PCWSTR DosFileName,
+    __out PUNICODE_STRING NtFileName,
+    __out_opt PWSTR *FilePart,
+    __out_opt PVOID RelativeName
+);
+                </pre>
+            <br />
+                <p>
+Как можно догадаться из названия, функция служит для того, что бы 
+преобразовывать DOS-имена файлов в nativ'ный формат. Рассмотрим отдельно 
+параметры функции:
+                </p>
+                <p> 
+<b>DosFileName</b>: входной параметр. Константная строка, содержащая DOS-имя 
+целевого файла или директории.
+                </p>
+                <p>
+<b>NtFileName</b>: выходной параметр. В указанную строку функция будет 
+выделять и заполнять NT-путь до файла или директории.
+                </p>
+                <p>
+<b>FilePart</b>: выходной опциональный параметр. На выходе, в указатель 
+будет занесен адрес имени файла в сформированном пути. Если этот параметр 
+на выходе заполняется NULL, то указано только имя директории.
+                </p>
+                <p>
+<b>RelativeName</b>: выходной опциональный параметр. На самом деле это 
+указатель на RTL-структуру, содержащую информацию о текущей директории, 
+но формат ее толком не известен, и самое главное, возможно, меняется от 
+версии к версии операционной системы. Можно принять этот параметр за 
+PVOID Reserved, который всегда должен быть NULL :)
+                </p>
+                <p>
+<b>Возвращаемое значение</b>:
+                </p>
+                <p>
+TRUE - операция преобразования пути успешно завершена. После использования, 
+необходимо освободить буфер строки NtFileName вызовом 
+HeapFree(GetProcessHeap(), 0, NtFileName-&gt;Buffer)
+                </p>
+                <p>
+FALSE - операция преобразования пути завершилась с ошибкой.
+                </p>
+            <br />
+                <p>
+Для тестирования этой функции я написал небольшую утилиту 
+<a href="../download/dos2nt.rar">dos2nt</a>.
+Эта консольная утилита просто вызывает функцию 
+ntdll!RtlDosPathNameToNtPathName_U(...) со строкой, переданной ей в 
+качестве аргумента. После успешного вызова, утилита печатает в консоль 
+выходные параметры функции. На основе результатов тестирования утилиты 
+можно сделать довольно интересные особенности работы функции. Примеры 
+указаны для ситуации, в которой текущей директорией утилиты является 
+<i><b>D:\Test\dir00\</b></i>. Пример печати утилиты:
+                </p>
+            <br />
+                <div class="code">
+D:\Test\dir00&gt;dos2nt dir.name\file.name
+DOS Name  : dir.name\file.name
+NT Name   : \??\D:\Test\dir00\dir.name\file.name
+File Part : file.name
+                </div>
+            <br />
+                <p>
+Если указанный путь заканчивается символом обратного слеша, то указанное 
+имя трактуется как директория. На это указывает NULL в возвращаемом параметре 
+имени файла FilePart. Это удобно, если учесть, что при вызове ZwCreateFile 
+необходимо указывать во флагах признак директории\файла: 
+<b>FILE_DIRECTORY_FILE</b> и <b>FILE_NON_DIRECTORY_FILE</b>. 
+Пример печати утилиты:
+                </p>
+            <br />
+                <div class="code">
+D:\Test\dir00&gt;dos2nt dir.name\
+DOS Name  : dir.name\
+NT Name   : \??\D:\Test\dir00\dir.name\
+File Part : (null)
+                </div>
+            <br />
+                <p>
+Если указанный путь начинается с символа обратного слеша, то путь преобразуется, 
+как указанный от корневой директории текущего диска. Пример печати утилиты:
+                </p>
+            <br />
+                <div class="code">
+D:\Test\dir00&gt;dos2nt \dir.name\file.name
+DOS Name  : \dir.name\file.name
+NT Name   : \??\D:\dir.name\file.name
+File Part : file.name
+                </div>
+            <br />
+                <p>
+Еще одна из немаловажных <i>"вкусностей"</i> работы функции - преобразование 
+прямых слешей в обратные. То есть не важно, какими млешами пользователь разделял 
+путь при вводе, функция добросовестно приведет путь к человеческому 
+(Windows - Style) виду. Пример печати утилиты:
+                </p>
+            <br />
+                <div class="code">
+D:\Test\dir00&gt;dos2nt dir.name/file.name
+DOS Name  : dir.name/file.name
+NT Name   : \??\D:\Test\dir00\dir.name\file.name
+File Part : file.name
+                </div>
+            <br />
+                <p>
+Еще одна из особенностей работы функции, это преобразование префикса 
+"\\.\" в "\??\". Например, введем имя pipe'а и на выходе получим:
+                </p>
+            <br />
+                <div class="code">
+D:\Test\dir00&gt;dos2nt \\.\pipe\w2003
+DOS Name  : \\.\pipe\w2003
+NT Name   : \??\pipe\w2003
+File Part : w2003
+                </div>
+            <br />
+                <p>
+Ну и последнее, на что хотелось бы обратить внимание, это то, что функция 
+никак не реагирует на специальные символы: '?' '*' '&lt;' '&gt;'. Естественно, 
+что файловая система, при обработке пути, вернет ошибку, так что нужно быть 
+готовым к статусу <b>STATUS_OBJECT_NAME_INVALID</b>. Пример печати утилиты:
+                </p>
+            <br />
+                <div class="code">
+D:\Test\dir00&gt;dos2nt d*r.name\f?le.name
+DOS Name  : d*r.name\f?le.name
+NT Name   : \??\D:\Test\dir00\d*r.name\f?le.name
+File Part : f?le.name
+                </div>
+            <br />
+                <p>
+Функция присутствует на всей линейке ОС: 2000 - Seven(7). Резюмируя 
+вышеописанное, хочется сказать, что использование этой функции может сильно 
+упростить жизнь при работе с файловой подсистемой на nativ'ном уровне. 
+Use and enjoy.
+                </p>
+            <br />
+                <p>
+Тестовую утилиту с исходным кодом можно скачать 
+<a href="../download/dos2nt.rar">здесь</a>.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

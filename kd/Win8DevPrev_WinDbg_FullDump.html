@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Полный дамп падения с Windows 8 Developer Preview - повод обновить WinDbg</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg, Windows 8 Development Preview, Full memory dump " />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Полный дамп падения с Windows 8 Developer Preview - повод обновить WinDbg
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+              <br />
+                <p>
+Не так давно нужно было разобраться с падением одного драйвера на 
+Windows 8 Developer Preview AMD64. Исходные данные на первый взгляд хорошие - 
+полный дамп памяти при падении. Но при попытке открытия отладчик WinDbg крепко 
+задумался на несколько секунд, после чего выдал многозначительное окно:
+                </p>
+              <br />
+                <div class="quote">
+Could not find the w8dp_amd64.dmp Dump File, Win32 error 0n87
+<br /><br />
+The parameter is incorrect.
+                </div>
+              <br />
+                <p>
+Хотя отладчик у меня не самый старый (WinDbg:6.12.0002.633 AMD64), решил 
+попробовать WinDbg из WDK для Windows 8 Developer Preview. Результат - дамп 
+замечательно открылся.
+                </p>
+              <br />
+                <p>
+Так что, видимо, пришло время снова обновлять WinDbg даже не из-за новых 
+возможностей (возможно напишу о нововведениях в 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff540540%28VS.85%29.aspx">Debug Engine</a> 
+чуть позже, отдельной статьей), а из-за банальной работоспособности: для анализа 
+новых дампов.
+                </p>
+            <br />
+                <a name="UPD_10_02_2012"></a>
+                <h2>Updated (10.02.2012)</h2>
+            <br />
+                <p>
+Как оказалось, о нововведения не надо писать, про них уже есть пост в блоге 
+Microsoft'а: 
+<a target="_blank" href="http://blogs.msdn.com/b/andrew_richards/archive/2011/09/24/debugger-engine-dbgeng-updates-in-windows-8-developer-preview.aspx">Debugger Engine (DbgEng) updates in the Windows 8 Developer Preview</a>. 
+А вот официальная документация в MSDN пока не обновлена.
+                </p>
+            <br />
+                <p>
+От себя скажу, что мне нравится введение привязки в точке останова к GUID'у: 
+<b>IDebugBreakpoint3::GetGuid</b> и <b>IDebugControl5::GetBreakpointByGuid</b>. 
+Раньше точку останова можно было идентифицировать по 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff545617(VS.85).aspx">численному идентификатору (IDebugControl::GetBreakpointById)</a>
+и <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff545639(VS.85).aspx">порядковому номеру (IDebugControl::GetBreakpointByIndex)</a>. 
+Но оба эти параметра могут идентифицировать точку останова в конкретный момент 
+времени, а работать с break-point'ами приходится из обратных вызовов, после 
+трассировки и тому подобное. И тут никто не даст гарантии что за это время 
+пользователь через команды не изменил точки останова.
+                </p>
+            <br />
+                <p>
+Остальные изменения нужно будет <i>пощупать руками</i>. Возможно что-то из 
+нового в скором времени попадет в 
+<a target="_blank" href="http://pykd.codeplex.com/">PyKd</a> :)
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

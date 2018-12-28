@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Сюрпризы от Windows 10 build 17133: ObQueryNameString для ключей реестра перестала выдавать ошибку STATUS_INFO_LENGTH_MISMATCH</title>
+<meta name="keywords" content="EreTIk, kernel, Windows Windows 10, Windows 10 build 17133, Registry, ObQueryNameString, STATUS_INFO_LENGTH_MISMATCH" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Сюрпризы от Windows 10 build 17133: ObQueryNameString для ключей реестра перестала выдавать ошибку STATUS_INFO_LENGTH_MISMATCH
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Завершающим сюрпризом (
+<a target="_blank" href="29.html">первый</a>, 
+<a target="_blank" href="2A.html">второй</a>
+) стало то, что функциия 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/ntifs/nf-ntifs-obquerynamestring">ObQueryNameString</a> 
+перестала выдавать ошибку <b>STATUS_INFO_LENGTH_MISMATCH</b> для объектов ключей реестра при нехватке выходного буфера.
+                </p>
+            <br />
+                <p>
+То есть для ситуации, когда размер выходного буфера больше структуры 
+OBJECT_NAME_INFORMATION, но заведомо меньше полного имени ключа, раньше (до 
+Windows 10 build 17133) функция возвращала статус ошибки 
+<b>STATUS_INFO_LENGTH_MISMATCH</b>. А сейчас функция стала возвращать 
+<b>STATUS_SUCCESS</b>, заполнять <i>огрызок</i> имени в структуре UNICODE_STRING 
+(сколько уместилось в буфере), а факт нехватки памяти сигнализируется лишь тем, 
+что последним выходным параметром ReturnLength функция возвращает больший размер, 
+чем мы указывали во входном параметре Length.
+                </p>
+            <br />
+                <p>
+Как это выглядит в отладчике (продублировано c 
+<a target="_blank" href="https://github.com/MicrosoftDocs/windows-driver-docs-ddi/issues/36">https://github.com/MicrosoftDocs/windows-driver-docs-ddi/issues/36</a>).
+Для вызова:
+                </p>
+                <div class="code">
+    Status = ObQueryNameString(pObject, pObjInfo, uBufSize, &amp;uResLen);
+                </div>
+            <br />
+                <p>
+Было:
+                </p>
+                <div class="code">
+0: kd&gt; dv
+         Status = 0xc0000004
+                </div>
+            <br />
+                <p>
+Стало:
+                </p>
+                <div class="code">
+1: kd&gt; dv
+        pObject = 0x86a00420
+         Status = 0n0
+       uBufSize = 0x10
+       pObjInfo = 0x8c2c4d30
+        uResLen = 0x9e
+1: kd&gt; dx pObjInfo
+pObjInfo         : 0x8c2c4d30 [Type: _OBJECT_NAME_INFORMATION *]
+    [+0x000] Name             : "\RE" [Type: _UNICODE_STRING]
+1: kd&gt; !object 0x86a00420
+Object: 86a00420  Type: (869169d0) Key
+    ObjectHeader: 86a00408 (new version)
+    HandleCount: 1 PointerCount: 33
+    Directory Object: 00000000  Name: \REGISTRY\MACHINE\SYSTEM\CONTROLSET001\CONTROL\SESSION MANAGER\ENVIRONMENT
+                </div>
+            <br />
+                <p>
+Текущая проблемная версия ядра:
+                </p>
+                <div class="code">
+Windows 10 Kernel Version 17133 MP (2 procs) Free x86 compatible
+Built by: 17133.1.x86fre.rs4_release.180323-1312
+                </div>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

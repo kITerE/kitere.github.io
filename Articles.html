@@ -1,0 +1,383 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Статьи, исходники</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests" />
+<link rel="stylesheet" type="text/css" href="style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; Статьи, исходники
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="index.htm">Стартовая страница</a></li>
+                <li><a href="Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="Downloads.html">Скачать</a></li>
+                <li><a href="Links.html">Внешние ссылки</a></li>
+                <li><a href="Overview.html">Обо всем</a></li>
+                <li><a href="Contacts.html">Контакты</a></li>
+                <li><a href="Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Данный раздел содержит небольшие статьи, которые посвящены разработке и 
+результатам моих исследований. Некоторые исходные тексты представлены 
+частично, но их полные версии можно получить, связавшись со мной.
+                </p>
+            <br />
+                <p>
+<a href="art/2D.html">Раскрытие памяти (Memory Disclosure) ядра в современных ОС</a>
+                </p>
+                <p>
+tags: &lt;memory disclosure&gt;, &lt;Windows&gt;, &lt;Linux&gt;, &lt;syscalls&gt;
+                </p>
+            <br />
+                <p>
+<a href="art/2C.html">Механизм Arbitrary Code Guard (ACG) на примере Microsoft Edge</a>
+                </p>
+                <p>
+tags: &lt;Windows 10&gt;, &lt;ACG&gt;, &lt;Edge&gt;
+                </p>
+            <br />
+                <p>
+<a href="art/2B.html">Сюрпризы от Windows 10 build 17133: ObQueryNameString для ключей реестра перестала выдавать ошибку STATUS_INFO_LENGTH_MISMATCH</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 10 (17133)&gt;
+                </p>
+            <br />
+                <p>
+<a href="art/2A.html">Сюрпризы от Windows 10 build 17133: новый системный процесс Registry</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 10 (17133)&gt;
+                </p>
+            <br />
+                <p>
+<a href="art/29.html">Сюрпризы от Windows 10 build 17133: маска для NtBuildNumber</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 10 (17133)&gt;
+                </p>
+            <br />
+                <p>
+<a href="art/28.html">Собственные данные в системном дампе падения Windows</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;python&gt;, &lt;Debug Tips&gt;
+                </p>
+            <br />
+                <p>
+<a href="art/27.html">&quot;Закат&quot; Legacy-фильтров файловых систем: что под капотом?</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 10&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/26.html">Рассылка IRP о завершении работы системы (IRP_MJ_SHUTDOWN)</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;WinDbg&gt;, &lt;python&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/25.html">Открытие описателя объекта нити процесса SYSTEM из процесса с правами администратора (Windows 7). Обновлено про Pico-процессы для Windows 10.0.14393</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;pico&gt;, &lt;WSL&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/24.html">Новый механизм подсчета ссылок на объект в Windows 8.1</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 8.1&gt;, &lt;WinDbg&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/23.html">Отсутствие DACL'а у security descriptor'а и Lowbox-процессы (AppContainer)</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 8&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/22.html">Функция PathAppend и реализация ATL::CPathT&lt;...&gt;::Append в Microsoft Visual Studio 9.0</a>
+                </p>
+                <p>
+tags: &lt;ATL&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/21.html">FltSetInformationFile vs ZwSetInformationFile при переименовании файлов</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;WinDbg&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/20.html">Alternate Data Streams на ReFS</a>
+                </p>
+                <p>
+tags: &lt;ReFS&gt;, &lt;Windows 8&gt;, &lt;Windows 8.1&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/1F.html">Новый бит маски доступа к объекту нити (thread) в Windows 8.1: THREAD_RESUME</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 8.1&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/1E.html">Нотификация проверки цифровой подписи файла драйвера</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 8.1&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/1D.html">Потроха отладчика в помощь при исследовании внутренностей ядра</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;WinDbg&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/1C.html">Deadlock при использовании ObOpenObjectByPointer для ключей реестра на Win XP SP2</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/1B.html">diaview: пример использования MS DIA из питона (diabind)</a>
+                </p>
+                <p>
+tags: &lt;DIA&gt;, &lt;python&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/1A.html">Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;python&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/19.html">Нюансы использования FsRtlIsNameInExpression</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/18.html">Создание процесса из драйвера режима ядра: Windows 8</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;Windows 8&gt;, &lt;ZwCreateUserProcess&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/17.html">Скрипт обновления файла ординалов для HIEW</a>
+                </p>
+                <p>
+tags: &lt;HIEW&gt;, &lt;python&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/16.html">Дескриптор безопасности объекта нити или почему при создании процесса игнорируется имперсонированность нити</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;python&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/15.html">Неожиданный статус в рекурсивном вызове реестровой функции из Cm-callback'а</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/14.html">BSOD: KeStackAttachProcess + ObReferenceObjectByHandle</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/13.html">О подписи исполняемых файлов... в очередной раз</a>
+                </p>
+                <p>
+tags: &lt;Code Signing&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/12.html">Аппаратная точка останова на запись и инструкция CMPXCHG</a>
+                </p>
+                <p>
+tags: &lt;source code&gt;, &lt;WinDbg&gt;, &lt;Debug Tips&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/11.html">Фильтрация создания описателей для объекта любого типа</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/10.html">Verifier и динамический импорт в ядре</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;verifier&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/0F.html">Соглашение о вызовах на x64-платформе и обход проверки цифровой подписи модуля при установке OB-callback'а</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;x64&gt;, &lt;code signing&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/0D.html">Реализация клиентского RPC-вызова из драйвера режима ядра: запуск и останов системных сервисов</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;RPC&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/0C.html">Таблица системных сервисов (SSTD) на x64 системах: поиск и трактовка содержимого</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/0B.html">Поиск скрытых процессов python’вским скриптом в WinDbg</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;WinDbg&gt;, &lt;python&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/09.html">Подводные камни использования флага IO_OPEN_TARGET_DIRECTORY (SL_OPEN_TARGET_DIRECTORY)</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;file system&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/0A.html">Открытие ключа реестра текущего пользователя: RegOpenKeyEx(HKEY_CURRENT_USER, ...) или RegOpenCurrentUser()</a>
+                </p>
+                <p>
+tags: &lt;registry&gt;, &lt;impersonation&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/08.html">Таблица разрешенных символов в именах файлов для разных файловых систем</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;file system&gt;, &lt;validate file name&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/03.html">Описатели объектов Windows: взгляд из ядра</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;, &lt;handle&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/02.html">Противодействие splice-перехватам системных библиотек: обходим Hacker Defender с помощью ONTL</a>
+                </p>
+                <p>
+tags: &lt;hook&gt;, &lt;hxdef&gt;, &lt;.ntl&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/07.html">Установка устройства аудио-воспроизведения по умолчанию, используя недокументированный COM-интерфейс IPolicyConfig</a>
+                </p>
+                <p>
+tags: &lt;COM&gt;, &lt;Vista+&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/05.html">Анализ splice-перехватов функций системных вызов или использование XDE–дизассемблера в “мирных” целях</a>
+                </p>
+                <p>
+tags: &lt;XDE&gt;, &lt;hook&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/06.html">Класс загрузки драйвера, расположенного в ресурсах: TResourceDrv</a>
+                </p>
+                <p>
+tags: &lt;driver&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/04.html">Преобразование DOS-пути в NT-формат: функция RtlDosPathNameToNtPathName_U</a>
+                </p>
+                <p>
+tags: &lt;file system&gt;, &lt;source code&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/01.html">Размер буфера данных при соединении с [A]LPC-портом</a>
+                </p>
+                <p>
+tags: &lt;[A]LPC&gt;
+                </p>
+            <br />
+                <p>
+                <a href="art/00.html">Открытие объекта по имени в ядре Windows 7</a>
+                </p>
+                <p>
+tags: &lt;kernel&gt;
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

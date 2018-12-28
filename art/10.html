@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Verifier и динамический импорт в ядре</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, Verifier, MmGetSystemRoutineAddress, VerifierMmGetSystemRoutineAddress, dynamic import" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Verifier и динамический импорт в ядре
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+При разработке драйверов, я стараюсь не собирать различные исполняемые файлы 
+для разных версий Windows. В большинстве случаев проблемы, связанные с разным 
+набором API, решаются тем, что адреса функций, которые присутствуют только на 
+более старших версиях ядра ОС, можно получить через динамический импорт.
+                </p>
+            <br />
+                <p>
+Для получения адреса функции по имени можно использовать функцию 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff554563(VS.85).aspx">MmGetSystemRoutineAddress</a>. 
+К сожалению эта функция имеет ограничение, о чем написано в MSDN:
+                </p>
+            <br />
+                <div class="quote">
+Drivers can use this routine to determine if a routine is available on a 
+specific version of Windows. It can only be used for routines exported by the 
+kernel or HAL, not for any driver-defined routine. 
+                </div>
+            <br />
+                <p>
+Поэтому если есть необходимость обрабатывать динамический импорт не из ядра и 
+не из HAL'а, то придется эту функцию писать <i>руками</i>. Второй интересный 
+момент, относящийся к <b>MmGetSystemRoutineAddress</b>, связан с входным 
+параметром. Почему эта функция принимает UNICODE-строку для меня остается 
+загадкой. Особенно расстраивает то, что внутри вызова этой функции строка все 
+же преобразуется к ANSI-строке, что приводит к лишним манипуляциям с пулом. Из 
+этого я делаю вывод, что не только я пользуюсь самописной функцией получения 
+адреса экспортируемой функции по адресу загруженного модуля и ANSI-строке :)
+Назовем ее <b>GetProcAddress</b>. Реализация такой функции достаточно 
+тривиальная (90% процентов кода это разбор директории экспортов PE-файла), 
+поэтому я не буду приводить ее здесь.
+                </p>
+            <br />
+                <p>
+Не для кого не секрет, что включенный verifier заменяет в целевом исполняемом 
+модуле статически импортируемые из модуля ядра функции на свои, которые 
+начинаются с префикса <b>Verifier</b>. Мне стало интересно как же обстоят дела 
+с динамическим импортом, поэтому я предлагаю посмотреть на  результат получения 
+адреса функции различными способами. Для этого будем использовать следующий 
+тестовый код:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+    static UNICODE_STRING usExAcquireResourceSharedLite = 
+        RTL_CONSTANT_STRING(L"ExAcquireResourceSharedLite");
+    PVOID pFuncStatic = &amp;::ExAcquireResourceSharedLite;
+    PVOID pFuncDynMm = MmGetSystemRoutineAddress(&amp;usExAcquireResourceSharedLite);
+    PVOID pFuncDynamic = 
+        GetProcAddress(pNtoskrnlBase, "ExAcquireResourceSharedLite");
+    __debugbreak();
+                </pre>
+            <br />
+                <p>
+Переменная pNtoskrnlBase в вышеприведенном примере содержит адрес загрузки 
+модуля ядра.
+                </p>
+            <br />
+                <p>
+Для начала запустим (естественно, с включенным verifier'ом) на Windows Server 
+2003 R2 SP2 (3790):
+                </p>
+            <br />
+                <div class="code">
+0: kd> ln @@C++(pFuncStatic)
+...
+Exact matches:
+    nt!VerifierExAcquireResourceExclusiveLite = &lt;no type information&gt;
+
+0: kd> ln @@C++(pFuncDynMm)
+...
+Exact matches:
+    nt!ExAcquireResourceExclusiveLite = &lt;no type information&gt;
+
+0: kd> ln @@C++(pFuncDynamic)
+...
+Exact matches:
+    nt!ExAcquireResourceExclusiveLite = &lt;no type information&gt;
+                </div>
+            <br />
+                <p>
+Затем запустим этот же код под verifier'ом на Windows 7 SP1 (7601). Результат 
+отличается:
+                </p>
+            <br />
+                <div class="code">
+kd> ln @@C++(pFuncStatic)
+...
+Exact matches:
+    nt!VerifierExAcquireResourceExclusiveLite = &lt;no type information&gt;
+
+kd> ln @@C++(pFuncDynMm)
+...
+Exact matches:
+    nt!VerifierExAcquireResourceExclusiveLite = &lt;no type information&gt;
+
+kd> ln @@C++(pFuncDynamic)
+...
+Exact matches:
+    nt!ExAcquireResourceExclusiveLite = &lt;no type information&gt;
+                </div>
+            <br />
+                <p>
+Как видно из вышеприведенных данных (результат выполнения 
+"ln @@C++(pFuncDynMm)"), на Win7 функция <b>MmGetSystemRoutineAddress</b> 
+обрабатывает ситуацию, когда на вызывающий драйвер включен verifier и 
+возвращает <i>более правильный</i> адрес запрашиваемой функции.
+                </p>
+            <br />
+                <p>
+На самом деле разница на старшей версии ОС в том, что появилась функция 
+<b>nt!VerifierMmGetSystemRoutineAddress</b> (она появилась в Windows Vista 
+(6000)). Так как <b>MmGetSystemRoutineAddress</b> была использована статическим 
+вызовом, вместо нее реально была вызвана 
+<b>nt!VerifierMmGetSystemRoutineAddress</b>, которая является достаточно 
+простой proxy-оберткой:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+    push        ebp
+    mov         ebp,esp
+    push        esi
+    mov         esi,[ebp][8]
+    push        esi
+    call        MmGetSystemRoutineAddress
+    test        eax,eax
+    jz         .000744511
+    push        eax
+    call        VfThunkAdjustExportAddressIfHooked
+; .00744511:
+    pop         esi
+    pop         ebp
+    retn        4
+                </pre>
+            <br />
+                <p>
+Из вышесказанного можно лишь еще раз подтвердить старую истину, что 
+использование <i>велосипедов</i> вредно для вашего кода.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

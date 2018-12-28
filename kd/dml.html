@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Debugger Markup Language (DML): краткий обзор</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, WinDbg, DML, Debugger Markup Language" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Debugger Markup Language (DML): краткий обзор
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Меня всегда поражало построение документации у Microsoft: с одной стороны 
+многое тщательно документировано, но с другой… бывало, что в новом MSDN’е 
+возьмут, да и выкинут формат отладочной информации CodeView, например. Или 
+рассмотрим ситуацию с WinDbg. У отладчика есть свой chm-help, в котором описано 
+множество команд и встроенных расширений, но о языке разметки 
+(Debugger Markup Language - <b>DML</b>), который поддерживается с версии 6.6.07, 
+ничего не описано. Для того, что бы понять, что это такое нужно открыть файл, 
+который располагается в директории установлено отладчика: <b><i>dml.doc</i></b>. 
+Здесь я приведу основные выдержки из этого документа, но советую 
+прочитать содержимое dml.doc.
+                </p>
+            <br />
+                <p>
+Итак, как понятно из названия, DML это язык разметки вывода отладчика. С помощью 
+DML можно линковать между собой информацию, которую вы считаете связанной, а 
+так же немного <i>«раскрасить»</i> вывод в отладочную консоль. Линковка 
+осуществляется гиперссылками, пример которой можно увидеть при возникновении 
+Bug Check: отладчик выводит ссылку на команду 
+<span style="background-color: #ffffff;"> <font color="blue" ><u>!analyze -v</u></font> </span>.
+                </p>
+            <br />
+                <p>
+Язык <b>DML</b> имеет тэговую разметку, похожую на HTML. Формат тэга следующий:
+                </p>
+                <div class="code">
+&lt;tagname [args]&gt; text &lt;/tagname&gt;
+                </div>
+                <br /><h2>Описание тэгов DML</h2><br />
+                <p>
+Тэг <b>link</b> служит для формирования гиперссылки. Формат тэга:
+                </p>
+                <div class="code">
+&lt;link [name="text"] [cmd="debugger_command"] [section="name"]&gt;link text&lt;/link&gt;
+                </div>
+                <p>
+В результате, в отладочном выводе, будет сформирована гиперссылка. Тест 
+гиперссылки будет соответствовать "link text", а действие при клике 
+соответствует "debugger_command". Действие (команда) может быть любой 
+командой отладчика. Параметры name и section служат для навигации между 
+связанными ссылками.
+                </p>
+            <br />
+                <p>
+Тэг <b>exec</b> более простая версия тэга <b>link</b>, который служит для 
+вывода ссылок на команды отладчика в виде гиперссылок. Формат тэга:
+                </p>
+                <div class="code">
+&lt;exec cmd=”debugger_command” &gt;descriptive text&lt;/exec&gt;
+                </div>
+                <p>
+Параметр <b>cmd</b> аналогичен тэгу <b>link</b>. С помощью <b>exec</b> можно 
+организовать довольно сложное меню.
+                </p>
+            <br />
+                <p>
+Тэги изменения стиля теста: 
+&lt;b&gt;text&lt;/b&gt;, &lt;i&gt;text&lt;/i&gt;, &lt;u&gt;text&lt;/u&gt;. 
+Эти тэги меняют стиль написания текста на 
+<b>жирный</b>, <i>наклонный</i> и <u>подчеркнутый</u>
+                </p>
+            <br />
+                <p>
+Тэг изменения цвета текста - <b>col</b>. Формат тэга:
+                </p>
+                <div class="code">
+&lt;col fg=”col_name1” bg=”col_name2”&gt;text&lt;/col&gt;
+                </div>
+                <p>
+Параметры <b>fg</b> <b>bg</b> задают цвет теста и фона соответственно. Цвета 
+можно выбрать из следующих значений:
+                </p>
+<table border="1">
+  <tr>
+    <td>wbg, wfg</td>
+    <td>Системные цвета по умолчанию для теста и фона</td>
+  </tr>
+  <tr>
+    <td> cbg, cfg </td>
+    <td> Системные цвета по умолчанию для выделенного теста и фона</td>
+  </tr>
+  <tr>
+    <td>changed</td>
+    <td>Цвет, используемый WinDbg для выделения низменных значений (регистров, переменных). По умолчанию - красный</td>
+  </tr>
+  <tr>
+    <td> srcnum, srcchar, srcstr, srcid, srckw, srcpair, srccmnt, srcdrct, srcspid, srcannot</td>
+    <td> Цвета, используемые WinDbg для раскраски исходных текстов</td>
+  </tr>
+  <tr>
+    <td> empbg, emphfg</td>
+    <td>Цвет выделенного текста в Windbg. По умолчанию - голубой</td>
+  </tr>
+  <tr>
+    <td>subbg, subfg </td>
+    <td>Системные цвета неактивного цвета и фона</td>
+  </tr>
+  <tr>
+    <td> normbg, normfg, warnbg, warnfg, errbg, errfg, verbbg, verbfg</td>
+    <td>Цвета уровней вывода в WinDbg</td>
+  </tr>
+</table>
+            <br /><h2>Использование DML</h2><br />
+                <p>
+Собственно, фабула. Существует как минимум 3-и основных применения <b>DML</b>:
+                </p>
+<ul>
+<li>скрипты отладчика</li>
+<li>отладочный вывод процесса или драйвера</li>
+<li>библиотеки расширений</li>
+</ul>
+            <br />
+                <p>
+Для вывода форматированного текста в скриптах используется токен <b>.print</b>. 
+Для того, что бы выводимый текст интерпретировался как DML, необходимо 
+использовать опцию <b>/D</b>. Например:
+                </p>
+                <div class="code">
+.printf /D "Example: &lt;exec cmd=\"version\"&gt;Show debugger version&lt;/exec&gt;\n"
+                </div>
+            <br />
+                <p>
+Выведет на экран гиперссылку 
+<span style="background-color: #ffffff;"> <font color="blue" ><u>Show debugger version</u></font> </span>, 
+при клике на которую будет выполнена команда <b>version</b>.
+                </p>
+            <br />
+                <p>
+<b>DML</b> можно использовать и в отладочном выводе, который формируется 
+функциями OutputDebugString(…) и DbgPrint(…). Для этого используется ключевой 
+тэг &lt;?dml?&gt;. Часть строки, следующая за этим тэгом, будет трактоваться 
+как <b>DML</b>. Что бы вывести вышеописанный пример из кода нужно:
+                </p>
+                <div class="code">
+DbgPrint("Example: &lt;?dml?&gt;&lt;exec cmd=\"version\"&gt;Show debugger version&lt;/exec&gt;\n");
+                </div>
+            <br />
+                <p>
+Разработчиков библиотек дополнений к WinDbg тоже не обделили прелестями <b>DML</b>. 
+Для формирования вывода можно использовать метод 
+<a href="http://msdn.microsoft.com/en-us/library/ff539248%28v=VS.85%29.aspx" target="_blank"> IDebugControl::ControlledOutput</a>. 
+Ниже приведен пример функции, написанной на C++, и ее использования. На выходе 
+будет сформирован вышеописанный пример.
+                </p>
+                <pre class="brush: cpp;">
+void PrintDmlExec(__in PCSTR szCommand, __in PCSTR szText)
+{
+    CString csDmlCommand;
+    csDmlCommand.Format(_T("&lt;exec cmd=\"%s\"&gt;%s&lt;/exec&gt;"), szCommand, szText);
+    g_pDbgControl-&gt;ControlledOutput(
+        DEBUG_OUTCTL_AMBIENT_DML,
+        DEBUG_OUTPUT_NORMAL,
+        csDmlCommand);
+}
+
+    ...
+    PrintDmlExec("version", "Show debugger version");
+    ... 
+                </pre>
+                <p>
+Переменная g_pDbgControl должна содержать указатель на интерфейс 
+<a href="http://msdn.microsoft.com/en-us/library/ff550508%28v=VS.85%29.aspx" target="_blank">IDebugControl</a>.
+                </p>
+            <br /><h2>Расширение стандартных команд WinDbg DML</h2><br />
+                <p>
+Многие стандартные команды были расширены DML’ем, ходя с chm-help’е об этом не 
+сказано. Токен <b>.printf</b> с параметром <b>/D</b> я уже описал выше. 
+Краткое описание других команд:
+                </p>
+<ul>
+<li><b>.help /D</b> - вывод помощи в виде меню, организованного гиперссылками</li>
+<li><b>.chain /D</b> - отображение цепочки расширений</li>
+<li><b>.extmatch /D</b> - вывод расширений, имя которых совпадает с заданной маской</li>
+<li><b> lmD</b> - отображение списка загруженных модулей. Гиперссылками можно просматривать детализированную информацию о модуле</li>
+<li><b>kM</b> - отображение стека вызовов. Гиперссылками отображается номер фрейма в стеке.</li>
+</ul>
+            <br />
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

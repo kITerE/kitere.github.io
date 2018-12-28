@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Функция PathAppend и реализация ATL::CPathT&lt;...&gt;::Append в Microsoft Visual Studio 9.0</title>
+<meta name="keywords" content="EreTIk, ATL::CPathT, ATL::CPath, PathAppendW, Windows 7, Windows Checked Build" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Функция PathAppend и реализация ATL::CPathT&lt;...&gt;::Append в Microsoft Visual Studio 9.0
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+На днях мне на глаза попался странный дамп, в котором произошло 
+падение в функции ntdll!memmove, которая была вызвана 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/bb773565(v=vs.85).aspx">shlwapi!PathAppendW</a>. 
+Функцию PathAppend вызывал код, который использовал метод 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/z1beh949.aspx">ATL::CPathT&lt;...&gt;::Append</a>. 
+Быстрый осмотр конкатенируемых строк показал, что они расположены в доступной 
+памяти и заканчиваются 0-символом.
+                </p>
+            <br />
+                <p>
+А вот листинг начала функции shlwapi!PathAppendW меня удивил:
+                </p>
+                <pre class="brush: asm;">
+mov          rax,rsp
+mov          [rax][018],rbx
+mov          [rax][010],rdx
+mov          [rax][8],rcx
+push         rbp
+push         rsi
+push         rdi
+sub          rsp,030 ;'0'
+xor          ebx,ebx
+mov          ebp,07FFFFFFF
+mov          rsi,rcx
+cmp          rcx,rbx
+jz          .000007FF`71B9605E
+mov          rcx,rbp
+mov          rax,rsi
+cmp          [rax],bx
+jz          .000007FF`71B96046
+add          rax,2
+sub          rcx,1
+jnz         .000007FF`71B96037
+mov          r8d,000000208
+mov          rdx,rsi
+mov          rcx,rsi
+call         memmove
+                </pre>
+            <br />
+                <p>
+В частности, удивил вызовов memmove, с указателем на первый аргумент функции 
+как в качестве памяти-источника, так и в качестве памяти-приемника с 
+фиксированной длинной 0x208 байт. То есть функция <i>потрогала</i> входной 
+буфер на чтение/запись. При этом функция не принимает размер строки в первом 
+аргументе. Вот что про это говорит моя старая локальная копия MSDN'а от 2008-й 
+студии (Microsoft Visual Studio 9.0):
+                </p>
+            <br />
+                <div class="quote">
+You <b>should set</b> the size of this buffer to MAX_PATH to ensure that it is large enough to hold the returned string
+                </div>
+            <br />
+                <p>
+Современная online версия более категорична (
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/bb773565(v=vs.85).aspx">PathAppend</a>):
+                </p>
+            <br />
+                <div class="quote">
+You <b>must set</b> the size of this buffer to MAX_PATH to ensure that it is large enough to hold the returned string
+                </div>
+            <br />
+                <p>
+Исходный exe-файл был скомпилирован с использованием 2008-й студии 
+(Microsoft Visual Studio 9.0), в которой метод ATL::CPathT&lt;...&gt;::Append 
+выглядит так:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+    BOOL Append( _In_ PCXSTR pszMore )
+	{
+		PXSTR pszBuffer;
+		BOOL bResult;
+		pszBuffer = m_strPath.GetBuffer( m_strPath.GetLength()+StringType::StringLength( pszMore )+1 );
+		bResult = ATLPath::Append( pszBuffer, pszMore );
+		m_strPath.ReleaseBuffer();
+		return bResult;
+	}
+                </pre>
+            <br />
+                <p>
+Что идет в полный разрез с документацией. Вместо того, что бы выделить честных 
+MAX_PATH-символов, реализация из Microsoft Visual Studio 9.0 выделяет разумный 
+(по ее мнению) максимум: сумму длин двух строки и одного символа-разделителя.
+                </p>
+            <br />
+                <p>
+И такой экономный подход работает в большинстве случаев. Пока... пока собранный 
+файл не запустили на <b>checked</b>-сборке Windows 7. Да, именно в 
+<b>checked</b>-сборке есть приведенная выше проверка буфера на чтение/запись 
+вызовом memmove. И, в какой-то момент, когда буфер строки попал на конец 
+страницы, за которой памяти не было, процесс упал.
+                </p>
+            <br />
+                <p>
+У меня нет установленной Microsoft Visual Studio 10.0, но в 
+Microsoft Visual Studio 11.0 такой проблемы уже нет:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+    BOOL Append(_In_z_ PCXSTR pszMore)
+	{
+		PXSTR pszBuffer = m_strPath.GetBuffer( MAX_PATH );
+		BOOL bResult = ATLPath::Append( pszBuffer, pszMore );
+		m_strPath.ReleaseBuffer();
+		return bResult;
+	}
+                </pre>
+            <br />
+                <p>
+Кстати, проблема касается не только PathAppend, но и множества других функций, 
+семейства PathXxx (и, соответственно, методах ATL::CPathT).
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Таблица разрешенных символов в именах файлов для разных файловых систем</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, имя файла, NTFS, FAT, FASTFAT, символы имени файла" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Таблица разрешенных символов в именах файлов для разных файловых систем
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Эти данные располагаются в ядре, в массиве (0x80 элементов), на который указывет 
+<b>nt!FsRtlLegalAnsiCharacterArray</b>. Индекс элемента массива в нем является 
+численным значением символа. Каждый элемент – маска флагов, сигнализирующая: 
+для каких файловых систем разрешено использовать символ в имени файла.
+                </p>
+                <p>
+Флаги:
+                </p>
+<ul>
+  <li>
+    <b>0x01</b> - символ разрешен к использованию на файловой системе FAT
+  </li>
+  <li>
+    <b>0x02</b> - символ разрешен к использованию на файловой системе HPFS
+  </li>
+  <li>
+    <b>0x04</b> - символ разрешен к использованию на файловой системе NTFS
+  </li>
+  <li>
+    <b>0x08</b> - разрешен к использованию в качестве WILD-символа (задание маски)
+  </li>
+  <li>
+    <b>0x10</b> - символ разрешен к использованию на файловой системе NTFS в имени потока (stream)
+  </li>
+</ul>
+<br />
+<p>Таблица взята из ядра Windows (актуальность проверена на линейке Windows 2000-Seven):</p>
+  <table border="1">
+<tr><td>Символ</td><td>FAT</td><td>HPFS</td><td>NTFS</td><td>NTFS:Stream</td><td>WILD</td></tr>
+<tr><td>0x00 ^@       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x01 ^A       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x02 ^B       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x03 ^C       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x04 ^D       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x05 ^E       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x06 ^F       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x07 ^G       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x08 ^H       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x09 ^I       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x0A ^J       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x0B ^K       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x0C ^L       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x0D ^M       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x0E ^N       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x0F ^O       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x10 ^P       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x11 ^Q       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x12 ^R       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x13 ^S       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x14 ^T       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x15 ^U       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x16 ^V       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x17 ^W       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x18 ^X       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x19 ^Y       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x1A ^Z       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x1B ESC      </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x1C FS       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x1D GS       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x1E RS       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x1F US       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x20 space    </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x21 !        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x22 "        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td></tr>
+<tr><td>0x23 #        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x24 $        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x25 %        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x26 &amp;    </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x27 '        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x28 (        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x29 )        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x2A *        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td></tr>
+<tr><td>0x2B +        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x2C ,        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x2D -        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x2E .        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x2F /        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x30 0        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x31 1        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x32 2        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x33 3        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x34 4        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x35 5        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x36 6        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x37 7        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x38 8        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x39 9        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x3A :        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x3B ;        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x3C &lt;     </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td></tr>
+<tr><td>0x3D =        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x3E &gt;     </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td></tr>
+<tr><td>0x3F ?        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td></tr>
+<tr><td>0x40 @        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x41 A        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x42 B        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x43 C        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x44 D        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x45 E        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x46 F        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x47 G        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x48 H        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x49 I        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x4A J        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x4B K        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x4C L        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x4D M        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x4E N        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x4F O        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x50 P        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x51 Q        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x52 R        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x53 S        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x54 T        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x55 U        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x56 V        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x57 W        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x58 X        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x59 Y        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5A Z        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5B [        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5C backslash</td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5D ]        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5E ^        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5F _        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x60 `        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x61 a        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x62 b        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x63 c        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x64 d        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x65 e        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x66 f        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x67 g        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x68 h        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x69 i        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x6A j        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x6B k        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x6C l        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x6D m        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x6E n        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x6F o        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x70 p        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x71 q        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x72 r        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x73 s        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x74 t        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x75 u        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x76 v        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x77 w        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x78 x        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x79 y        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x7A z        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x7B {        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x7C |        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x7D }        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x7E ~        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x7F         </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td> > 0x7F</td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+  </table>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

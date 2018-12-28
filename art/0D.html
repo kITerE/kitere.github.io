@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Реализация клиентского RPC-вызова из драйвера режима ядра: запуск и останов системных сервисов</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, msrpc, msrpc.sys, RPC, NdrClientCall2, scm, svcctl, ntsvcs" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Реализация клиентского RPC-вызова из драйвера режима ядра: запуск и останов системных сервисов
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Очень часто можно наблюдать случаи, когда вместе с некоторым драйвером 
+поставляется, например, системный сервис. Это зачастую обусловлено тем, что 
+несмотря на то, что в драйвере Windows разработчик обладает широкими 
+возможностями и привилегиями, он достаточно серьезно ограничен предоставляемым 
+ему API. Если для работы с подсистемами ввода/вывода, дерева объектов, 
+безопасности и т.п. уже давно написано немалое количество оберток, то остается 
+еще одно <i>"сугубо user-mod’ное"</i> место - 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa378651%28VS.85%29.aspx">RPC: Remote Procedure Call</a>. 
+Отчасти это связано с тем, что вся основная реализация RPC-вызова находится не 
+в ядре, а во внешнем процессе (RPC-сервере), который в общем случае может 
+исполняться на удаленной машине. И до некоторого времени Microsoft не 
+предоставляла никаких средств для работы с механизмами RPC в ядре. Но не так 
+давно мне на глаза попался интересная kernel-mode библиотека <b>msrpc.sys</b>. 
+И вот наконец-то у меня дошли руки ее опробовать, о чем далее и пойдет речь.
+                </p>
+            <br />
+                <p>
+Начиная с Windows Vista, среди системных драйверов появилась уже упомянутая 
+kernel-библиотека <b>msrpc.sys</b>. Если взглянуть на 
+<a target="_blank" href="../download/msrpc.6000.i386.exports.txt">экспорты этой библиотеки</a>, 
+то мы увидим набор функций для реализации клиентского RPC-вызова. К сожалению, 
+RPC-сервер на ее основе создать не получится, но кто знает, что будет в 
+будущих версиях ОС. Для того, что бы продемонстрировать ее работу я решил 
+поставить достаточно злободневную задачу – запуск и останов системных сервисов 
+из ядра. Конечно, формат хранимых в реестре данных о сервисах уже давно 
+известен и <i>"проинсталлировать"</i> системный сервис, который запустится в 
+следующую загрузку системы - не проблема. Но запустить системный сервис 
+немедленно - это всегда было головной болью kernel-разработчика. Как правило, 
+эта задача решается передачей некоторой команды своему user-mode процессу, 
+который уже общается с 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms685141%28VS.85%29.aspx">SCM через advapi32.dll</a>.
+                </p>
+            <br />
+                <p>
+В реализации поставленной задачи сильно поможет то, что Microsoft начала 
+открывать протоколы RPC-взаимодействия со своими системными сервисами. В том 
+числе и с <b>SCM</b>: в MSDN опубликован 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/cc245860%28PROT.10%29.aspx"> 
+полный IDL-файл для вызова SCM-функций - интерфейс svcctl</a>. Если взглянуть 
+на него чуть внимательней, то можно понять, что слово <b>полный</b> стоит 
+понимать в лучших традициях Microsoft: несколько функций имеют имена 
+OpnumDDNotUsedOnWire. Настощие имена этих функций можно получить прямо в 
+WinDbg из символов, например моим скрипом 
+<a target="_blank" href="../kd/RpcServer_IfHandle.html">RpcServer_IfHandle.dcmd</a>. 
+В примере приведен разбор интерфейса svcctl (SCM-функций), а 
+недокументированные функции сразу бросаются в глаза префиксом <b>RI_</b>. 
+Параметры вызова этих функций несложно получить при помощи IDA, но для 
+реализации запуска и останова системных сервисов эти функции нам не нужны, 
+поэтому я не буду здесь их приводить.
+                </p>
+            <br />
+                <p>
+Демонстрационный проект, состоящий из консольного приложения и драйвера режима 
+ядра, я назвал <a href="../download/KScProxy-0.1.0.0.rar">KScProxy</a>. 
+Общая архитектура проекта довольно проста: консольное приложение <b>kcs.exe</b> 
+распаковывает и стартует драйвер <b>KScProxy.sys</b>. Затем, в зависимости от 
+параметров командной строки, процесс отсылает запрос управляющему устройству 
+драйвера либо на старт, либо на останов указанного в командной строке 
+системного сервиса. В свою очередь драйвер, используя библиотеку 
+<b>msrpc.sys</b>, отсылает клиентский RPC-запрос в <b>services.exe</b>. Именно 
+в <b>services.exe</b> реализован RPC-сервер svcctl (SCM).
+                </p>
+            <br />
+                <p>
+Для того, что бы собрать драйвер, реализующий клиентский RPC-вызов, нужно 
+получить stub-файлы из IDL, используя 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa367300(VS.85).aspx">компилятор MIDL</a>. 
+Первой строчкой svcctl.idl идет использование файла ms-dtyp.idl, который так же 
+можно скачать из 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/cc230300(PROT.10).aspx">статьи MSDN: Full MS-DTYP IDL</a>. 
+В этом файле представлены объявления необходимых типов. Но генерировать по нему 
+h-файл не обязательно, так как все эти типы описаны в заголовочных файлах 
+SDK/DDK. Для себя я создал пустой файл ms-dtyp.h, что бы не исправлять файлы, 
+сгенерированные компилятором midl. Для сборки stub-файлов можно использовать 
+следующий командный файл ~\KScProxy\midl-svcctl\midl-svcctl.cmd (здесь и далее 
+путь c префиксом <b>~\</b> указывает в директорию \KScProxy\@src\ 
+<a href="../download/KScProxy-0.1.0.0.rar">архива KScProxy.rar</a>):
+                </p>
+            <br />
+                <div class="code">
+midl /server none /win32 /cstub svcctl_i386.c  /h svcctl.h svcctl.idl
+midl /server none /x64   /cstub svcctl_amd64.c /h svcctl.h svcctl.idl
+                </div>
+            <br />
+                <p>
+На выходе будут сгенерированы 3-и файла:
+                </p>
+<ul>
+  <li><b>svcctl_i386.c</b> - реализация клиентского stub-файла для платформы i386</li>
+  <li><b>svcctl_amd64.c</b> - реализация клиентского stub-файла для платформы amd64</li>
+  <li><b>svcctl.h</b> - заголовочный клиентский файл</li>
+</ul>
+            <br />
+                <p>
+Сгенерированные c-файлы имеют препроцессор, включающий или исключающий 
+содержимое файла по дерективе_M_AMD64. Об этой директиве можно почитать в статье 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/magazine/cc300794.aspx">MSDN Magazine: Everything You Need To Know To Start Programming 64-Bit Windows Systems</a>.
+                </p>
+            <br />
+                <p>
+Так как заголовочный файл не отличается для платформ i386 и amd64, то можно 
+генерировать его единожды (в приведенном примере второй вызов midl пересоздаст 
+файл svcctl.h). В этом же заголовочном файле следует включение SDK-файлов rpc.h 
+и rpcndr.h. Это порождает множество ошибок компиляции. Но если посмотреть на 
+содержимое этого файла, то одной из причин не включать файл windows.h будет 
+объявленное определение <b>_KRPCENV_</b>. Как несложно догадаться из названия 
+это указание на использование RPC в режиме ядра. Хотя это нигде не 
+документировано, но именно определение <b>_KRPCENV_</b> позволяет включать 
+файлы rpc.h и rpcndr.h при компиляции драйверов.
+                </p>
+            <br />
+                <p>
+Но, к сожалению, lib-файла для использования <b>msrpc.sys</b> Microsoft не 
+предоставляет. Поэтому при попытке собрать драйвер мы получаем ошибку линкера о 
+неизвестной функции NdrClientCall2. Выше я уже привел файл 
+<a target="_blank" href="../download/msrpc.6000.i386.exports.txt">экспортов msrpc.sys</a>. 
+На его основе, что бы не реализовывать динамический импорт, несложно сгенерировать 
+нужные lib-файлы: ~\KScProxy\lib-msrpc\i386\msrpc.lib и ~\KScProxy\lib-msrpc\amd64\msrpc.lib.
+Небольшая особенность заключается в том, что <b>msrpc.sys</b> предоставляет 
+только UNICODE-версии функций, что не является серьезным минусом для 
+разработчиков драйверов.
+                </p>
+            <br />
+                <p>
+На этом ошибки линкера не заканчиваются, не найдены функции:
+                </p>
+<ul>
+  <li>MIDL_user_allocate</li>
+  <li>MIDL_user_free</li>
+  <li>SVCCTL_HANDLEW_bind</li>
+  <li>SVCCTL_HANDLEW_unbind</li>
+  <li>SVCCTL_HANDLEA_bind</li>
+  <li>SVCCTL_HANDLEA_unbind</li>
+</ul>
+                <p>
+С первыми двумя функциями вопросов возникнуть не должно, 
+это стандартные функции, реализующие 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa373934(VS.85).aspx">выделение/освобождение памяти</a>. 
+Их можно реализовать вызовами выделения и освобождения памяти из Paged-пула.
+                </p>
+            <br />
+                <p>
+А вот функции *_[un]bind должны реализовывать создание RPC-описателя и привязку 
+этого описателя к серверному RPC-интерфейсу. Так как перед нами не стоит задачи 
+управления сервисами на удаленной машине, реализация этих функций сильно 
+упрощается. Статья в 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa378665(VS.85).aspx">MSDN Selecting a Protocol Sequence</a> 
+предлагает использовать функции <b>RpcBindingFromStringBinding(...)</b> и 
+<b>RpcStringBindingCompose(...)</b>, которые не экспортируются из 
+<b>msrpc.sys</b>. Поэтому создание и привязку RPC-описателей следует 
+реализовывать семейством функций RpcBindingXxx(...):
+                </p>
+<ul>
+  <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa375587%28VS.85%29.aspx">RpcBindingCreate(...)</a></li>
+  <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa375583%28VS.85%29.aspx">RpcBindingBind(...)</a></li>
+  <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa375613%28VS.85%29.aspx">RpcBindingUnbind(...)</a></li>
+  <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa375588%28VS.85%29.aspx">RpcBindingFree(...)</a></li>
+</ul>
+            <br />
+                <p>
+Отмечу, что я не использовал описанный в 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/cc245895(PROT.10).aspx">MSDN RPC well-known endpoint для svcctl</a>. 
+Вместо именованного канала <b>svcctl</b> я предпочел [A]LPC-порт <b>ntsvcs</b>. 
+Именованный канал стоит использовать при доступе к удаленной машине, так как 
+механизм [A]LPC-портов локальный, или для более ранних версий Windows, где 
+процесс services.exe еще не создавал LPC-endpoint <b>ntsvcs</b>.
+                </p>
+            <br />
+                <p>
+Думаю, что не нужно останавливаться на важности заполнения Security-QoS 
+параметров описателя. В большинстве случае заранее известен <b>SID</b> 
+RPC-сервера (в нашем случае SYSTEM: S-1-5-18). Так же не стоит давать 
+RPC-серверу возможность имперсонации по клиенту, без явной необходимости. 
+Из особенностей создания RPC-описателя хочу выделить то, что хотя параметр 
+Security функции 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa375587%28VS.85%29.aspx">RpcBindingCreate(...)</a> 
+объявлен опциональным, реализация в <b>msrpc.sys</b> содержит следующий код:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+.000165F8:  xor         ebx,ebx
+
+.00016617:  mov         esi,[ebp][00C]  ; esi &lt;- Security 
+.0001661A:  cmp         esi,ebx         ; if (!Security)
+.0001661C:  jz         .000016694       ;   return STATUS_INVALID_PARAMETER
+
+.00016694:  mov         eax,0C000000D
+.00016699:  pop         edi
+.0001669A:  pop         esi
+.0001669B:  pop         ebx
+.0001669C:  leave
+                </pre>
+            <br />
+                <p>
+То есть при вызове <b>msrpc.sys!RpcBindingCreateW</b> обязательно указывать 
+опции безопасности. Так же эта функция вернет <b>STATUS_INVALID_PARAMETER</b>, 
+если не заполнен одно из полей 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa378496%28VS.85%29.aspx">RPC_BINDING_HANDLE_SECURITY_V1</a>.ServerPrincName 
+или Sid в QoS (это поле появилось начиная с 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/aa378649%28VS.85%29.aspx">третьей версии структуры</a>).
+За это отвечает неэкспортируемая функция <b>msrpc.sys!ValidateSecurityQOS</b>
+                </p>
+            <br />
+                <p>
+Стоит так же отметить, что примеры использования msrpc.sys (дизассемблерные 
+листинги win32k.sys, ntfs.sys и т.п.) всегда используют асинхронную модель 
+вызова RPC-сервера. Остальной код драйвера и консольного приложения достаточно 
+очевиден. Поэтому, после успешно сборки, перейдем к тестированию. Для 
+тестирования будем использовать следующий командный файл:
+                </p>
+            <br />
+                <div class="code">
+sc  query vds
+sc  query w32time
+echo --------------------------------------------------------------------------
+ksc start vds
+ksc stop  w32time
+echo --------------------------------------------------------------------------
+sc  query vds
+sc  query w32time
+                </div>
+            <br />
+                <p>
+Результат его исполнения показывает работоспособность проекта (протестировано 
+на i386 и amd64 платформах):
+                </p>
+            <br />
+                <div class="code">
+SERVICE_NAME: vds 
+        TYPE               : 10  WIN32_OWN_PROCESS  
+        STATE              : 1  <b>STOPPED</b>
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x0
+        WAIT_HINT          : 0x0
+
+SERVICE_NAME: w32time 
+        TYPE               : 20  WIN32_SHARE_PROCESS  
+        STATE              : 4  <b>RUNNING</b> 
+                                (STOPPABLE, NOT_PAUSABLE, ACCEPTS_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x0
+        WAIT_HINT          : 0x0
+
+--------------------------------------------------------------------------
+
+svcctl-proxy over kernel, ver. 0.1.0.0
+Operation successfully finished
+
+svcctl-proxy over kernel, ver. 0.1.0.0
+Operation successfully finished
+
+--------------------------------------------------------------------------
+
+SERVICE_NAME: vds 
+        TYPE               : 10  WIN32_OWN_PROCESS  
+        STATE              : 4  <b>RUNNING</b> 
+                                (STOPPABLE, NOT_PAUSABLE, IGNORES_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x0
+        WAIT_HINT          : 0x0
+
+SERVICE_NAME: w32time 
+        TYPE               : 20  WIN32_SHARE_PROCESS  
+        STATE              : 1  <b>STOPPED</b> 
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x0
+        WAIT_HINT          : 0x0
+                </div>
+                  <p>
+В заключении хочется сказать, что Microsoft предоставила огромные возможности
+kernel-разработчикам, предоставив msrpc.sys, пусть это пока и не 
+документировано. Сейчас еще можно встреть единичные случаи ручной сборки 
+RPC-пакетов и взаимодействия с RPC-сервером, например через механизм 
+именованных каналов или [A]LPC. В случае c <b>msrpc.sys</b> есть достаточно 
+полная документация на <b>rpcrt4.dll</b>, которая может быть использована с 
+некоторыми оговорками.
+                  </p>
+            <br /><hr /><br />
+                <p>
+Скачать demo-утилиту 
+<a href="../download/KScProxy-0.1.0.0.rar">KScProxy с исходным кодом</a>.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

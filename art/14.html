@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; BSOD: KeStackAttachProcess + ObReferenceObjectByHandle</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, BSOD, KeStackAttachProcess, ObReferenceObjectByHandle, ZwDuplicateObject, nt!_EPROCESS.ObjectTable" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; BSOD: KeStackAttachProcess + ObReferenceObjectByHandle
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Далее по тексту я хочу поделиться своим опытом разбора одного BSOD'а. 
+Падение достаточно банальное: разыменование NULL-указателя. А вот стек падения 
+достаточно странный:
+                </p>
+            <br />
+            <ul>
+<li>nt!ExpLookupHandleTableEntry</li>
+<li>nt!ExMapHandleToPointerEx</li>
+<li>nt!ObReferenceObjectByHandle</li>
+            </ul>
+            <br />
+                <p>
+Посмотрев в WRK несложно догадать, что поле <b>ObjectTable</b> структуры 
+nt!_EPROCESS у процесса, с описателем которого работает драйвер, равно 0. 
+Важная особенность: драйвер работает не с текущим процессом, поэтому для 
+корректного referenc'а описателя используется вызов функции 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff549659(v=vs.85).aspx">KeStackAttachProcess(...)</a>.
+                </p>
+            <br />
+                <p>
+Но возникает вопрос: когда у процесса поле <b>ObjectTable</b> может содержать 0? 
+Обратившись к WRK несложно выяснить, что это может происходить в момент, когда 
+процесс уже сигнальный, т.е. уничтожается. Написав небольшой тест я добился 
+стабильного воспроизведения BSOD'а. Шаги теста следующие:
+                </p>
+            <br />
+            <ul>
+<li>Процесс обращается к драйверу, передавая ему значение своего описателя.</li>
+<li>Драйвер инкрементирует количество ссылок на объект процесса-источника, передавая указатель на процесс и описатель в WorkItem. Запрос от процесса завершается.</li>
+<li>Процесс спокойно уничтожается.</li>
+<li>WorkItem ожидает пока целевой процесс станет сигнальным (уничтожится).</li>
+<li>WorkItem вызывает <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff549659(v=vs.85).aspx"> KeStackAttachProcess(...)</a>, что бы <i>переключить</i> текущий процесс, а, соответственно, и таблицу описателей.</li>
+<li>WorkItem вызывает <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff558679(v=vs.85).aspx">ObReferenceObjectByHandle(...)</a> для попытки получения указателя на объект.</li>
+            </ul>
+            <br />
+                <p>
+Если посмотреть на код ядра, то можно обнаружить неэкспортируемую функцию 
+nt!ObReferenceProcessHandleTable, которая <b>безопасно</b> проверяет поле 
+<b>ObjectTable</b> объекта процесса. Но этой функцией пользуется достаточно 
+ограниченный набор экспортируемых API-функций ядра. В частности: 
+ObFindHandleForObject и ObDuplicateObject, вызываемая из 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff566445(v=vs.85).aspx">ZwDuplicateObject(...)</a>. 
+Первая функция, в нашем случае, никак не поможет. А вот вызов дублирования 
+описателя в <i>безопасный</i> процесс решает проблему. Кстати, в вышеописанном 
+случае вернется соответствующий говорящий статус ошибки: 
+<b>STATUS_PROCESS_IS_TERMINATING</b>.
+                </p>
+            <br />
+                <p>
+Вывод достаточно прост: связка вызовов KeStackAttachProcess + 
+ObReferenceObjectByHandle небезопасна, если нельзя гарантировано обеспечить то, 
+что целевой процесс не уничтожился. Нужно гарантировать либо то, что процесс не 
+будет сигнальным, например Kernel-ожиданием в одной из его нитей, либо 
+использовать вызов 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff566445(v=vs.85).aspx">ZwDuplicateObject(...)</a>.
+                </p>
+            <br />
+                <p>
+Еще хочу немного расписать диагностирование ошибки. С включенным verifier XP Sp2 
+пропускает этот вызов без проблем. А вот Windows 8 (проверено на 9200) выдает 
+опережащий BSOD:
+                </p>
+            <br />
+                <div class="quote">
+DRIVER_VERIFIER_DETECTED_VIOLATION (c4)
+<br />
+...
+<br />
+Arguments:
+<br />
+Arg1: 0000003c, ObReferenceObjectByHandle is being called with a bad handle.
+                </div>
+            <br />
+                <p>
+Информативность сообщения, честно говоря, не радует. Но вот если запустить это 
+на checked-сборке той же XP Sp2, то перед BSOD'ом будет assert:
+                </p>
+            <br />
+                <div class="quote">
+*** Assertion failed: HandleTable != NULL
+<br />
+***   Source File: d:\xpsprtm\base\ntos\ob\obref.c, line 1214
+<br />
+Break repeatedly, break Once, Ignore, terminate Process, or terminate Thread (boipt)?
+                </div>
+            <br />
+                <p>
+Я считаю, это еще один повод прогонять свои драйвера на checked-сборках.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

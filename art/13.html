@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; О подписи исполняемых файлов... в очередной раз</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, signtool, IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY, code signing" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; О подписи исполняемых файлов... в очередной раз
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Тема embedded-подписи драйверов Windows не нова. Есть достаточно подробное описание 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/gg487332.aspx">Digital Signatures for Kernel Modules on Windows</a>. 
+Документ большой: прочел, написал cmd-файлы и забыл.
+                </p>
+            <br />
+                <p>
+Но недавно мне понадобилось собирать исполняемые файлы пользовательского режима 
+с флагом <b>IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY</b> и, естественно, 
+цифровой подписью. Решение было простым: с использованием cmd-файлов для 
+подписи драйверов были успешно подписаны и файлы пользовательского режима. 
+Smoke-тесты дали отличные результаты. А вот запуск на Windows Vista дал 
+ошибку 577 (ERROR_INVALID_IMAGE_HASH):
+                </p>
+            <br />
+                <div class="quote">
+Windows cannot verify the digital signature for this file. A recent hardware 
+or software change might have installed a file that is signed incorrectly or 
+damaged, or that might be malicious software from an unknown source.
+                </div>
+            <br />
+                <p>
+Проведя несколько тестов и поискав на просторах MSDN было найдено много рекомендаций 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx">подписывать user mod'ные модули с ключем /ph</a>. 
+Это и стало решением проблемы. А о том, что проблемными платформами являются 
+Windows Vista и 2008 Server, говорит 
+<a target="_blank" href="http://social.technet.microsoft.com/wiki/contents/articles/255.forced-integrity-signing-of-portable-executable-pe-files.aspx#Use_the_ph_option_with_SignTool">статься Forced Integrity Signing of Portable Executable (PE) files: Use the /ph option with SignTool</a>:
+                </p>
+            <br />
+                <div class="quote">
+During both test signing and release signing, you must use the /ph (page hash) 
+flag with SignTool when signing user mode binaries with the 
+IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY flag set. On Windows 7 and Windows Server 2008 R2, 
+page hashes are optional, but recommended for performance reasons. 
+The /ph option requires the computer used to sign target files to be using 
+Windows Vista, Windows Server 2008 or later OS versions.
+                </div>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

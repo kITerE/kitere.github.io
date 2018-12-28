@@ -1,0 +1,372 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Таблица системных сервисов (SSTD) на x64 системах: поиск и трактовка содержимого</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, SSDT, SSDT x64, SSDT AMD64, KiServiceTable, KiServiceTable x64, KiServiceTable amd64, KeServiceDescriptorTable, KeServiceDescriptorTable x64, KeServiceDescriptorTable amd64, KeCompactServiceTable " />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Таблица системных сервисов (SSTD) на x64 системах: поиск и трактовка содержимого
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+<table border="1">
+<tr><td><h2>Warning (12.08.2016)</h2></td></tr>
+<tr><td>Статья не применима к ядру Windows 10.0.14393. Описанный в конце статьи способ поиска не применим к этой версии ОС.</td></tr>
+</table>
+            <br />
+                <p>
+Сразу скажу, что под x64-системами, здесь и далее будет идти речь о 
+AMD64-сборках Windows.С 64-х разрядными Itanium-сборками (IA-64) ядра Windows я 
+так тесно не работал, да и Microsoft уже отказалась от этой платформы. Поэтому 
+Itanium-платформа в рамках этой статьи рассматриваться не будет.
+                </p>
+            <br />
+                <p>
+С приходом x64-ядер Windows разработчики драйверов, в частности разработчики 
+защит и прочих продуктов, использующих перехваты вызовов системных сервисов, 
+сразу столкнулись с рядом трудностей. Среди этого длинного списка: 
+<a target="_blank" href="http://blogs.msdn.com/b/windowsvistasecurity/archive/2006/08/11/695993.aspx">PatchGuard</a>, 
+<a target="_blank" href="http://www.microsoft.com/whdc/driver/install/drvsign/kmcs-walkthrough.mspx">Kernel Mode Code Signing (KMCS)</a>. 
+Впрочем, сейчас существует достаточно надежные способы как отключения защиты 
+от модификации ядра, так и способы загрузки неподписанного кода в ядро Windows. 
+Хотя количество способов сильно ограничено, но все таки они есть и успешно 
+применяются.
+                </p>
+            <br />
+                <p>
+И тут разработчик сталкивается со следующей особенностью x64-систем: переменная 
+<b>nt!KeServiceDescriptorTable</b> больше не экспортируется из ядра ОС. Как 
+известно, <b>nt!KeServiceDescriptorTable</b> является массивом, в котором 
+хранятся описатели таблицы системных вызовов: указатель на начало таблицы, ее 
+размер и еще некоторые служебные поля. На 32-х разрядных системах в таблице 
+системных вызовов хранятся указатели на соответствующие функции-обработчики. И 
+это утверждение неверно для x64-систем, при загруженном ядре в таблице 
+системных вызовов хранятся не указатели, а знаковые 4-х байтные смещения. Но и 
+на этом проблемы не закачиваются, формат хранения данных в таблицах системных 
+вызовов различается на ОС раньше Vista и системах Vista и старше. Поэтому 
+начнем именно с формата таблицы системных вызовов.
+                </p>
+            <br />
+            <a name="format"></a>
+            <h2>Формат данных таблицы системных вызовов SSDT на x64-системах</h2>      
+            <br />
+                <p>
+Вначале рассмотрим формат <b>SSDT</b> для систем младше Vista. Ни для кого не 
+секрет, что ядра Windows XP Professional x64 это не что иное, как ядро Windows 
+2003 Server x64. В этом легко убедится, если выполнить простую команду в WinDbg:
+                </p>
+            <br />
+                <div class="code">
+kd&gt; ? wo(nt!NtBuildNumber)
+Evaluate expression: 3790 = 00000000`00000ece
+                </div>
+            <br />
+                <p>
+Номер сборки 3790 всегда был закреплен за 2003-им сервером (напомню, что для XP 
+номер сборки всегда был 2600), о чем нам и говорит WinDbg при соединении с 
+Windows XP Professional x64:
+                </p>
+            <br />
+                <div class="code">
+Windows Server 2003 Kernel Version 3790 (Service Pack 2) MP (2 procs) Free x64
+Product: WinNt, suite: TerminalServer SingleUserTS
+Built by: 3790.srv03_sp2_qfe.100324-1618
+                </div>
+            <br />
+                <p>
+Поэтому сейчас речь пойдет о Windows 2003 Server x64, подразумевая, что на 
+Windows XP Professional x64 дела обстоят аналогично. При  рассмотрении формата 
+<b>SSDT</b> будем использовать таблицу системных сервисов ядра, которая 
+расположена в <b>KiServiceTable</b>. Именно на этот символ указывает поле 
+начала таблицы системных сервисов дескриптора с индексом 0 из массива 
+<b>nt!KeServiceDescriptorTable</b>. Итак, откроем файл ntoskrnl.exe и взглянем 
+на содержимое начала таблицы системных сервисов:
+                </p>
+            <br />
+                <div class="code">
+0:000&gt; dps ntoskrnl!KiServiceTable
+00000000`0045ea80  00000000`007659c0 ntoskrnl!NtMapUserPhysicalPagesScatter
+00000000`0045ea88  00000000`00681ef0 ntoskrnl!NtWaitForSingleObject
+00000000`0045ea90  00000000`00426d10 ntoskrnl!NtCallbackReturn
+00000000`0045ea98  00000000`00665685 ntoskrnl!NtReadFile+0x5
+                </div>
+            <br />
+                <p>
+Вроде бы все привычно, но вот только немного смущает символ 
+<b>ntoskrnl!NtReadFile+0x5</b>. На самом деле все просто: в значениях таблицы 
+системных сервисов, точнее в младших четырех битах, закодировано количество 
+параметров, передаваемых через стек. У функции 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff567072(VS.85).aspx">ZwReadFile(...)</a>
+девять параметров, но, учитывая специфику передачи параметров на x64 платформе 
+(<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff561499(VS.85).aspx#calling_conventions">Calling Conventions: x64 Architecture</a>: 
+первые четыре параметра передаются через регистры), как раз и получается, что 
+при вызове пять параметров будут переданы в эту функцию через стек.
+                </p>
+            <br />
+                <p>
+Теперь посмотрим на тот же символ <b>nt!KiServiceTable</b>, но уже на 
+загруженной системе:
+                </p>
+            <br />
+                <div class="code">
+0: kd&gt; dd nt!KiServiceTable
+fffff800`0105ea80  00306f40 00223470 fffc8290 00206c05
+fffff800`0105ea90  002240b6 0023b385 00225091 001fe1a0
+fffff800`0105eaa0  0022b870 0020ddd0 0022e9e0 0020bfb0
+fffff800`0105eab0  0022d330 00230f21 0020a4b1 0023f480
+                </div>
+            <br />
+                <p>
+На очень многих форумах по низкоуровневому программированию поднималась 
+примерно одна и та же тема: почему команда WinDbg 
+<b>"dps nt!KiServiceTable"</b> в начале таблицы отображает "мусор"? А все 
+потому, что это не мусор, а, как было написано выше, 4-х байтные смещения. Но 
+вот только количество параметров, закодированное в исходной таблице системных 
+вызовов, никуда не делось. Поэтому младшие четыре бита в каждом 4-х байтном 
+слове таблицы это все то же количество параметров, передаваемых через стек. В 
+этом легко убедиться, выполнив следующую команду:
+                </p>
+            <br />
+                <div class="code">
+0: kd&gt; ln nt!KiServiceTable+(dwo(nt!KiServiceTable+(3*4))&amp;0xFFFFFFF0)
+(fffff800`01265680)   nt!NtReadFile   |  (fffff800`01265b90)   nt!NtSetInformationFile
+Exact matches:
+    nt!NtReadFile = &lt;no type information&gt;
+                </div>
+            <br />
+                <p>
+Аналогично тому, как мы видели в файле ntoskrnl.exe, по индексу 3 лежит 
+смещение до <b> NtReadFile(...)</b>. Преобразованием элементов таблицы из 8-ми 
+байтовых указателей а 4-х байтовые смещения занимается цикл в функции 
+<b>nt!KeCompactServiceTable</b> (в первом параметре <b>rcx</b> передан 
+указатель на таблицу, а во втором параметре <b>edx</b> передано количество 
+элементов таблицы):
+                </p>
+            <br />
+                <pre class="brush: asm;">
+mov     r11d,edx ; количество элементов
+mov     r10,rcx ; начало таблицы описателей
+mov     rdx,rcx ; начальный указатель массива и ULONG’ов, и PVOID’ов
+test    r11d,r11d
+je      nt!KeCompactServiceTable+0x35
+mov     r9,r11 ; количество сервисов
+    ; ...    
+nt!KeCompactServiceTable+0x20:
+mov     eax,dword ptr [rdx] ; очередной (указатель | кол-во параметров)
+add     rcx,4 ; смещаем указатель ULONG’ов
+add     rdx,8 ; смещаем указатель PVOID’ов
+sub     eax,r10d ; указатель –> смещение от начала таблицы
+dec     r9
+mov     dword ptr [rcx-4],eax
+jne     nt!KeCompactServiceTable+0x20
+                </pre>
+            <br />
+                <p>
+Теперь перейдем к системам Windows Vista и старше. Откроем файл ntoskrnl.exe от 
+Windows 7 RTM x64 (7600) и взглянем на <b>KiServiceTable</b>:
+                </p>
+            <br />
+                <div class="code">
+0:000&gt; dps ntoskrnl!KiServiceTable
+00000001`40072b00  00000001`40483190 ntoskrnl!NtMapUserPhysicalPagesScatter
+00000001`40072b08  00000001`40369a00 ntoskrnl!NtWaitForSingleObject
+00000001`40072b10  00000001`40069dd0 ntoskrnl!NtCallbackReturn
+00000001`40072b18  00000001`4038cb10 ntoskrnl!NtReadFile
+                </div>
+            <br />
+                <p>
+То есть на системах Vista и старше в файле элементы таблицы системных сервисов 
+больше не содержат количество параметров функций. Для этого существует, как и 
+на x32, отдельная таблица <b>KiArgumentTable</b>. Естественно, что в ней 
+учтено, что первые 4-е параметра передается через стек, поэтому значения в ней 
+(размер параметров на стеке в байтах, из расчета 4-х байт на параметр) 
+отличаются по содержимому от таблицы в x32-сборке. Например, для того же 
+ntoskrnl.exe из Windows 7 x64:
+                </p>
+            <br />
+                <div class="code">
+0:000&gt; db ntoskrnl!KiArgumentTable
+00000001`4007378c  00 00 00 14 18 14 04 00-00 00 00 00 00 04 04 00
+                </div>
+            <br />
+                <p>
+Но, как и для систем Win2k3, после загрузки ядра массив <b>KiServiceTable</b> 
+преобразуется в 4-х байтные смещения, младшие четыре бита которых содержат 
+количество параметров, передаваемых через стек:
+                </p>
+            <br />
+                <div class="code">
+1: kd&gt; dd nt!KiServiceTable
+fffff800`030c8300  04113300 02f9e200 fff73100 031cb705
+fffff800`030c8310  031ac106 0315f605 02ba5601 02b76c00
+fffff800`030c8320  0310e200 03e0fc00 02cf1e00 031bdc40
+fffff800`030c8330  03153200 02e7ee01 02e25d01 02dfcb80
+                </div>
+            <br />
+                <p>
+В данном формате смешением являются старшие только 28 бит 4-х байтового слова 
+элемента таблицы (т.е. нужно <i>отбросить</i> младшие 4-е бита). Например, 
+можно вычислить адрес того же <b>NtReadFile</b>'а по индексу 3:
+                </p>
+            <br />
+                <div class="code">
+1: kd&gt; ln nt!KiServiceTable+(dwo(nt!KiServiceTable+(3*4))&gt;&gt;4)
+(fffff800`033e4e70)   nt!NtReadFile   |  (fffff800`033e55b0)   nt!NtOpenFile
+Exact matches:
+    nt!NtReadFile = &lt;no type information&gt;
+                </div>
+            <br />
+                <p>
+Преобразованием таблицы занимается все та же функция 
+<b>nt!KeCompactServiceTable</b>, но формат ее вызова расширен, ведь в 
+изначальной таблице (той, что записана в файле) не было количества 
+параметров, передаваемых через стек:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+nt!KiInitializeKernel+0x358:
+mov     r8d,dword ptr [nt!KiServiceLimit]
+lea     rdx,[nt!KiArgumentTable]
+lea     rcx,[nt!KiServiceTable]
+call    nt!KeCompactServiceTable
+                </pre>
+            <br />
+                <p>
+Ну и логика преобразования таблицы поменялась, как и поменялся формат 
+содержимого:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+mov     rdi,rdx
+mov     r10d,r8d
+mov     rbx,rcx
+mov     rdx,rcx
+test    r8d,r8d
+je      nt!KeCompactServiceTable+0x45
+mov     r11,r10
+nt!KeCompactServiceTable+0x1e:
+mov     r8d,dword ptr [rdx]
+movzx   eax,byte ptr [rdi]
+add     rdx,8
+sub     r8d,ebx ; указатель -> смещение
+shr     eax,2 ; 'элемент KiArgumentTable -> количество параметров
+inc     rdi
+shl     r8d,4 ; перенос значения смещения в старшие 28 бит
+or      r8d,eax ; сохранение количества параметров
+mov     dword ptr [rcx],r8d
+add     rcx,4
+sub     r11,1
+jne     nt!KeCompactServiceTable+0x1e
+                </pre>
+            <br />
+                <p>
+Реализацию разбора содержимого таблицы на языке Python можно посмотреть в 
+<a target="_blank" href="http://pykd.codeplex.com/SourceControl/changeset/view/61611#1282025">примере ~\samples\ssdt.py из проекта PYKD</a>.
+                </p>
+            <br />
+            <a name="search"></a>
+            <h2>Поиск таблицы системных вызовов ядра: <b>nt!KiServiceTable</b></h2>
+            <br />
+                <p>
+Таблица системных вызовов ядра (указатель на которую хранится в 
+<b>nt!KeServiceDescriptorTable</b> по нулевому индексу) расположена по адресу 
+символа <b>nt!KiServiceTable</b>, который не экспортируется ни в x32, ни в x64 
+сборках ядра ОС. В интернете можно найти достаточное количество способов 
+нахождения массива <b>nt!KeServiceDescriptorTable</b>, по данным которого 
+определяется адрес <b>nt!KiServiceTable</b>. Но я хочу рассмотреть способ 
+<i>"эвристического"</i> поиска <b>nt!KiServiceTable</b> на x64-платформе 
+напрямую.
+                </p>
+            <br />
+                <p>
+Способ основан на формате SSDT, описанном выше. Фактически, 
+<b>nt!KeCompactServiceTable</b> перетирает первую половину таблицы 
+<b>nt!KiServiceTable</b> смещениями, оставляя вторую половину нетронутой. Это 
+означает, что во второй половине таблицы остаются <i>"настоящие"</i> указатели 
+на Nt-функции ядра. Это можно использовать:
+                </p>
+<ul>
+<li>
+Выбираем экспортируемую Nt-функцию, которая всегда находится во второй половине 
+таблицы и получаем ее адрес. Я бы рекомендовал выбрать функции с количеством 
+параметров &lt;= 4, что бы при поиске не закладываться на номер билда ОС, 
+например это функция 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff567106(v=VS.85).aspx">NtSetSecurityObject</a>
+</li>
+<li>
+Проходим все not-paged секции PE-модуля ядра
+</li>
+<li>
+В каждой секции с шагом в размер указателя сравниваем очередные 8-мь байт с 
+полученным на первом этапе указателем функции. Когда значения совпадут - мы 
+<i>внутри</i> <b>nt!KiServiceTable</b>
+</li>
+<li>
+Перед таблицей <b>nt!KiServiceTable</b> всегда (во всяком случае я иного не 
+встречал) есть область padding’а заполненная nop’ами. Следовательно, для поиска 
+начала таблицы нужно идти вверх от <b>NtSetSecurityObject</b>, пока не встретим 
+значение 0x9090909090909090
+</li>
+<li>
+Что бы найти конец таблицы (и узнать ее размер) необходимо идти по таблице от 
+<b>NtSetSecurityObject</b> вниз и проверять, что очередные 8-мь байт являются 
+указателем в диапазон одной из секций кода PE-модуля ядра
+</li>
+</ul>
+            <br />
+                <p>
+Метод не самый надежный, но был протестирован на нескольких машинах с разными 
+версиями x64-ОС. Во всех случаях таблица <b>nt!KiServiceTable</b> была найдена 
+успешно.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

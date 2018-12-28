@@ -1,0 +1,161 @@
+* { 
+ padding: 0;
+ margin: 0;
+ list-style-position: inside;
+}
+td {
+ padding: 4px;
+}
+body {
+ font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+ font-size: 13px;
+ background: #333;
+}
+a {
+ color: #fff;
+ text-decoration: none;
+ border-bottom: 1px #D0EB6A solid;
+}
+a:hover {
+ color: #fff;
+ border-bottom: 1px #D0EB6A dashed;
+}
+#wrapper { 
+ margin: 0 auto;
+}
+#header {
+ color: #fff;
+ width: 96%;
+ float: left;
+ padding: 10px;
+ height: 70px;
+ margin: 10px 0px 5px 0px;
+ background: #333;
+ border: 1px solid #393939;
+}
+#strap {
+ float: left;
+ width: 96%;
+ color: gray;
+ padding: 10px;
+ margin: 0px 0px 5px 0px;
+ background: #333;
+ border: 1px solid #393939;
+ text-align: center;
+}
+#navigation { 
+ color: #fff;
+ border: 1px solid #393939;
+ background: #333;
+ margin: 0px 5px 5px 0px;
+ padding: 10px;
+ width: 195px;
+ float: left;
+}
+#navigation div {
+  position: absolute;
+	visibility: hidden;
+  padding: 10px;
+}
+
+#navigation div a	{	
+  position: relative;
+	display: block;
+	margin: 0;
+	width: auto;
+	white-space: nowrap;
+	text-align: left;
+	text-decoration: none;
+}
+
+#content { 
+ float: right;
+ color: #ccc;
+ border: 1px solid #393939;
+ background: #333;
+ margin: 0px 0px 5px 0px;
+ padding: 10px;
+ display: inline;
+ position: relative;
+}
+#footer {
+ float: left;
+ width: 96%;
+ color: gray;
+ padding: 10px;
+ margin: 0px 0px 5px 0px;
+ background: #333;
+ border: 1px solid #393939;
+ text-align: center;
+}
+#menu {
+ background: #333;
+ float: left;
+ list-style: none;
+ margin: 0;
+ padding: 0;
+ width: 15em;
+}
+#menu li {
+ font: 13px "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+ margin: 0;
+ padding: 0;
+}
+#menu a {
+ background: #333;
+ border-bottom: 1px solid #393939;
+ color: #ccc;
+ display: block;
+ margin: 0;
+ padding: 8px 12px;
+ text-decoration: none;
+}
+#menu a:hover {
+ background: #D0EB6A url("images/hover.gif") left center no-repeat;
+ color: #000;
+ padding-bottom: 8px;
+}
+h1 { 
+ font: bold 1.9em "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+ color: #D0EB6A; 
+ padding: 0; 
+ margin: 0;
+}
+h2 { 
+ font: 1.6em "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+ padding: 0; 
+ margin: 0; 
+ color: gray; 
+}
+h3 { 
+ font: 1.3em "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+ color: #D0EB6A; 
+ padding: 0; 
+ margin: 0;
+}
+h4 { 
+ font: bold 1.1em "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+ color: #D0EB6A; 
+ padding: 0; 
+ margin: 0;
+}
+div.code {
+    font-family: "Courier New" , Courier, monospace; 
+    font-size: 10pt; 
+    border:1px dashed black;
+    padding:6px;
+    background-color:#333;
+    margin-bottom:1em;
+    white-space:pre;
+}
+div.quote {
+    font-style:italic;
+    border:1px dashed black;
+    padding:6px;
+    background-color:#333;
+    margin-bottom:1em;
+}
+div.epigraph {
+    font-style:italic;
+    text-align: right
+}

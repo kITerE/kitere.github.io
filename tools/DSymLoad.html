@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; DSymLoad: Загрузка отладочных символов в HIEW</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, DSymLoad, HIEW, names, debug symbols, dbghelp" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Tools.html">Утилиты</a> &raquo; DSymLoad: Загрузка отладочных символов в HIEW
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+<a href="https://dsymload.codeplex.com/releases"><img src="../images/download.png" alt="Download DSymLoad" align="right" /></a>
+                <p>
+Когда необходимо быстро что-то посмотреть или исправить в PE-файле очень удобно 
+использовать замечательный инструмент 
+<a href="http://hiew.ru/" target="_blank">HIEW</a>. Но у него нет штатной 
+возможности загрузки отладочной информации. А это просто необходимо, когда, 
+например, нужно "подсмотреть", что же творится внутри MS’овского драйвера. На 
+официальном сайте есть расширение <b>NamesPeMap</b>, но оно использует 
+MAP-файл, которым обычно публично никто не делится.
+                </p>
+            <br />
+                <p>
+Немного поискав на просторах интернета, нашел довольно забавное решение, 
+использующее модуль <b>Python</b>’а и IDA в качестве источника символов: 
+<a href="https://0xeb.wordpress.com/2010/10/13/pyhiew-transferring-names-between-ida-pro-and-hiew/" target="_blank">PyHiew: Transferring names between IDA Pro and Hiew</a>. 
+Имена передаются из IDA в HIEW по средствам локальной связки клиент-сервера, 
+которая реализована на <b>Python</b>’овских скриптах. Автор точно знает толк в 
+извращенных формах программирования :)
+                </p>
+            <br />
+                <p>
+В связи с таким положением вещей была написана 
+<a href="https://dsymload.codeplex.com/releases">утилита DSymLoad</a> для загрузки отладочных 
+символов в HIEW. <strike>На самом деле DSymLoad включает в себя два исполняемых модуля: 
+утилиту командной строки <b>NameTGen.exe</b> и внешний модуль для HIEW - 
+<b>DSymLoad.HEM</b> (с файлом настроек DSymLoad.ini).</strike>
+Утилита командной строки оказалась не нужна. На 
+<a href="https://dsymload.codeplex.com">dsymload.codeplex.com</a> 
+выложены исходные коды уже без нее.
+                </p>
+            <br />
+<a name=" DSymLoad_HEM"></a><h2>DSymLoad.hem</h2> 
+            <br />
+                <p>
+Что бы загружать символы "не отходя от HIEW" был написан внешний модуль 
+<b>DSymLoad.HEM</b>. Это загружаемая в <b>HIEW</b> библиотека, которая 
+использует отладочную информацию, перечисляет символы и формирует локальные 
+символы для текущего файла. 
+                </p>
+            <br />
+                <p>
+Для хранения настроек используется обычный INI-файл (DSymLoad.ini). Этот файл 
+должен располагаться в той же директории, что и исполняемый образ 
+<b>DSymLoad.hem</b>.
+                </p>
+                <p>
+Важный момент: все настройки, измененные в главном диалоговом окне, не 
+сохраняются в файл, пока не будет нажата клавиша &lt;F8&gt;.
+                </p>
+            <br />
+                <p>
+Скачать <a href="https://dsymload.codeplex.com/releases">утилиту DSymLoad</a>
+                </p>
+            <br /><hr /><br />
+<h2>Change log:</h2>
+<br /><div><table align="left" border="0" cellpadding="0" cellspacing="0" rules="rows">
+<tr>
+  <td><a name="moved_to_codeplex"></a><p>0.1.0.4</p></td>
+  <td>
+    <p>Опубликован исходный код на <a href="https://dsymload.codeplex.com">dsymload.codeplex.com</a></p>
+    <p>Эта страница останется только для истории, пока удалять ее не буду. Но актуальную информацию по утилите можно будет получить с ее нового сайта.</p>
+    <ul>
+        <li>Исправлено: игнорирование SYMFLAG_TLSREL-символов</li>
+        <li>Реализовано: определение директории WinDbg (поддерживаются: Windows Kits 8, 8.1 и 10)</li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td><p>0.1.0.1</p></td>
+  <td><p>Добавлена детализация загрузки отладочных символов</p><p>NameTGen.exe поддерживает ключ <b>-i </b></p><p>В архив добавлены необходимые библиотеки отладки</p></td>
+</tr>
+<tr>
+  <td><p>0.1.0.0</p></td>
+  <td><p>Первая публичная работоспособная версия</p></td>
+</tr>
+</table></div>
+
+            <br />
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

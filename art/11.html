@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Фильтрация создания описателей для объекта любого типа</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, ObRegisterCallbacks, OB_OPERATION_REGISTRATION, PsProcessType, PsThreadType, LpcPortObjectType" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Фильтрация создания описателей для объекта любого типа
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Как гласит документация, функцию 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff558692(v=vs.85).aspx">ObRegisterCallbacks</a>
+ можно вызывать только для фильтрации создания описателей процесса и нити (поле 
+ <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff558718(v=vs.85).aspx">ObjectType в структуре OB_OPERATION_REGISTRATION</a>):
+                </p>
+            <br />
+                <div class="quote">
+A pointer to the object type (process or thread) that triggers the callback 
+routine. Specify either PsProcessType for process handle operations, or 
+PsThreadType for thread handle operations.
+                </div>
+            <br />
+                <p>
+Если не верить написанному и запустить тест, который попытается 
+зарегистрировать фильтр, например, для nt!LpcPortObjectType, то путем недолгой 
+трассировки мы увидим следующий код:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+    test    byte ptr [rcx+42h],40h
+    je      nt!ObRegisterCallbacks+0x1a8 (fffff800`01ad2ce8)
+
+; nt!ObRegisterCallbacks+0x1a8 (fffff800`01ad2ce8):
+    mov     esi,0C000000Dh
+                </pre>
+            <br />
+                <p>
+А при выходе функция вернет STATUS_INVALID_PARAMETER(0xC000000D). По листингу 
+nt!ObRegisterCallbacks нетрудно догадаться, что на момент проверки в rcx 
+хранится указатель на целевой тип объекта. Структура типа объекта есть в 
+символах:
+                </p>
+            <br />
+                <div class="code">
+kd> dt nt!_OBJECT_TYPE -b
+   +0x000 TypeList         : _LIST_ENTRY
+      +0x000 Flink            : Ptr64 
+      +0x008 Blink            : Ptr64 
+   +0x010 Name             : _UNICODE_STRING
+      +0x000 Length           : Uint2B
+      +0x002 MaximumLength    : Uint2B
+      +0x008 Buffer           : Ptr64 
+   +0x020 DefaultObject    : Ptr64 
+   +0x028 Index            : UChar
+   +0x02c TotalNumberOfObjects : Uint4B
+   +0x030 TotalNumberOfHandles : Uint4B
+   +0x034 HighWaterNumberOfObjects : Uint4B
+   +0x038 HighWaterNumberOfHandles : Uint4B
+   +0x040 TypeInfo         : _OBJECT_TYPE_INITIALIZER
+      +0x000 Length           : Uint2B
+      +0x002 ObjectTypeFlags  : UChar
+      +0x002 CaseInsensitive  : Pos 0, 1 Bit
+      +0x002 UnnamedObjectsOnly : Pos 1, 1 Bit
+      +0x002 UseDefaultObject : Pos 2, 1 Bit
+      +0x002 SecurityRequired : Pos 3, 1 Bit
+      +0x002 MaintainHandleCount : Pos 4, 1 Bit
+      +0x002 MaintainTypeList : Pos 5, 1 Bit
+      +0x002 SupportsObjectCallbacks : Pos 6, 1 Bit
+      +0x004 ObjectTypeCode   : Uint4B
+ ... 
+                </div>
+            <br />
+                <p>
+Как видно из результата печати структуры, по смещению 0x42 расположены флаги. А 
+маска 0x40 (6-ой бит) соответствует флагу с очень говорящим названием 
+SupportsObjectCallbacks. Ради продолжения эксперимента можно написать 
+простенький скрипт печати флагов для всех типов (py-скрипт с использованием 
+<a target="_blank" href="http://pykd.codeplex.com/">PyKd</a> версии 0.1.x):
+                </p>
+            <br />
+                <pre class="brush: py;">
+from pykd import *
+import re
+
+nt = loadModule( "nt" )
+
+cmdRes = dbgCommand( "!object \\ObjectTypes" )
+for strRes in cmdRes.split( "\n" ):
+  strRes = strRes.strip("\r\n")
+  mObj = re.search( "[ ]+[0-9]*[0-9]*[ ]+([0-9|a-f]+)", strRes )
+  if mObj:
+    typeObj = nt.typedVar( "_OBJECT_TYPE", int(mObj.group(1), 16 ))
+    dprint( "%024s" % loadUnicodeString(typeObj.Name.getAddress()) )
+    if typeObj.TypeInfo.CaseInsensitive:
+      dprint( " [CaseInsensitive]")
+    if typeObj.TypeInfo.UnnamedObjectsOnly:
+      dprint( " [UnnamedObjectsOnly]")
+    if typeObj.TypeInfo.UseDefaultObject:
+      dprint( " [UseDefaultObject]")
+    if typeObj.TypeInfo.SecurityRequired:
+      dprint( " [SecurityRequired]")
+    if typeObj.TypeInfo.MaintainHandleCount:
+      dprint( " [MaintainHandleCount]")
+    if typeObj.TypeInfo.MaintainTypeList:
+      dprint( " [MaintainTypeList]")
+    if typeObj.TypeInfo.SupportsObjectCallbacks:
+      dprint( " &lt;col fg=\"changed\"&gt;[SupportsObjectCallbacks]&lt;/col&gt;", True)
+    if hasattr(typeObj.TypeInfo, "CacheAligned"):
+      if typeObj.TypeInfo.CacheAligned:
+        dprint( " [CacheAligned]")
+    dprintln( "")
+                </pre>
+            <br />
+                <p>
+Результат работы скрипта:
+                </p>
+            <br />
+                <div class="code">
+                    TmTm [UnnamedObjectsOnly] [SecurityRequired]
+                 Desktop [SecurityRequired] [MaintainHandleCount]
+                 Process [UnnamedObjectsOnly] [SecurityRequired] <font color="red">[SupportsObjectCallbacks]</font>
+             DebugObject [SecurityRequired]
+         TpWorkerFactory
+                 Adapter [UseDefaultObject]
+                   Token [UseDefaultObject] [SecurityRequired]
+               EventPair [UseDefaultObject]
+               PcwObject [UnnamedObjectsOnly] [UseDefaultObject]
+                 WmiGuid [SecurityRequired]
+         EtwRegistration [SecurityRequired] [MaintainHandleCount]
+                 Session [UseDefaultObject] [SecurityRequired]
+                   Timer
+                  Mutant
+            IoCompletion [CaseInsensitive] [UseDefaultObject]
+           WindowStation [SecurityRequired] [MaintainHandleCount]
+                 Profile
+                    File [CaseInsensitive] [MaintainHandleCount]
+               Semaphore
+             EtwConsumer [SecurityRequired] [MaintainHandleCount]
+                    TmTx [SecurityRequired]
+            SymbolicLink [CaseInsensitive] [UseDefaultObject]
+    FilterConnectionPort [SecurityRequired]
+                     Key [UseDefaultObject] [SecurityRequired]
+              KeyedEvent [UseDefaultObject]
+                Callback
+          UserApcReserve [UnnamedObjectsOnly]
+                     Job [SecurityRequired]
+              Controller [UseDefaultObject]
+     IoCompletionReserve [UnnamedObjectsOnly]
+                  Device [CaseInsensitive] [UseDefaultObject]
+               Directory [CaseInsensitive] [UseDefaultObject] [SecurityRequired]
+                 Section [UseDefaultObject]
+                    TmEn [SecurityRequired]
+                  Thread [UnnamedObjectsOnly] [SecurityRequired] <font color="red">[SupportsObjectCallbacks]</font>
+                    Type [UseDefaultObject] [MaintainTypeList]
+ FilterCommunicationPort
+            PowerRequest [MaintainHandleCount]
+                    TmRm [SecurityRequired] [MaintainHandleCount]
+                   Event
+               ALPC Port [MaintainHandleCount]
+                  Driver [CaseInsensitive] [UseDefaultObject]
+                </div>
+            <br />
+                <p>
+Результат полностью соответствует документации: флаг SupportsObjectCallbacks 
+установлен только для объектов типов <b>Process</b> и <b>Thread</b>. Но можно 
+продолжить экспериментировать: напишем небольшой тестовый драйвер, который 
+будет следить за описателями ALPC-портов, собственноручно взводя флаг 
+SupportsObjectCallbacks в nt!LpcPortObjectType. Смещение до этого флага 
+одинаково на всех линейке ОС, начиная с Vista: 0x2a для i386 и 0x42 для AMD64. 
+Тест имеет больше академический интерес, так как за такие манипуляции бьет по 
+рукам 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/windows/hardware/gg487350">KPP aka PatchGuard</a>.
+                </p>
+            <br />
+                <p>
+Далеко не секрет, что все Win32-процессы при инициализации устанавливают 
+LPC-соединение с csrss.exe. Полезной нагрузкой драйвера-теста будет запрет 
+установки такого соединения для процессов calc.exe. Стек вызовов должен быть 
+примерно такой:
+                </p>
+            <br />
+                <div class="code">
+fffff880`0baf14c0 fffff800`01a6facf nt!ObpCallPreOperationCallbacks+0x196
+fffff880`0baf1540 fffff800`019f1bbd nt!ObpPreInterceptHandleCreate+0xaf
+fffff880`0baf15c0 fffff800`019bb93e nt! ?? ::NNGAKEGL::`string'+0x30c3f
+fffff880`0baf16d0 fffff800`019adaa3 nt!ObInsertObjectEx+0xde
+fffff880`0baf1920 fffff800`0197d812 nt!AlpcpCreateClientPort+0x2e3
+fffff880`0baf19d0 fffff800`0197f0e1 nt!NtSecureConnectPort+0x2ec
+fffff880`0baf1b50 fffff800`016d0f93 nt!NtConnectPort+0x41
+fffff880`0baf1bb0 00000000`771e1c3a nt!KiSystemServiceCopyEnd+0x13
+00000000`0015e8f8 00000000`771d462e ntdll!ZwConnectPort+0xa
+00000000`0015e900 00000000`771d43b5 ntdll!CsrpConnectToServer+0x25e
+00000000`0015eac0 000007fe`fd6b041a ntdll!CsrClientConnectToServer+0x230
+00000000`0015ecd0 00000000`771cb0d8 KernelBase!KernelBaseDllInitialize+0x148
+00000000`0015ef60 00000000`771d42ed ntdll!LdrpRunInitializeRoutines+0x1fe
+00000000`0015f130 00000000`771d1dc8 ntdll!LdrGetProcedureAddressEx+0x2aa
+00000000`0015f2a0 00000000`771d1a17 ntdll!LdrpInitializeProcess+0x1a0c
+00000000`0015f790 00000000`771bc32e ntdll! ?? ::FNODOBFM::`string'+0x29220
+00000000`0015f800 00000000`00000000 ntdll!LdrInitializeThunk+0xe
+                </div>
+            <br />
+                <p>
+Запрет заключается в том, что для создаваемого описателя сбрасываем маску 
+доступа в 0. Процесс не сможет выполнить инициализацию, не имея связи с 
+csrss.exe. В результате вместо запущенного калькулятора на экран выводится 
+диалог:
+                </p>
+            <br />
+                <div class="code">
+[calc.exe - Application Error]
+The application was unable to start correctly (0xc0000142). 
+Click OK to close the application.
+                </div>
+            <br />
+                <p>
+Так что тест свою задачу выполнил. Исходный код теста приводить не буду, так 
+как он тривиален. А все шаги достаточно подробно описаны.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

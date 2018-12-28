@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Аппаратная точка останова на запись и инструкция CMPXCHG</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, InterlockedCompareExchange, cmpxchg, dr0, dr7, break on write, break on access" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Аппаратная точка останова на запись и инструкция CMPXCHG
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Часто возникает ситуация, когда необходимо мониторить и логировать обращения к 
+некоторому значению памяти. Используя WinDbg, я часто использую 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff538165(v=vs.85).aspx">аппаратную точку останова</a> 
+вида:
+                </p>
+            <br />
+                <div class="code">
+ba w 4 ADDR "?dwo(ADDR);?@$thread;kb;gc;"
+                </div>
+            <br />
+                <p>
+В результате получаем какая нить какое значение записывала по целевому адресу. 
+Плюс полезным подспорьем выступает стек вызовов.
+                </p>
+            <br />
+                <p>
+Совсем недавно я разгребал подобные логи, целевой код для которых выглядел 
+примерно следующим образом:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+  for (; ; )
+  {
+    if (!InterlockedCompareExchange(pBarrier, TRUE, FALSE))
+      break;
+    WaitForBarrier();
+  }
+
+  // ...
+
+  InterlockedExchange(pBarrier, TRUE);
+  SignalBarrier()
+                </pre>
+            <br />
+                <p>
+Не секрет, что 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms683560(v=vs.85).aspx">InterlockedCompareExchange(...)</a> 
+реализуется процессорной инструкцией CMPXCHG с префиксом LOCK. Соответсвенно, 
+для правильной интерпретации логов, возник вопрос: будет ли срабатывать 
+аппаратная точка останова, если после выполнения CMPXCHG значение памяти не 
+меняется (было TRUE).
+                </p>
+            <br />
+                <p>
+Если прочесть документацию от Intel, то там есть интересная ремарка:
+                </p>
+            <br />
+                <div class="quote">
+To simplify the interface to the processor’s bus, the destination operand 
+receives a write cycle without regard to the result of the comparison. The 
+destination operand is written back if the comparison fails; otherwise, the 
+source operand is written into the destination. (The processor never produces a 
+locked read without also producing a locked write.)
+                </div>
+            <br />
+                <p>
+Получается, что запись происходит всегда. Что бы это проверить, набросаем 
+небольшой тест:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+struct CCmpXchgData
+{
+  CHandle m_hThreadStatedEvent;
+  CHandle m_hStartBarrierEvent;
+  volatile long m_nDest;
+
+  CCmpXchgData() : m_nDest(0) {}
+};
+
+// ----------------------------------------------------------------------------
+
+static DWORD CmpXchgExceptionFilter(
+  __in DWORD dwExceptionCode
+)
+{
+  if (EXCEPTION_SINGLE_STEP == dwExceptionCode)
+  {
+    _tprintf(_T(" *** EXCEPTION_SINGLE_STEP occurred\n"));
+    return EXCEPTION_CONTINUE_EXECUTION;
+  }
+  return EXCEPTION_CONTINUE_SEARCH;
+}
+
+// ----------------------------------------------------------------------------
+
+static DWORD WINAPI CmpXchgThreadProc(
+  __inout PVOID pParam
+)
+{
+  CCmpXchgData *pCmpXchgData = reinterpret_cast&lt;CCmpXchgData *&gt;(pParam);
+
+  VERIFY(::SetEvent(pCmpXchgData-&gt;m_hThreadStatedEvent));
+  VERIFY(
+    WAIT_OBJECT_0 == 
+    ::WaitForSingleObject(pCmpXchgData-&gt;m_hStartBarrierEvent, INFINITE)
+  );
+
+  __try
+  {
+    _tprintf(
+      _T("lock cmpxchg %u &lt;- 1\n"),
+       InterlockedCompareExchange(&amp;pCmpXchgData-&gt;m_nDest, 1, 0));
+    _tprintf(
+      _T("lock cmpxchg %u &lt;- 1\n"),
+       InterlockedCompareExchange(&amp;pCmpXchgData-&gt;m_nDest, 1, 0));
+  }
+  __except( CmpXchgExceptionFilter(GetExceptionCode()) )
+  {
+  }
+
+  return ERROR_SUCCESS;
+}
+
+// ----------------------------------------------------------------------------
+
+INT _tmain(
+  IN  INT nArgCount,
+  IN  PTSTR arrArguments[]
+)
+{
+  CCmpXchgData CmpXchgData;
+
+  CmpXchgData.m_hThreadStatedEvent.Attach(
+    ::CreateEvent(NULL, TRUE, FALSE, NULL));
+  if (!CmpXchgData.m_hThreadStatedEvent)
+    return PrintFormatError(_T("Create start event"));
+
+  CmpXchgData.m_hStartBarrierEvent.Attach(
+    ::CreateEvent(NULL, TRUE, FALSE, NULL));
+  if (!CmpXchgData.m_hStartBarrierEvent)
+    return PrintFormatError(_T("Create barrier event"));
+
+  CHandle hCmpXchgThread;
+  hCmpXchgThread.Attach(
+    ::CreateThread(NULL, 0, &amp;CmpXchgThreadProc, &amp;CmpXchgData, 0, NULL)
+  );
+  if (!hCmpXchgThread)
+    return PrintFormatError(_T("Create test thread"));
+  VERIFY(
+    WAIT_OBJECT_0 == 
+    ::WaitForSingleObject(CmpXchgData.m_hThreadStatedEvent, INFINITE)
+  );
+
+  if ((DWORD)-1 == ::SuspendThread(hCmpXchgThread))
+    return PrintFormatError(_T("Suspend test thread"));
+
+  CONTEXT ThreadContext;
+  ThreadContext.ContextFlags = CONTEXT_ALL;
+  if (!::GetThreadContext(hCmpXchgThread, &amp;ThreadContext))
+    return PrintFormatError(_T("Get test thread context"));
+
+  ThreadContext.Dr0 = reinterpret_cast&lt;ULONG_PTR&gt;(&amp;CmpXchgData.m_nDest);
+  ThreadContext.Dr7 = 0x00010501;
+  if (!::SetThreadContext(hCmpXchgThread, &amp;ThreadContext))
+    return PrintFormatError(_T("Set test thread context"));
+
+  if ((DWORD)-1 == ::ResumeThread(hCmpXchgThread))
+    return PrintFormatError(_T("Suspend test thread"));
+
+  VERIFY(::SetEvent(CmpXchgData.m_hStartBarrierEvent));
+  VERIFY(WAIT_OBJECT_0 == ::WaitForSingleObject(hCmpXchgThread, INFINITE));
+
+  return ERROR_SUCCESS;
+}
+                </pre>
+            <br />
+                <p>
+Тест  использует механизм аппаратных точек останова, манипулируя DR-регистрами. 
+Отладочные исключения в обрабатываются механизмом 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms680657(v=vs.85).aspx">SEH'а</a>.
+Запустим собранный код теста, получим результаты:
+                </p>
+            <br />
+                <div class="code">
+ *** EXCEPTION_SINGLE_STEP occurred
+lock cmpxchg 0 &lt;- 1
+ *** EXCEPTION_SINGLE_STEP occurred
+lock cmpxchg 1 &lt;- 1
+                </div>
+            <br />
+                <p>
+Результаты недвусмысленно подтверждают, что даже если по результату выполнения 
+CMPXCHG память не изменила своего значения, происходит отладочное исключение на 
+запись по целевому адресу. Соответственно, в случае с логами, нужно при анализе 
+отличать первую запись значения от повторной попытки записи.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

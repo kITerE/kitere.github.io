@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Класс загрузки драйвера, расположенного в ресурсах</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, загрузка драйвера, драйвер в ресурсах, NtLoadDriver, NtUnloadDriver, TResourceDrv" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Класс загрузки драйвера, расположенного в ресурсах
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Часто приходится писать небольшие утилиты, которым необходима поддержка со 
+стороны ядра. Для этого нужно писать отдельный драйвер. Но "таскать" драйвер 
+с файлом утилиты некрасиво. Поэтому есть довольно простой способ - слинковать 
+модуль драйвера с PE-файлом user mod'ного exe-шника.
+                </p>
+            <br />
+                <p>
+Что бы не писать постоянно один и тот же код по распаковке модуля драйвера на 
+носитель и его загрузке в систему я написал небольшой класс <b>TResourceDrv</b>. 
+Основные особенности класса:
+                </p>
+                <ul>
+<li>класс использует ATL-обёртки описателей</li>
+<li>класс не генерирует исключений</li>
+<li>класс работает с кучей по умолчанию текущего процесса</li>
+                </ul>
+                <p>
+Класс содержит 2-а основных публичных метода. Метод LoadDriver:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+ULONG LoadDriver(
+    IN  PCWSTR wszResourceName,
+    IN  PCWSTR wszResourceType,
+    IN  PCWSTR wszDriverName,
+    IN  DWORD dwDrvRegType = SERVICE_KERNEL_DRIVER,
+    IN  DWORD dwDrvRegStart = SERVICE_DEMAND_START,
+    IN  PCWSTR wszDrvRegDisplayName = NULL,
+    IN  DWORD dwDrvRegErrorControl = SERVICE_ERROR_NORMAL
+) throw();
+                </pre>
+                <p>
+Параметры метода:
+                </p>
+                <ul>
+<li>wszResourceName - имя ресурса модуля драйвера</li>
+<li>wszResourceType - имя типа ресурса модуля драйвера.</li>
+<li>wszDriverName - короткое имя службы драйвера. Фактически это имя ключа реестра драйвера.</li>
+<li>dwDrvRegType - тип драйвера. По умолчанию 1 - <b>SERVICE_KERNEL_DRIVER</b>.</li>
+<li>dwDrvRegStart - тип запуска драйвера. По умолчанию 3 - <b>SERVICE_DEMAND_START</b>.</li>
+<li>wszDrvRegDisplayName - отображаемое имя дравера. По умолчанию <b>NULL</b>.</li>
+<li>dwDrvRegErrorControl - уровень контроля ошибок запуска драйвера. По умолчанию 1 - <b>SERVICE_ERROR_NORMAL</b>.</li>
+                </ul>
+                <p>
+Возвращаемое значение:
+                </p>
+                <p>
+<b>ERROR_SUCCESS</b> в случае, если загрузка драйвера произведена успешно. Или иной 
+код Win32-ошибки в случае неудачи.
+                </p>
+            <br />
+                <p>
+Данный метод извлекает модуль драйвера из ресурсов в файл. Созданный файл 
+располагается в директории "%WINDIR%\System32\Drivers\". Далее формируется 
+ключ драйвера в реестре, записывая указанные параметры. Если действия по 
+формированию файла и ключа реестра драйвера завершены успешно, то метод 
+загружает драйвер вызовом функции ntdll!NtLoadDriver(...). Перед загрузкой 
+драйвера, если это необходимо, метод пытается разрешить текущему процессу 
+привилегию загрузки/выгрузки драйверов <b>SE_LOAD_DRIVER_NAME</b>.
+                </p>
+            <br />
+                <p>
+Второй метод - UnloadDriver:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+ULONG UnloadDriver() throw();
+                </pre>
+            <br />
+                <p>
+Возвращаемое значение:
+                </p>
+                <p>
+<b>ERROR_SUCCESS</b> в случае, если выгрузка драйвера произведена успешно. Или иной код Win32-ошибки в случае неудачи.
+                </p>
+                <p>
+Метод выгружает драйвер, который был загружен успешным вызовом метода LoadDriver.
+                </p>
+            <br />
+                <a name="UPD_28_04_2011"></a>
+                <h2>Updated (28.04.2011)</h2>
+            <br />
+                <p>
+Класс загрузки драйвера из ресурсов был мною немного переработан до 
+версии 0.1.1.0. В частности, в список изменений входит:
+                </p>
+<ul>
+  <li>Интерфейс IProcessBeforeWrite был удален.</li>
+  <li>Работа с ntdll.dll переписана на динамический импорт.</li>
+  <li>Объявление нативных функций/структур обзавелись префиксом для избежания конфликта с другими файлами проекта.</li>
+  <li>Работа с памятью полностью переписана на ATL. Использован CAtlArray, что сохранило отсутствие генерации исключений.</li>
+  <li>Добавлена опция: не выгружать драйвер при уничтожении объекта.</li>
+</ul>
+            <br />
+                <p>
+Для задания опции, указывающей объекту класса <b>TResourceDrv</b> не выгружать 
+драйвер в деструкторе, появился конструктор с bool-параметром:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+TResourceDrv(
+    bool bUnloadOnDestroy
+) throw();
+                </pre>
+            <br />
+                <p>
+И отдельный метод установки опции:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+void SetUnloadOnDestroy(
+  __in bool bUnloadOnDestroy = true
+) throw();
+                </pre>
+            <br />
+                <p>
+Описанный класс в исходном коде можно скачать 
+<a href="../download/ResourceDrv-0.1.1.0.rar">здесь</a>.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

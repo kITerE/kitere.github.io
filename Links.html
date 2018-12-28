@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Внешние ссылки</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests" />
+<link rel="stylesheet" type="text/css" href="style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; Внешние ссылки
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="index.htm">Стартовая страница</a></li>
+                <li><a href="Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="Downloads.html">Скачать</a></li>
+                <li><a href="Links.html">Внешние ссылки</a></li>
+                <li><a href="Overview.html">Обо всем</a></li>
+                <li><a href="Contacts.html">Контакты</a></li>
+                <li><a href="Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Эта страница содержит ссылки на некоторые публичные ресурсы, которыми я часто 
+пользуюсь. Для некоторых из них (особенно англоязычных) приведены основные 
+выдержки из текта, и ссылка на источник.
+                </p>
+            <br /><hr /><br />
+                <a name="proc_mans"></a><p>
+Официальная документация на 
+<a href="http://www.intel.com/products/processor/manuals/index.htm" target="_blank">Intel 64 and IA-32</a> 
+и 
+<a href="http://developer.amd.com/documentation/guides/Pages/default.aspx#manuals" target="_blank">AMD</a>
+                </p>
+            <br /><hr /><br />
+                <a name="mskb_ServicesPipeTimeout"></a><p>
+<a  target="_blank" href="http://support.microsoft.com/kb/922918/en-us">Увеличение таймаута старта служб</a>
+                </p>
+            <br /><hr /><br />
+                <a name="map_status2error_mskb"></a><p>
+<a  target="_blank" href="http://support.microsoft.com/kb/113996">Mapping NT Status Error Codes to Win32 Error Codes</a>
+                </p>
+            <br /><hr /><br />
+                <a name="x64_cc_msdn"></a><p>
+Передача параметров для архитектуры amd64
+<a  target="_blank" href="http://msdn.microsoft.com/en-us/library/ff561499(VS.85).aspx#calling_conventions">Calling Conventions: x64 Architecture</a>
+                </p>
+            <br /><hr /><br />
+                <a name="crt_alloc_num_break"></a><p>
+<a href="http://msdn.microsoft.com/en-us/library/w2fhc9a3(VS.80).aspx" target="_blank">
+MSDN'новская статья о том, как поймать утечку (аллокацию памяти) по ее номеру выделения
+</a>
+                </p>
+            <br /><hr /><br />
+                <a name="debug_bcd"></a><p>
+<a href="http://www.microsoft.com/whdc/driver/tips/debug_vista.mspx" target="_blank">
+Настройка отладочной конфигурации с использованием bcdedit (ОС Vista и старше)
+</a>
+                </p>
+            <br /><hr /><br />
+                <a name="rpc_prot_seq"></a><p>
+Описание констант RPC-транспортов в MSDN:
+<a href="http://msdn.microsoft.com/en-us/library/aa374395%28VS.85%29.aspx" target="_blank">Protocol Sequence Constants</a>.
+                </p>
+            <br /><hr /><br />
+                <a name="osr_ioctl_dec"></a><p>
+<a href="http://www.osronline.com/article.cfm?article=229" target="_blank">Разбор IOCTL на составляющие.</a>
+Страница OSR'а где вбиваем численный код IOCTL и получаем все параметры: тип 
+устройсва, номер функции, режим доступа, метод доступа.
+                </p>
+            <br /><hr /><br />
+                <a name="osr_ifs_faq"></a><p>
+Если возникают какие-то вопросы по написанию драйвера фаловой системы или ее
+фильтра, то перед тем, как терзать людей своими вопросами нужно посмотреть
+<a href="http://www.osronline.com/article.cfm?article=17" target="_blank">OSR'овский FAQ по FSD</a>
+или <a href="http://www.osronline.com/wiki/index.cfm/IFS%20FAQ" target="_blank">WiKi-вариант</a>
+                </p>
+            <br /><hr /><br />
+                <a name="msdn_force_crash"></a><p>
+Генерация падения системы с клавиатуры. Иногда возникает необходимость 
+посмотреть, что же твориться в ядре машины, к которой нет возможности 
+подключить отладчик в определенный момент времени. Один из способов – генерация
+ crash-дампа «руками» (т.е. клавиатурой). Для это необходимо выставить нужные
+ параметры генерации дампов в настройках системы. Далее необходимо прописать 
+REG_DWORD-значение CrashOnCtrlScroll  равным 0x01. Ключ реестра выбирается в 
+зависимости от типа клавиатуры: для PS\2 это </p>
+<pre>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\i8042prt\Parameters,</pre>
+<p>а для USB:</p>
+<pre>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\kbdhid\Parameters.</pre>
+<p>Перезагружаемся, и теперь для генерации crash’а системы необходимо нажать 
+два раза на &lang;SCROLL LOCK&rang; при зажатом правом &lang;CTRL&rang;.
+<a href="http://msdn.microsoft.com/en-us/library/ff545499%28VS.85%29.aspx" target="_blank">Статья в MSDN’е</a> 
+описывает дополнительные параметры и совместимость на различных версиях Windows.
+                </p>
+            <br /><hr /><br />
+                <a name="msdn_data_acc"></a><p>
+<a href="http://msdn.microsoft.com/en-us/library/ff554436%28VS.85%29.aspx" target="_blank">Методы доступа к буферам данных при обработке IRP'ов</a>.
+Основы основ для человека, пишущего драйвера. Три метода доспупа к 
+входному\выходному буферам данных запроса.
+                </p>
+            <br />
+            <ul type="square">
+<li>Buffered I/O. Метод буферизации данных. Ядро операционной системы определяет 
+максимальный размер данных (входные/выходные) и выделяет буфер в пуле. Входной 
+буфер копируется ядром при формировании запроса. Выходные данные формирует 
+драйвер по тому же адресу. Указатель на буфер располагается в 
+в поле AssociatedIrp.SystemBuffer IRP'а. Используется для передачи небольших 
+объемов данных.</li>
+<li>Direct I/O. Метод прямого доступа к страницам памяти буфера. Доступ 
+осуществляется через механизмы MDL. Адрес структуры MDL располагается в поле 
+MdlAddress IRP'а. Используется для передачи больших объемов данных.</li>
+<li>Neither Buffered Nor Direct I/O. «Третий» (не buffered и не direct) метод 
+доступа к данным. В этом случае, указатель на пользовательский буфер с данными 
+передается без изменений. Адрес входной буфера располагается в поле 
+Parameters.DeviceIoControl.Type3InputBuffer текущей ячейки стека IRP'а. Адрес
+выходного буфера помещается менеджером I/O поле UserBuffer IRP'а. При 
+обработке такого рода запросов, драйвер должен сам вызывать Probe-функции, 
+следить за текущим контекстом пользовательского процесса и обращаться данным 
+внутри блока структурной обработки исключений (__try/__except).</li>
+            </ul>
+            <br /><hr /><br />
+                <a name="osr_en_kdout"></a><p>
+Начиная с Windows Vista, по умолчанию отладочная печать ядра отключена. Для 
+того, что бы ее включить, необходимо произвести небольшую модификацию реестра. 
+В ключе </p>
+<pre>"HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Debug Print Filter"</pre>
+<p>создать REG_DWORD-значение "DEFAULT". И присвоить ему значение 
+0xFFFFFFFF. 
+<a href="http://www.osronline.com/article.cfm?id=295" target="_blank">Оригинальная статья на OSR'е (Hector's Memos:Getting DbgPrint Output To Appear In Longhorn)</a>
+ описывает так же включение отладочной печати динамически, изменяя глобальные переменные ядра.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

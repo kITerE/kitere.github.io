@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Скрипты к WinDbg</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Скрипты к WinDbg
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Кроме всего прочего, отладчик WinDbg позволяет исполнять файлы, содержащие 
+произвольный код на скрипторм языке. Язык скриптов, с синтаксисом которого 
+можно ознакомиться в хелпе к WinDbg, довольно прост. Основной минус 
+их [скриптов] использования (например, в отличие от библиотеки расширений) 
+это время исполнения. Но зато... не нужно выгружать расширение из WinDbg, 
+перекомпилировать его и подкладывать снова в отладчик.
+                </p>
+            <br />
+                <p>
+Далее приведен скромный список скриптов, которые я написал и привел в 
+читабельный вид :). К некоторым из скриптам так же сопутствует небольшие 
+описания.
+                </p>
+            <br /><hr /><br />
+                <p>
+Разбор и отображение заголовка формата MIDL-сгенерированного формата NDR-вызова. 
+Этот указатель передается во второй параметр <b>rpcrt4!NdrClientCall2(...)</b>. 
+                </p><p>
+Запускать с одним параметром: PFORMAT_STRING
+                </p><p>
+<a href="../download/DCMD/NdrFormat.rar">Скачать архив с NdrFormat.dcmd</a>
+                </p>
+            <br />
+                <p>
+Отображение таблицы функций-обработчиков для RPC-сервера.
+                </p><p>
+Запускать с одним параметром: адресом структры описывающей RPC-сервер (первый параметр функции rpcrt4!RpcServerRegisterIfEx(...)).
+                </p><p>
+<a href="../download/DCMD/RpcServer_IfHandle.rar">Скачать архив с RpcServer_IfHandle.dcmd</a>, 
+<a href="RpcServer_IfHandle.html">Детальное описание и пример использования</a>
+                </p>
+            <br />
+                <p>
+Отображение списка нитей, ожидающих синхро-объект. 
+                </p><p>
+Запускать с одним параметром: адрес синхро-объект. Указный синхро-объект должен 
+быть "примитивным", то есть его структура должна начинаться со структуры 
+<b>nt!_DISPATCHER_HEADER</b>: KEVENT, KMUTANT, KTHREAD...
+                </p><p>
+<a href="../download/DCMD/Print_WaitList.rar">Скачать архив с Print_WaitList.dcmd</a>
+                </p>
+            <br />
+                <p>
+Отображение очереди IRP для указанной нити. 
+                </p><p>
+Запускать с одним параметром: адрес целевой нити.
+                 </p><p>
+<a href="../download/DCMD/Print_IrpList.rar">Скачать архив с Print_IrpList.dcmd</a>
+                </p>
+
+            <br />
+                <p>
+Просмотр таблицы системных вызовов в режиме отладки ядра.
+                </p><p>
+Запускать без параметров, на выходе: таблица системных вызовов ядра и win32k.sys
+                 </p><p>
+<a href="../download/DCMD/SSDT_Print_Live.rar">Скачать архив с SSDT_Print_Live.dcmd</a>
+                </p>
+
+            <br />
+                <p>
+Просмотр таблицы системных вызовов для загруженного модуля ядра.
+                </p>
+                <p>
+Что бы загрузить модуль ядра в WinDbg необходимо или запускать WinDbg с ключом "-z", например:
+                </p>
+                <div class="code">
+windbg.exe -z ntoskrnl.exe
+                </div>
+                <p>
+Или в запущенном WinDbg открыть PE-модуль ядра как дамп: File->Open Crash Dump (&lt;Ctrl&gt;+D)
+                </p>
+                <p>
+Запускать без параметров, на выходе: таблица системных вызовов ядра
+                </p>
+                <p>
+<a href="../download/DCMD/SSDT_Print_ntoskrnl.rar">Скачать архив с SSDT_Print_ntoskrnl.dcmd</a>
+                </p>
+
+
+            <br /><hr /><br />
+                <p>
+<a href="../download/DCMD/DCMD.rar">Скачать все скрипты в одном rar-архиве</a>
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

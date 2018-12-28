@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; diaview: пример использования MS DIA из питона (diabind)</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, MSDIA, DIA, Debug Interface Access, diabind, diaview, python" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; diaview: пример использования MS DIA из питона (diabind)
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+<a target="_blank" href="https://diabind.codeplex.com/releases"><img src="../images/download.png" alt="diabind releases" align="right" /></a>
+                <p>
+Не так давно я анонсировал свой проект 
+<a target="_blank" href="https://diabind.codeplex.com/releases">diabind</a>, 
+который является python-биндингом возможностей 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/x93ctkx8(v=vs.71).aspx">DIA SDK</a>. 
+Самое вкусное из того, что предоставляет DIA SDK (на мой взгляд), обернуто в интерфейс 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/w0edf0x4.aspx">IDiaSymbol</a>. 
+Это интерфейс с большим числом методов, которые возвращают что-то или генерирую 
+ошибку вызова в зависимости от того, интерпретацией чего они являются. 
+Например: метод get_callingConvention будет работать только для типов функций. 
+В документации достаточно расплывчато и не точно описано для каких символов 
+какие getter'ы будут работать.
+                </p>
+            <br />
+                <p>
+Поэтому для GUI-визуализации содержимого отладочной информации я написал скрипт 
+diaview.py, который может рассматриваться и как пример использования diabind. 
+В качестве GUI в скрипте используется PySide 
+<a target="_blank" href="http://qt-project.org/wiki/PySide_Binaries_Windows">(Binaries for Microsoft Windows)</a>.
+                </p>
+            <br />
+                <p>
+После открытия файла с отладочной информацией (или исполняемого файла, по 
+которому доступна отладочная информация) появляется основная вкладка 
+<b>global scope</b>. Это корневой символ полученный последовательностью вызовов:
+                </p>
+            <br />
+<ul>
+<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/2008hf0e.aspx">IDiaDataSource::loadDataFromPdb</a> или <a target="_blank" href="http://msdn.microsoft.com/en-us/library/12kk9t39.aspx">IDiaDataSource::loadDataForExe</a></li>
+<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/3tw26387.aspx">IDiaDataSource::openSession</a></li>
+<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/fkcc8hx6.aspx">IDiaSession::get_globalScope</a></li>
+</ul>
+            <br />
+                <p>
+Вся дальнейшая работа идет раскрытием дерева символов и исполнением поиска 
+дочерних элементов символа (пункт меню "Find children for IDiaSymbol"). Важно 
+понимать, что поиск дочерних элементов может быть только у символов. И сам 
+поиск применяется именно к тому символу, который в настоящий момент выбран в дереве.
+                </p>
+            <br />
+                <p>
+Для демонстрации получим список параметров DllMain. Выбираем единственный 
+символ в <b>global scope</b> и ищем функцию DllMain. Данные поиска идентичны 
+параметрам метода 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/yfx1573w.aspx">IDiaSymbol::findChildren</a>:
+                </p>
+                <p>
+<img src="../images/diaview_findChildren.png" alt="diaview_findChildren" />
+                </p>
+            <br />
+                <p>
+Для найденного символа ищем все дочерние символы SymTagData:
+                </p>
+                <p>
+<img src="../images/diaview_DllMain_SymTagData.png" alt="diaview_DllMain_SymTagData" />
+                </p>
+            <br />
+                <p>
+Скрипт diaview.py включен в новый релиз 
+<a target="_blank" href="https://diabind.codeplex.com/releases">diabind 0.1.0.2</a>, 
+который теперь поддерживает MS DIA от Visual Studio 12.0.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

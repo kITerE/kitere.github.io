@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; WinDbg 6.3.9600: новые возможности отладки</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg, Windows 8 Development Preview, Full memory dump " />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; WinDbg 6.3.9600: новые возможности отладки
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+              <br />
+                <p>
+Перед тем как я расскажу о некоторых новых возможностях, стоит пару слов сказать о 
+новой системе версий WinDbg. Изначально существовал отдельный продукт 
+"Debugging Tools for Windows". Он имел свою линейку версий. Затем Microsoft 
+интегрировали "Debugging Tools for Windows" в WDK и Platform SDK, убрав 
+возможность скачивания отдельного дистрибутива отладчика (что толкнуло меня на ведение 
+<a href="WinDBG_Download.html" target="_blank">коллекции отдельных дистрибутивов "Debugging Tools for Windows"</a>). 
+Следующим шагом (с выходом preview-версии Windows 8) стало появление версии 
+6.2.xxx.yyy после 6.12.xxx.yyy. То есть Microsoft лишили 
+"Debugging Tools for Windows" собственной версии, а версия WinDbg теперь 
+совпадает с версией операционной системы. Последняя версия (на момент написания) - 
+6.3.9600.16384, что соответствует Windows 8.1.
+                </p>
+              <br />
+                <p>
+Так что же нового предоставляет отладчик версии 6.3.9600 по сравнению с 
+6.12.xxx.yyy? Для начала стоит ознакомится с официальной документацией:
+                </p>
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/hardware/dn363433(v=vs.85).aspx" target="_blank">Debugging Tools for Windows: New for Windows 8</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/hardware/dn363434(v=vs.85).aspx" target="_blank">Debugging Tools for Windows: New for Windows 8.1</a></li>
+</ul>
+              <br />
+                <p>
+Так же стоит отметить, что старый отладчик упорно <i>обзывает</i> системы 
+Windows 8 семерками. Плюс, как я писал ранее, 
+<a href="Win8DevPrev_WinDbg_FullDump.html" target="_blank">отладчик 6.12.xxx.yyy не открывает полные дампы с Windows 8</a>.
+                </p>
+              <br />
+                <p>
+Но самое вкусное - расширения. Самые интересные (на мой взгляд), доступные только в новом отладчике:
+                </p>
+<ul><li>
+<b>!findhandle</b>-поиск описателей на указанный объект. Первый обязательный 
+параметр - адрес объекта. Второй необязательный параметр - адрес процесса, в 
+котором будет происходить поиск. Если второй параметр не задан, то будет 
+произведен поиск во всех процессах.
+</li></ul>
+              <br />
+                <div class="code">
+1: kd&gt; !object \PowerMonitorPort
+Object: 847615c8  Type: (8466d5e0) ALPC Port
+    ObjectHeader: 847615b0 (new version)
+    HandleCount: 1  PointerCount: 32
+    Directory Object: 81601188  Name: PowerMonitorPort
+1: kd&gt; !findhandle 847615c8  
+                                                              
+                   [8467acc0 System]
+    18: Entry 81605030 Granted Access 1f0001
+                </div>
+<ul><li>
+<b>!joblist</b> - команда перечисляет все созданные в системе job-объекты. Для 
+каждого job-объекта выводтся информация, аналогичная результату работы команды 
+<a href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff563843(v=vs.85).aspx" target="_blank">!job</a> 
+для этого объекта.
+</li></ul>
+              <br />
+                <div class="code">
+1: kd&gt; !joblist
+Job at 8751d518
+  Basic Accounting Information
+    TotalUserTime:             0x0
+    TotalKernelTime:           0x0
+    TotalCycleTime:            0x0
+    ThisPeriodTotalUserTime:   0x0
+    ThisPeriodTotalKernelTime: 0x0
+    TotalPageFaultCount:       0x0
+    TotalProcesses:            0x0
+    ActiveProcesses:           0x0
+    FreezeCount:               0
+    BackgroundCount:           1
+    TotalTerminatedProcesses:  0x0
+    PeakJobMemoryUsed:         0x0
+    PeakProcessMemoryUsed:     0x0
+  Job Flags
+    [background]
+    [empty job notified]
+  Limit Information (LimitFlags: 0x0)
+  Limit Information (EffectiveLimitFlags: 0x0)
+...
+Job at a2e673c8
+  Basic Accounting Information
+    TotalUserTime:             0x4c4b4
+    TotalKernelTime:           0x0
+    TotalCycleTime:            0xb94f9f7
+    ThisPeriodTotalUserTime:   0x4c4b4
+    ThisPeriodTotalKernelTime: 0x0
+    TotalPageFaultCount:       0x9ac
+    TotalProcesses:            0x4
+    ActiveProcesses:           0x1
+    FreezeCount:               0
+    BackgroundCount:           0
+    TotalTerminatedProcesses:  0x0
+    PeakJobMemoryUsed:         0x18c
+    PeakProcessMemoryUsed:     0xf3
+  Job Flags
+  Limit Information (LimitFlags: 0x2000)
+  Limit Information (EffectiveLimitFlags: 0x2000)
+    JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+                </div>
+<ul><li>
+<b>!ptetree</b> - отображения дерева структур памяти.
+</li></ul>
+              <br />
+                <div class="code">
+USAGE: !ptetree [Levels | PteVa]
+    Dump the tree of valid and non-zero paging structures.
+    Note: This relies on the particulars of NT PTE management
+
+    Levels - Optional depth of the tree to dump.
+    PteVa - Optional VA of a paging structure below which structures
+        should be dumped
+                </div>
+<ul><li>
+<b>!processirps</b> - команда, выделившаяся из общего списка тем, что присутствует в 
+<a href="http://msdn.microsoft.com/en-us/library/windows/hardware/jj193212(v=vs.85).aspx" target="_blank">официальной документации</a>.
+</li></ul>
+              <br />
+                <p>
+Есть у нового отладчика и неприятные моменты. Появилась проблема зависания при 
+выходе из отладчика, если в этот момент исполняющееся расширение читает 
+пользовательский ввод. Поясню на примере, исходный код расширения:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+extern "C" __declspec(dllexport)
+HRESULT CALLBACK echo(IDebugClient4 *pClient, PCSTR)
+{
+    CComQIPtr&lt; IDebugControl &gt; pControl(pClient);
+    for(; ; )
+    {
+        char buf[MAX_PATH] = {0};
+        pControl->Input(&amp;buf[0], _countof(buf), NULL);
+        pControl->Output(DEBUG_OUTPUT_NORMAL, "&gt;&gt; %s\n", &amp;buf[0]);
+    }
+}
+                </pre>
+              <br />
+                <p>
+Дальше запускаем расширения (!echo) и закрываем отладчик. Старый отладчик 
+закрывается, а новый - зависает. Это приводит к известным проблемам использования 
+<a href="http://pykd.codeplex.com/workitem/12323" target="_blank">!pycmd</a>. 
+Проблема была признана Microsoft'ом, но так до сих пор и не исправлена.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

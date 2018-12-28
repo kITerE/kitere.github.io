@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Часто используемые команды отладчика</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, команды Windbg" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Часто используемые команды отладчика
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Ниже приведены часто используемые мной команды отладчика:
+                </p>
+            <br />
+                <table border="1">
+                    <tr> 
+                        <td>Установка точки останова на создание именованного устройства</td>
+                        <td>bp nt!IoCreateDevice "j (poi(@esp + (3 * @$ptrsize) )) '!ustr poi(@esp + (3 * @$ptrsize) )'; 'gc' "</td>
+                        <td></td>
+                    </tr>
+                    <tr> 
+                        <td>Установка точки останова на уничтожение процесса 0xaabbccdd</td>
+                        <td>bp nt!PspProcessDelete "j(poi(@esp + (1 * @$ptrsize) )!=0xaabbccdd) 'gc';'kb'"</td>
+                        <td></td>
+                    </tr>
+                    <tr> 
+                        <td>Вывод в отладчик стека вызовов (трассировка отладочной печатью) при исполнении инструкции по адресу 0xaabbccdd </td>
+                        <td>ba e 1 0xaabbccdd ".reload /user; kb 100; gc"</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Точка останова для трассировки вызова создания/открытия файла с выводом структуры  атрибутов объекта</td>
+                        <td>bp nt!NtCreateFile "!obja poi(@esp + (3 * @$ptrsize) )";bp nt!NtOpenFile "!obja poi(@esp + (3 * @$ptrsize) )"</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Точка останова для трассировки соединения с [A]LPC-портом</td>
+                        <td>bp nt!NtSecureConnectPort "!ustr poi(@esp + (2 * @$ptrsize) )";bp nt!NtAlpcConnectPort "!ustr poi(@esp + (2 * @$ptrsize) )"</td>
+                        <td>Функция nt!NtAlpcConnectPort(...) присутствует на системах Vista+</td>
+                    </tr>
+                    <tr>
+                        <td>Точка останова для трассировки создания серверного [A]LPC-порта</td>
+                        <td>bp nt!NtCreateWaitablePort "!obja poi(@esp + (2 * @$ptrsize) )";bp nt!NtCreatePort "!obja poi(@esp + (2 * @$ptrsize) )";bp nt!NtAlpcCreatePort "!obja poi(@esp + (2 * @$ptrsize) )"</td>
+                        <td>Функция nt!NtAlpcCreatePort(...) присутствует на системах Vista+</td>
+                    </tr>
+                    <tr>
+                        <td>Забыл точку останова в коде (int 3)? Выкашиваем одной командой :)</td>
+                        <td>eb @eip 0x90</td>
+                        <td>Команда вписывает по текущему значению регистра EIP инструкцию "nop"</td>
+                    </tr>
+                    <tr>
+                        <td>Включение режима остановки отладчика при возникновении исключения в пользовательском режиме</td>
+                        <td>!gflag +soe</td>
+                        <td>Выключение: !gflag -soe</td>
+                    </tr>
+                    <tr>
+                        <td>Удаленная отладка через TCP</td>
+                        <td>
+На удаленной машине (которую хотим отлаживать) запускаем и подготавливаем отладчик, затем набираем:
+<br />
+.server tcp:port=<b><i>PORT_NUM</i></b>
+<hr />
+На основной машине (с которой хотим отлаживать) запускаем WinDbg, выбираем "File"-&gt;"Connect To Remote Session…" (Ctrl+R). 
+В "Connection String" набираем:
+<br />
+tcp:Port=<b><i>PORT_NUM</i></b>,Server=<b><i>HOST_NAME</i></b>
+                        </td>
+                        <td>
+<b><i>PORT_NUM</i></b> - номер TCP порта, по которому будет проходить отладка
+<br />
+<b><i>HOST_NAME</i></b> - имя отлаживаемого хоста или его IP-адрес
+                        </td>
+                    </tr>
+                </table>
+                <br /><hr /><br />
+                <a name="kd_dr_bug00"></a><p>
+Проблемы после команд трассировки исполнения отладочными регистрами, вида:
+</p><div class="code">ba e 1 ADDR</div><p>
+Даже когда точка останова снята командой 
+</p><div class="code">bc*</div><p>
+у WinDbg появляются "фантомные боли". Он останавливается в другом 
+процессе на этом адресе и не хочет продолжать исполнение кода. 
+Лечится очисткой контрольного отладочного регистра dr7:
+</p><div class="code">r dr7=0</div>
+                <br /><hr /><br />
+                <a name="debug_ninja_s_twitter_debug_tips"></a><p>
+Отличная подборка команд для WinDbg с кратким описанием:
+<a target="_blank" href="http://blogs.msdn.com/b/ntdebugging/archive/2011/07/20/updated-archive-of-the-debug-ninja-s-twitter-debug-tips.aspx">Updated Archive of the Debug Ninja’s Twitter Debug Tips</a>.
+Некоторые приемы неочевидны и не описаны в документации, в общем - спасибо автору.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

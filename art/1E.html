@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Нотификация проверки цифровой подписи файла драйвера</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, KeNumberProcessors, nt!KeNumberProcessors, KeGetCurrentProcessorNumber, функции kdexts!GetProcessorCount " />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Нотификация проверки цифровой подписи файла драйвера
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+        <br />
+            <div class="epigraph">
+<p>Сохнут волосы, метёт метла</p>
+<p>В кобуре мороза пистолет тепла</p>
+<p>Гражданская Оборона - "Тошнота"</p>
+            </div>
+            <br />
+                <p>
+Одним из новшеств в Windows 8.1 стала нотификация (объект обратного вызова, 
+callback object) проверки цифровой подписи исполняемых файлов драйверов: 
+SeRegisterImageVerificationCallback(...) и SeUnregisterImageVerificationCallback(...). 
+Эти функции документированы в заголовочных файлах WDK 8.1:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+//
+// Types of images.
+//
+
+typedef enum _SE_IMAGE_TYPE
+{
+  SeImageTypeElamDriver = 0,
+  SeImageTypeDriver,
+  SeImageTypeMax
+} SE_IMAGE_TYPE, *PSE_IMAGE_TYPE;
+
+typedef struct _BDCB_IMAGE_INFORMATION *PBDCB_IMAGE_INFORMATION;
+
+typedef
+_IRQL_requires_same_
+_Function_class_(SE_IMAGE_VERIFICATION_CALLBACK_FUNCTION)
+VOID
+SE_IMAGE_VERIFICATION_CALLBACK_FUNCTION (
+    _In_opt_ PVOID CallbackContext,
+    _In_ SE_IMAGE_TYPE ImageType,
+    _Inout_ PBDCB_IMAGE_INFORMATION ImageInformation
+    );
+
+typedef SE_IMAGE_VERIFICATION_CALLBACK_FUNCTION *PSE_IMAGE_VERIFICATION_CALLBACK_FUNCTION;
+
+typedef enum _SE_IMAGE_VERIFICATION_CALLBACK_TYPE {
+    SeImageVerificationCallbackInformational = 0
+} SE_IMAGE_VERIFICATION_CALLBACK_TYPE, *PSE_IMAGE_VERIFICATION_CALLBACK_TYPE;
+
+typedef PVOID SE_IMAGE_VERIFICATION_CALLBACK_TOKEN, *PSE_IMAGE_VERIFICATION_CALLBACK_TOKEN;
+
+#if (NTDDI_VERSION >= NTDDI_WINBLUE)
+_IRQL_requires_max_(PASSIVE_LEVEL)
+NTKERNELAPI
+NTSTATUS
+SeRegisterImageVerificationCallback(
+    _In_ SE_IMAGE_TYPE ImageType,
+    _In_ SE_IMAGE_VERIFICATION_CALLBACK_TYPE CallbackType,
+    _In_ PSE_IMAGE_VERIFICATION_CALLBACK_FUNCTION CallbackFunction,
+    _In_opt_ PVOID CallbackContext,
+    _Reserved_ SE_IMAGE_VERIFICATION_CALLBACK_TOKEN Token,
+    _Out_ PVOID* CallbackHandle
+    );
+
+_IRQL_requires_max_(PASSIVE_LEVEL)
+NTKERNELAPI
+VOID
+SeUnregisterImageVerificationCallback (
+    _In_ PVOID CallbackHandle
+    );
+#endif
+                </pre>
+                <p>
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/hh406359(v=vs.85).aspx">Структура BDCB_IMAGE_INFORMATION</a>
+                </p>
+            <br />
+                <p>
+Несмотря на такое детальное описание в заголовочном файле wdm.h, статьи описания 
+работы функций SeRegisterImageVerificationCallback(...) и 
+SeUnregisterImageVerificationCallback(...) просто нет. Хочу немного восполнить 
+этот пробел.
+                </p>
+            <br />
+                <p>
+Хотя функция регистрации SeRegisterImageVerificationCallback получает достаточно 
+много параметров, большинство из них просто проверяются на валидность и 
+не используются:
+                </p>
+<ul>
+  <li><b>ImageType</b> == SeImageTypeDriver, иначе функция вернет STATUS_INVALID_PARAMETER_1</li>
+  <li><b>CallbackType</b> == SeImageVerificationCallbackInformational, иначе функция вернет STATUS_INVALID_PARAMETER_2</li>
+  <li><b>Token</b> == NULL, иначе функция вернет STATUS_INVALID_PARAMETER_5</li>
+</ul>
+            <br />
+                <p>
+То есть сейчас, фактически, функция принимает адрес функции обратного вызова, 
+контекст функции обратного вызова и возвращает описатель зарегистрированного 
+обратного вызова или статус ошибки.
+                </p>
+            <br />
+                <p>
+Хочется отметить, что сам объект нотификации имеет имя в дереве объектов: 
+"\Callback\SeImageVerificationDriverInfo". Так же есть не экспортируемый символ 
+объекта обратного вызова - <b>nt!ExCbSeImageVerificationDriverInfo</b>. Но 
+регистрировать нотификацию нужно именно <b>Se</b>-функциями: в ядре присутствует 
+счетчик, имя которого не включено в отладочную информацию. Но этот счетчик 
+атомарно инкрементируется при регистрации, декрементируется при де-регистрации 
+<b>Se</b>-функциями. Но самое важное - он проверяется на 0 перед вызовом самой 
+нотификации. Это, видимо, своеобразная оптимизация: если нет подписчиков 
+нотификации, то нет необходимости копировать структуру <b>BDCB_IMAGE_INFORMATION</b> 
+и ставить WORK_ITEM для вызова нотификации.
+                </p>
+            <br />
+                <p>
+Вторая особенность этой нотификации заключается в том, что вызов обработчиков 
+всегда происходит из WORK_ITEM'а, то есть не в контексте нити проверки подписи. 
+Оригинальная операция никак не блокируется, все данные копируются через пул. 
+Последовательность вызовов:
+                </p>
+<ul>
+  <li>MiValidateSectionCreate</li>
+  <li>SeValidateImageHeader (тут происходит проверка счетчика)</li>
+  <li>SepScheduleImageVerificationCallbacks</li>
+  <li>ExQueueWorkItem</li>
+  <li>...<b><i>миграция в другую нить</i></b>...</li>
+  <li>SepImageVerificationCallbackWorker</li>
+  <li>ExNotifyWithProcessing</li>
+</ul>
+<ol>
+  <li>SepImageVerificationCallbackPreProcess</li>
+  <li><b><i>зарегистрированные обработчики нотификации</i></b></li>
+</ol>
+            <br />
+                <p>
+Я думаю, что это сделано сознательно, что бы избежать взаимо-блокировок, так как 
+нотификация вызывается при загрузке файлов драйверов, сразу после работы 
+успешного вызова функции CI!CiValidateImageHeader. 
+                </p>
+            <br />
+                <p>
+Хотя надо отметить, что в инсталляции "из коробки" Windows 8.1 имеет 
+зарегистрированный нотификатор WdFilter!MpImageVerificationCallback. При 
+изучении содержимого WdFilter.sys стоит учитывать, что адреса функций 
+SeRegisterImageVerificationCallback(...) и SeUnregisterImageVerificationCallback(...) 
+получаются вызовом 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff554563(v=vs.85).aspx">MmGetSystemRoutineAddress(...)</a>, 
+(функция WdFilter!MpSetImageVerificationCallback).
+                </p>
+            <br />
+                <p>
+Для теста я тоже набросал драйвер, получающий нотификацию проверки цифровой 
+подписи и печатающий входные данные. Получилось что-то такое:
+                </p>
+            <br />
+                <div class="code">
+...
+
+Driver `\Windows\System32\Drivers\cdrom.sys'
+	-&gt;Classification=UnknownImage
+	-&gt;ImageFlags=0x0
+	-&gt;RegistryPath=`(null)'
+	-&gt;CertificatePublisher=`Microsoft Windows'
+	-&gt;CertificateIssuer=`Microsoft Windows Production PCA 2011'
+	-&gt;ImageHashAlgorithm=0x8004
+	02fa4f92d6f50df4a80dfe9e5c4668f5907d56ed
+	-&gt;ThumbprintHashAlgorithm=0x800c
+	4383c9a796dc607ddaae1849d8e5d2e7ea211aad2c599fe1e251285ec87dd150
+
+Driver `\Windows\System32\Drivers\null.sys'
+	-&gt;Classification=UnknownImage
+	-&gt;ImageFlags=0x0
+	-&gt;RegistryPath=`(null)'
+	-&gt;CertificatePublisher=`Microsoft Windows'
+	-&gt;CertificateIssuer=`Microsoft Windows Production PCA 2011'
+	-&gt;ImageHashAlgorithm=0x8004
+	ba802cc8b72cd02dc28d72361f142283cf3c3231
+	-&gt;ThumbprintHashAlgorithm=0x800c
+	4383c9a796dc607ddaae1849d8e5d2e7ea211aad2c599fe1e251285ec87dd150
+
+Driver `\Windows\System32\Drivers\beep.sys'
+	-&gt;Classification=UnknownImage
+	-&gt;ImageFlags=0x0
+	-&gt;RegistryPath=`(null)'
+	-&gt;CertificatePublisher=`Microsoft Windows'
+	-&gt;CertificateIssuer=`Microsoft Windows Production PCA 2011'
+	-&gt;ImageHashAlgorithm=0x8004
+	af44cd0e1ebbb7b06290bf05237ce864aa888313
+	-&gt;ThumbprintHashAlgorithm=0x800c
+	4383c9a796dc607ddaae1849d8e5d2e7ea211aad2c599fe1e251285ec87dd150
+
+...
+                </div>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

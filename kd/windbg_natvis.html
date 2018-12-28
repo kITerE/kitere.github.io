@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; WinDbg 10.0.10075 получил поддержку .NatVis-файлов</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg 10.0.10075, NatVis, .natvis" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; WinDbg 10.0.10075 получил поддержку .NatVis-файлов
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Наряду с <a href="win10074_windbg10041_kdnic.html">поддержкой ethernet-отладки Windows 10 10074</a>, 
+в <a href="WinDBG_Download.html#v10.0.10075">WinDbg 10.0.10075</a> наконец-то 
+появилась поддержка .NatVis-файлов. Если кто вдруг кто не знает, то это файлы 
+для custom-представления переменных 
+сложных типов.
+                </p>
+            <br />
+                <p>
+Набросаем и соберем в Visual Studio 2013 простой тест:
+                </p>
+            <br />
+                <div class="code">
+int _tmain(int argc, _TCHAR* argv[])
+{
+    std::string TestString;
+    TestString = "test!";
+    std::vector&lt;int&gt; TestVector(2);
+    TestVector[0] = 0;
+    TestVector[1] = -100000;
+    __debugbreak();
+    return 0;
+}
+                </div>
+            <br />
+                <p>
+В директории WinDbg (C:\Program Files (x86)\Windows Kits\10\Debuggers\x64) 
+создаем символическую ссылку Visualizers на директорию Visualizers в
+Visual Studio 2013. Результат должен быть таким:
+                </p>
+            <br />
+                <div class="code">
+C:\Program Files (x86)\Windows Kits\10\Debuggers\x64&gt;fsutil reparsepoint query Visualizers
+Reparse Tag Value : 0xa0000003
+Tag value: Microsoft
+Tag value: Name Surrogate
+Tag value: Mount Point
+Substitue Name offset: 0
+Substitue Name length: 186
+Print Name offset:     188
+Print Name Length:     178
+Substitute Name:       \??\C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Packages\Debugger\Visualizers
+Print Name:            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Packages\Debugger\Visualizers
+                </div>
+            <br />
+                <p>
+Запускам тест в WinDbg, ждем отладочное исключение в wmain. Наслаждаемся:
+                </p>
+            <br />
+                <div class="code">
+0:000&gt; dv
+           argc = 1
+           <font color="blue" ><u>argv</u></font> = 0x00000000`00336e90
+     <font color="blue" ><u>TestString</u></font> = "test!"
+     <font color="blue" ><u>TestVector</u></font> = { size=2 }
+                </div>
+            <br />
+                <p>
+Кликаем по TestString:
+                </p>
+            <br />
+                <div class="code">
+0:000&gt; dx -r1 ((natvis_test!std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt; *)0x18f778)
+<font color="blue" ><u>((natvis_test!std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt; *)0x18f778)</u></font> : 0x18f778 : "test!" : [Type: std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt; *]
+    "test!"[Type: std::basic_string&lt;char,std::char_traits&lt;char&gt;,std::allocator&lt;char&gt; &gt;]
+        <font color="blue" ><u>[&lt;Raw View&gt;]</u></font>    
+        [size]           : 5
+        [capacity]       : 15
+                </div>
+            <br />
+                <p>
+Кликаем по TestVector:
+                </p>
+            <br />
+                <div class="code">
+0:000&gt; dx -r1 ((natvis_test!std::vector&lt;int,std::allocator&lt;int&gt; &gt; *)0x18f7b8)
+<font color="blue" ><u>((natvis_test!std::vector&lt;int,std::allocator&lt;int&gt; &gt; *)0x18f7b8)</u></font> : 0x18f7b8 : { size=2 } : [Type: std::vector&lt;int,std::allocator&lt;int&gt; &gt; *]
+    { size=2 }[Type: std::vector&lt;int,std::allocator&lt;int&gt; &gt;]
+        <font color="blue" ><u>[&lt;Raw View&gt;]</u></font>    
+        [size]           : 2
+        [capacity]       : 2
+        [0]              : 0
+        [1]              : -100000
+                </div>
+            <br />
+                <p>
+Как видно выше, используется новая команда <b>dx</b>. В лучших традициях эта команда 
+не описана в приложенной к отладчику справке. Но разработчики не поленились и 
+добавили обработку соответствующего параметра командной строки:
+                </p>
+            <br />
+                <div class="code">
+0:000&gt; dx /?
+DX [-r[#]] &lt;expr&gt; - display C++ expression using extension model (e.g.: NatVis)
+DX [-r[#]] &lt;expr&gt;[,&lt;FormatSpecifier&gt;] - display C++ expression using extension model (e.g.: NatVis) in a specified format
+  -e              *TEMPORARY* -- Revert back to the C++ (??) expression evaluator for &lt;expr&gt;.
+  -?              Show this help.
+  -h              Show help for displayed items.
+  -n              Show raw/native information only (e.g.: No NatVis)
+  -r[l]           Recursively dump the subtypes (fields) upto l levels.
+  -v              Verbose output (includes methods and other non-typical objects)
+
+Format Specifiers:
+  ,x              Display ordinals in hexidecimal
+  ,d              Display ordinals in decimal
+  ,o              Display ordinals in octal
+  ,b              Display ordinals in binary
+  ,en             Display enums by name only (no value)
+  ,c              Display as single character (not a string)
+  ,s              Display 8-bit strings as ASCII quoted
+  ,sb             Display 8-bit strings as ASCII unquoted
+  ,s8             Display 8-bit strings as UTF-8 quoted
+  ,s8b            Display 8-bit strings as UTF-8 unquoted
+  ,su             Display 16-bit strings as UTF-16 quoted
+  ,sub            Display 16-bit strings as UTF-16 unqouted
+  ,!              Display objects in raw mode only (e.g.: no NatVis)
+  ,#              Specify length of pointer/array/container as the literal value # (replace with numeric)
+  ,[&lt;expression&gt;] Specify length of pointer/array/container as the expression &lt;expression&gt;
+  ,nd             Do not find the derived (runtype) type of the object.  Display static value only
+                </div>
+            <br />
+                <a name="UPD_11_11_2015"></a>
+                <h2>Updated (11.11.2015)</h2>
+            <br />
+                <p>
+После выпуска релизной версии отладчика (10.0) поддержка NatVis'ов задокументирована
+                </p>
+<ul>
+    <li><a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/mt219728%28v=vs.85%29.aspx">Debugging Tools for Windows: New for Windows 10.0</a></li>
+    <li><a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/dn936815(v=vs.85).aspx">dx (Display NatVis Expression)</a></li>
+</ul>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

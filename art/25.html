@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Открытие описателя объекта нити процесса SYSTEM из процесса с правами администратора (Windows 7)</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver, _EPROCESS, _ETHREAD, Protedted Process, PspThreadOpen, NtOpenThread, Pico, PicoContext" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Открытие описателя объекта нити процесса SYSTEM из процесса с правами администратора (Windows 7)
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Исходные данные: Windows 7, процесс, работающий от лица администратора и нить 
+процесса SYSTEM
+                </p>
+            <br />
+                <p>
+Проблема: при попытке открытия нити получаем STATUS_ACCESS_DENIED
+                </p>
+            <br />
+                <p>
+Расследование: Security Descriptor нити позволяет ее отрывать с достачно 
+широкими правами:
+                </p>
+                <div class="code">
+0: kd&gt; !process poi(nt!PsInitialSustemProcess) 3
+PROCESS fffffa8006cd3040
+    SessionId: none  Cid: 0004    Peb: 00000000  ParentCid: 0000
+    DirBase: 00187000  ObjectTable: fffff8a000001a10  HandleCount: 1062.
+    Image: System
+    VadRoot fffffa800723ab20 Vads 6 Clone 0 Private 9. Modified 6211841. Locked 2.
+    DeviceMap fffff8a000008aa0
+    Token                             fffff8a000004040
+    ElapsedTime                       4 Days 22:57:47.523
+    UserTime                          00:00:00.000
+    KernelTime                        00:00:18.439
+    QuotaPoolUsage[PagedPool]         0
+    QuotaPoolUsage[NonPagedPool]      0
+    Working Set Sizes (now,min,max)  (16, 0, 0) (64KB, 0KB, 0KB)
+    PeakWorkingSetSize                3451
+    VirtualSize                       3 Mb
+    PeakVirtualSize                   16 Mb
+    PageFaultCount                    125516
+    MemoryPriority                    BACKGROUND
+    BasePriority                      8
+    CommitCharge                      31
+
+        THREAD fffffa8006cd3ab0  Cid 0004.0008  &lt;...&gt;
+            fffff8000485cfa0  Gate
+&lt;...&gt;
+        THREAD fffffa800bcff040  Cid 0004.2214  &lt;...&gt;
+            fffff88003301690  QueueObject
+
+0: kd&gt; !object fffffa800bcff040
+Object: fffffa800bcff040  Type: (fffffa8006cafbc0) Thread
+    ObjectHeader: fffffa800bcff010 (new version)
+    HandleCount: 0 PointerCount: 2
+0: kd&gt; dt nt!_OBJECT_HEADER fffffa800bcff010
+   +0x000 PointerCount     : 0n2
+   +0x008 HandleCount      : 0n0
+   +0x008 NextToFree       : (null)
+   +0x010 Lock             : _EX_PUSH_LOCK
+   +0x018 TypeIndex        : 0x8 ''
+   +0x019 TraceFlags       : 0 ''
+   +0x01a InfoMask         : 0 ''
+   +0x01b Flags            : 0x2 ''
+   +0x020 ObjectCreateInfo : 0x00000000`00000001 _OBJECT_CREATE_INFORMATION
+   +0x020 QuotaBlockCharged : 0x00000000`00000001 Void
+   +0x028 SecurityDescriptor : 0xfffff8a0`000048ce Void
+   +0x030 Body             : _QUAD
+0: kd&gt; !sd 0xfffff8a0`000048c0 1
+-&gt;Revision: 0x1
+-&gt;Sbz1    : 0x0
+-&gt;Control : 0x8814
+            SE_DACL_PRESENT
+            SE_SACL_PRESENT
+            SE_SACL_AUTO_INHERITED
+            SE_SELF_RELATIVE
+-&gt;Owner   : S-1-5-32-544 (Alias: BUILTIN\Administrators)
+-&gt;Group   : S-1-5-18 (Well Known Group: NT AUTHORITY\SYSTEM)
+-&gt;Dacl    :
+-&gt;Dacl    : -&gt;AclRevision: 0x2
+-&gt;Dacl    : -&gt;Sbz1       : 0x0
+-&gt;Dacl    : -&gt;AclSize    : 0x3c
+-&gt;Dacl    : -&gt;AceCount   : 0x2
+-&gt;Dacl    : -&gt;Sbz2       : 0x0
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceType: ACCESS_ALLOWED_ACE_TYPE
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceFlags: 0x0
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceSize: 0x14
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;Mask : 0x001fffff
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;SID: S-1-5-18 (Well Known Group: NT AUTHORITY\SYSTEM)
+
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceType: ACCESS_ALLOWED_ACE_TYPE
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceFlags: 0x0
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceSize: 0x18
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;Mask : 0x00120848
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;SID: S-1-5-32-544 (Alias: BUILTIN\Administrators)
+
+-&gt;Sacl    :
+-&gt;Sacl    : -&gt;AclRevision: 0x2
+-&gt;Sacl    : -&gt;Sbz1       : 0x0
+-&gt;Sacl    : -&gt;AclSize    : 0x1c
+-&gt;Sacl    : -&gt;AceCount   : 0x1
+-&gt;Sacl    : -&gt;Sbz2       : 0x0
+-&gt;Sacl    : -&gt;Ace[0]: -&gt;AceType: SYSTEM_MANDATORY_LABEL_ACE_TYPE
+-&gt;Sacl    : -&gt;Ace[0]: -&gt;AceFlags: 0x0
+-&gt;Sacl    : -&gt;Ace[0]: -&gt;AceSize: 0x14
+-&gt;Sacl    : -&gt;Ace[0]: -&gt;Mask : 0x00000003
+-&gt;Sacl    : -&gt;Ace[0]: -&gt;SID: S-1-16-16384 (Label: Mandatory Label\System Mandatory Level)
+                </div>
+            <br />
+                <p>
+Трассируем nt!NtOpenThread до функции nt!ObpIncrementHandleCountEx, которая 
+вызывает обработчик nt!PspThreadOpen (обработчик создания описателей объектов, типа 
+"нить"). В теле nt!PspThreadOpen видим (псевдо-код):
+                </p>
+                <pre class="brush: cpp;">
+NTSTATUS __stdcall PspThreadOpen(&lt;...&gt;)
+{
+&lt;...&gt;
+  if ( PrevMode == 1
+    &amp;&amp; !(TargetProcess-&gt;Flags2 &amp; 0x800)
+    &amp;&amp; ThreadObject-&gt;Tcb.Process-&gt;Flags2 &amp; 0x800
+    &amp;&amp; GrantedAccess &amp; 0xFF3FD )
+  {
+    result = 0xC0000022; // == STATUS_ACCESS_DENIED
+  }
+  else
+&lt;...&gt;
+                </pre>
+            <br />
+                <p>
+Маска 0x800 - проверка флага защищенного процесса. А процесс SYSTEM как раз защищенный:
+                </p>
+                <div class="code">
+1: kd&gt; dt nt!_EPROCESS poi(nt!PsInitialSystemProcess) ProtectedProcess
+   +0x43c ProtectedProcess : 0y1
+                </div>
+            <br />
+                <p>
+Именно из-за этого и ошибка.
+                </p>
+            <br />
+                <p>
+Ссылки по protected-процессам:
+                </p>
+                <ul>
+<li><a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863(v=vs.85).aspx#CREATE_PROTECTED_PROCESS">MSDN: Process Creation Flags - CREATE_PROTECTED_PROCESS</a></li>
+<li><a target="_blank" href="https://technet.microsoft.com/en-us/magazine/2007.04.vistakernel.aspx">TechNet: Inside the Windows Vista Kernel: Part 3 - Protected Processes</a></li>
+<li><a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn313124(v=vs.85).aspx">MSDN: Protecting Anti-Malware Services</a></li>
+<li>И ряд постов из блога Alex Ionescu: <a target="_blank" href="http://www.alex-ionescu.com/?p=34">Why Protected Processes Are A Bad Idea</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=97">The Evolution of Protected Processes Part 1: Pass-the-Hash Mitigations in Windows 8.1</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=116">The Evolution of Protected Processes Part 2: Exploit/Jailbreak Mitigations, Unkillable Processes and Protected Services</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=146">Protected Processes Part 3 : Windows PKI Internals</a></li>
+                </ul>
+            <br />
+                <a name="UPD_30_09_2016"></a>
+                <h2>Updated (30.09.2016)</h2>
+            <br />
+                <p>
+Все вышеперечисленное ограничения на открытие описателей касаются, в том числе, 
+и объекта процесса. Например на Windows 7 за создание описателя на процесс 
+отвечает PspProcessOpen с таким псевдо-кодом:
+                </p>
+                <pre class="brush: cpp;">
+  if ( PrevMode == 1
+    &amp;&amp; !_bittest(&amp;DestinationProcess-&gt;Flags2, 11)
+    &amp;&amp; _bittest(&amp;OpenedProcess-&gt;Flags2, 11)
+    &amp;&amp; GrantedAccess &amp; 0xFE7FE )
+  {
+    result = STATUS_ACCESS_DENIED;
+  }
+                </pre>
+                <p>
+Но с приходом Windows 10.0.14393 в ядре появилась поддержка Linux-процессов 
+(Windows Subsystem for Linux, WSL), которые называются 
+<a target="_blank" href="https://blogs.msdn.microsoft.com/wsl/2016/05/23/pico-process-overview/">Pico-процессами</a>. 
+И эти PICO-процессы обрабатываются по аналогии с защищенными процессами (псевдо-кодо из Windows 10.0.14393):
+                </p>
+<ul><li>PspThreadOpen</li></ul>
+                <pre class="brush: cpp;">
+    || OpenedThread-&gt;PicoContext
+    &amp;&amp; !DestinationProcess_-&gt;PicoContext
+    &amp;&amp; PrevMode
+    &amp;&amp; ~*(_DWORD *)&amp;PspPicoProviderRoutines[0x4C] &amp; GrantedAccess )
+  {
+    result = STATUS_ACCESS_DENIED;
+  }
+                </pre>
+                <div class="code">
+0: kd&gt; ? dwo(nt!PspPicoProviderRoutines+0x4c)
+Evaluate expression: 1050625 = 00000000`00100801
+                </div>
+<ul><li>PspProcessOpen</li></ul>
+                <pre class="brush: cpp;">
+    || OpenedProcess-&gt;PicoContext
+    &amp;&amp; !DestinationProcess-&gt;PicoContext
+    &amp;&amp; PrevMode
+    &amp;&amp; ~*(_DWORD *)&amp;PspPicoProviderRoutines[0x48] &amp; GrantedAccess )
+  {
+    result = STATUS_ACCESS_DENIED;
+  }
+                </pre>
+                <div class="code">
+0: kd&gt; ? dwo(nt!PspPicoProviderRoutines+0x48)
+Evaluate expression: 1052673 = 00000000`00101001
+                </div>
+                <p>
+То есть из Win32-процесса (не Pico) можно открыть объект Pico-процесса максимум с 
+правами <b>PROCESS_TERMINATE</b> | <b>PROCESS_QUERY_LIMITED_INFORMATION</b> | <b>SYNCHRONIZE</b>. 
+                </p>
+                <p>
+А из Win32-процесса (не Pico) можно открыть объект нити Pico-процесса максимум с 
+правами <b>THREAD_TERMINATE</b> | <b>THREAD_QUERY_LIMITED_INFORMATION</b> | <b>SYNCHRONIZE</b>.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

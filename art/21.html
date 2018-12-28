@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; FltSetInformationFile vs ZwSetInformationFile при переименовании файлов</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, NTFS, ntfs.sys, FltCreateFile, FltSetInformationFile, ZwSetInformationFile, SeCaptureSubjectContext, SeAccessCheck, STATUS_ACCESS_DENIED" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; FltSetInformationFile vs ZwSetInformationFile при переименовании файлов
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Актуализируя один свой старый драйвер фильтра файловых систем, я стал портировать 
+логику работы с файлами с <b>Zw</b>- и <b>Io</b>- функций на <b>Flt</b>-функции. 
+У меня использовались операция создания файла и, при наступлении определенных 
+условий, операция переименование файла. Описание функции 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff541935(v=vs.85).aspx">FltCreateFile(...)</a> 
+достаточно однозначно указывает на то, что для переименования нужно использовать 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff544516(v=vs.85).aspx">FltSetInformationFile(...)</a>:
+                </p>
+            <br />
+                <div class="quote">
+Minifilter drivers must use FltSetInformationFile, not ZwSetInformationFile, to rename a file
+                </div>
+            <br />
+                <p>
+Замена используемого API заняла не так много времени. Но после непродолжительного 
+тестирования выяснилось, что операция переименования стала возвращать ошибку 
+<b>STATUS_ACCESS_DENIED</b>. Обычно этот статус ошибки возвращается там, где идет 
+создание описателя или reference объекта по уже созданному описателю. Именно по 
+этому меня удивил такой статус, возвращенный из функции, работающей с объектом 
+файла. Оказалось, что при переименовании драйвер NTFS сам активно работает с 
+Se-функциями. Для WinXP SP3 захват subject-контекста происходит при следующем 
+стеке вызовов:
+                </p>
+            <br />
+                <div class="code">
+0: kd&gt; k3
+ChildEBP RetAddr
+b217ca94 f84225d2 nt!SeCaptureSubjectContext
+b217caf0 f83e8b3b Ntfs!NtfsCommonSetInformation+0x2b3
+b217cb58 804ef1f9 Ntfs!NtfsFsdSetInformation+0xa3
+                </div>
+            <br />
+                <p>
+Сама проверка, вызов 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff563674(v=vs.85).aspx">SeAccessCheck(...)</a>:
+                </p>
+            <br />
+                <div class="code">
+0: kd&gt; k5
+ChildEBP RetAddr
+b217c82c f8423450 nt!SeAccessCheck
+b217c890 f8422e9c Ntfs!NtfsCheckIndexForAddOrDelete+0x7b
+b217ca7c f842264e Ntfs!NtfsSetRenameInfo+0xaad
+b217caf0 f83e8b3b Ntfs!NtfsCommonSetInformation+0x3fb
+b217cb58 804ef1f9 Ntfs!NtfsFsdSetInformation+0xa3
+                </div>
+            <br />
+                <div class="code">
+1: kd&gt; dps @esp+4 L 0n10
+b217c834  e1595248
+b217c838  e14b27d8
+b217c83c  00000001
+b217c840  00000002
+b217c844  00000000
+b217c848  b217c870
+b217c84c  8067f3c0 nt!IopFileMapping
+b217c850  00000001
+b217c854  b217c868
+b217c858  b217c86c
+                </div>
+            <br />
+                <p>
+То есть для приведенного выше примера видно, что драйвер NTFS проверяет 
+DesiredAccess == 0x0002 (FILE_WRITE_ACCESS) для AccessMode == 1 (UserMode).
+                </p>
+            <br />
+                <p>
+Следовательно при переходе на использование FltSetInformationFile(...) для 
+переименования необходимо обеспечить себе PreviousMode == KernelMode, если 
+операция не должна зависеть от контекста текущей нити.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

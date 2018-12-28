@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Механизм Arbitrary Code Guard (ACG) на примере Microsoft Edge</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver, ACG, Arbitrary Code Guard, Microsoft Edge, SetProcessMitigationPolicy, ProcessDynamicCodePolicy, CIG, Code Integrity Guard, CFG, Control Flow Guard" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Механизм Arbitrary Code Guard (ACG) на примере Microsoft Edge
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+<a target="_blank" href="https://habr.com/post/358650/"><img src="https://habr.com/images/favicons/favicon-32x32.png" alt="Хабрахабр: Механизм Arbitrary Code Guard (ACG) на примере Microsoft Edge" align="right" /></a>
+            <br />
+                <p>
+Это <b>копия</b> моего перевода, опубликованного на 
+<a target="_blank" href="https://habr.com/post/358650/">Хабрахабр: Механизм Arbitrary Code Guard (ACG) на примере Microsoft Edge</a>.
+                </p>
+            <br />
+<h2>Disclaimer</h2>
+<ul>
+<li>Эта публикация является переводом части документа 
+<a target="_blank" href="https://github.com/google/p0tools/raw/master/JITServer/JIT-Server-whitepaper.pdf">"Bypassing Mitigations by Attacking JIT Server in Microsoft Edge"</a> 
+от Ivan Fratric (Google Project Zero). Переведена та часть, в которой находится 
+описание механизма ACG и его применение в браузере Microsoft Edge. За рамками 
+этого перевода осталось более подробное описание внутренностей JIT в Chakra 
+(Microsoft Edge JavaScript Engine) и векторов атаки на него (с описанием 
+найденных уязвимостей, исправленных к моменту публикации документа).</li>
+<li>По роду своей профессиональной деятельности я не являюсь ни техническим 
+писателем, ни (тем более) переводчиком. Но содержимое документа мне показалось 
+очень интересным в плане изучения внутренностей Windows. Соответственно, я 
+открыт к конструктивным замечаниям и предложениям по улучшению перевода.</li>
+</ul>
+            <br />
+                <p>
+С выпуском Windows 10 Creators Update Microsoft начала использовать новый 
+механизм безопасности в Microsoft Edge: 
+<a target="_blank" href="https://blogs.windows.com/msedgedev/2017/02/23/mitigating-arbitrary-native-code-execution/">Arbitrary Code Guard (ACG)</a>. 
+Когда ACG применяется к процессу (в частности в процессу Microsoft Edge), в 
+целевом процессе становится невозможным выделить новую исполняемую память или 
+изменить существующую исполняемую память. Соответственно, исполнение 
+произвольного кода для злоумышленника становится более сложной задачей.
+                </p>
+            <br />
+                <p>
+Для достижения более высокой производительности современные браузеры используют 
+JIT компиляцию (Just-In-Time) JavaScript-кода, но такой подход не совместим с 
+ACG. Поэтому в Microsoft Edge был реализован следующий подход: JIT был выделен в 
+отдельный процесс, относительно процесса содержимого (Content Process). Процесс 
+содержимого посылает JIT процессу байт-код JavaScript, а JIT процесс компилирует 
+его в машинный код и проецирует этот машинный код обратно в процесс содержимого.
+                </p>
+            <br />
+<h2>Как работает ACG в Microsoft Edge</h2>
+            <br />
+                <p>
+ACG зависит от настройки политики динамического кода процесса. Эта политика 
+может быть установлена для любого процесса Windows вызовом функции 
+<a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/hh769088(v=vs.85).aspx">SetProcessMitigationPolicy</a> 
+с параметром ProcessDynamicCodePolicy. В процессе содержимого Microsoft Edge 
+вызов происходит следующим образом:
+                </p>
+                <div class="code">
+00 KERNELBASE!SetProcessMitigationPolicy 
+01 MicrosoftEdgeCP!SetProcessDynamicCodePolicy+0xc0 
+02 MicrosoftEdgeCP!StartContentProcess_Exe+0x164 
+03 MicrosoftEdgeCP!main+0xfe 
+04 MicrosoftEdgeCP!_main+0xa6 
+05 MicrosoftEdgeCP!WinMainCRTStartup+0x1b3 
+06 KERNEL32!BaseThreadInitThunk+0x14 
+07 ntdll!RtlUserThreadStart+0x21 
+                </div>
+            <br />
+                <p>
+Каждый процесс содержимого Microsoft Edge вызывает эту функцию вскоре после 
+создания. К сожалению, поскольку один процесс содержимого может обращаться к 
+другим процессам содержимого, которые запускаются в одной песочнице (
+<a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/mt595898(v=vs.85).aspx">App Container</a>
+), процесс содержимого A может получить доступ к процессу содержимого B до того, 
+как B активирует ACG. Это позволяет злоумышленнику сделать так, что в процессе B 
+никогда не будет активирован механизм ACG (или просто исполнить в процессе B 
+произвольный код до активации механизма ACG). Это 
+<a target="_blank" href="https://bugs.chromium.org/p/project-zero/issues/detail?id=1552">проблема архитектуры</a>, 
+которая <b>не исправлена</b> на момент публикации документа, и ожидается, что 
+проблема будет решена в будущих версиях Windows.
+                </p>
+            <br />
+                <p>
+Политика динамического кода не всегда устанавливается процессом содержимого 
+Microsoft Edge. Прежде чем принять решение о применении этой политики, процесс 
+обращается к нескольким записям в реестре, как показано на рисунке ниже:
+                </p>
+                <p>
+<img src="../images/ACG_registry.png" alt="ACG: procmon (registry)" />
+                </p>
+            <br />
+                <p>
+К счастью, процесс содержимого Microsoft Edge не имеет доступа на запись ни к 
+одному из этих разделов реестра, поэтому скомпрометированный процесс содержимого 
+не может просто отключить ACG для процессов, которые будут созданы в будущем.
+                </p>
+            <br />
+                <p>
+Кроме того, для обеспечения обратной совместимости перед установкой значения 
+политики динамического кода Edge пытается определить, присутствуют ли какие-либо 
+драйверы (например, графики), которые несовместимы с ACG. Как сказано 
+<a target="_blank" href="https://blogs.windows.com/msedgedev/2017/02/23/mitigating-arbitrary-native-code-execution/">в блоге Microsoft</a> 
+о ACG:
+                </p>
+            <br />
+                <div class="quote">
+По соображениям совместимости в настоящее время ACG применяется только на 64-х 
+разрядных машинах, у которых главный GPU работает под управлением драйвера 
+WDDM 2.2 (модель драйверов, выпущенная с Windows 10 Anniversary Update), или при 
+использовании программного рендеринга. В экспериментальных целях программный 
+рендеринг можно принудительно включить с помощью Control Panel -> 
+Internet Options -> "Advanced". На текущий момент на устройствах Microsoft 
+(Surface Book, Surface Pro 4 и Surface Studio) и некоторых других системах, 
+драйвера GPU которых точно совместимы с ACG, применяется ACG. Мы намерены 
+улучшить охват и точность списка поддерживаемых GPU, поскольку мы оцениваем 
+телеметрию и отзывы клиентов.
+                </div>
+            <br />
+                <p>
+Это означает, что на многих системах со старыми драйверами GPU механизм ACG не будет 
+включен, даже если компьютер работает под управлением обновленной версии Windows.
+                </p>
+            <br />
+                <p>
+Для проверки того, что политика динамического кода включена для процесса, можно 
+вызвать скрипт PowerShell'а 
+<a target="_blank" href="https://docs.microsoft.com/en-us/powershell/module/processmitigations/get-processmitigation?view=win10-ps">Get-ProcessMitigation</a>, 
+как показано на рисунке ниже:
+                </p>
+                <p>
+<img src="../images/ACG_ps.png" alt="ACG: PowerShell" />
+                </p>
+            <br />
+                <p>
+Особо следует отметить запись "AllowThreadOptOut: OFF". В предыдущих версиях 
+Windows этот параметр был "ON", что позволило выйти из под ACG. Это, как и 
+ожидалось, привело к тому, что механизм был крайне не эффективным.
+                </p>
+            <br />
+                <p>
+Когда процесс содержимого Microsoft Edge вызывает SetProcessMitigationPolicy(), 
+он также устанавливает флаг AllowRemoteDowngrade, который позволяет 
+не-AppContainer процессам, отключать политику в любое время. Это используется, 
+когда меняется драйвер дисплея. Попытка отключить политику динамического кода из 
+самого процесса содержимого, после включения, приведет к ошибке 
+<b>ERROR_ACCESS_DENIED</b>.
+                </p>
+            <br />
+                <p>
+Когда включена политика динамического кода, как сказано выше, становится невозможным:
+                </p>
+                <ol>
+<li>выделить новую исполняемую память</li>
+<li>изменить существующую исполняемую память</li>
+                </ol>
+            <br />
+                <p>
+Это означает, что будут завершаться с ошибкой вызовы функций 
+<a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366887(v=vs.85).aspx">VirtualAlloc</a> 
+и <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366898(v=vs.85).aspx">VirtualProtect</a>, 
+если флаги в аргументе flProtect/flNewProtect будут относиться к исполняемой 
+памяти. Это относится ко всем функциям, которые могут вызвать аналогичный 
+эффект, например - MapViewOfFile. Когда функция завершается с ошибкой из-за ACG, 
+она возвращает новый код ошибки: 0xc0000604, STATUS_DYNAMIC_CODE_BLOCKED.
+                </p>
+            <br />
+                <p>
+Когда процесс A пытается выделить исполняемую память в процессе B, имеет 
+значение только политика процесса A. То есть: если в процессе B установлена 
+политика динамического кода (включен механизм ACG), а в процессе А - нет, то 
+вызов из процесса A будет успешным, если процесс A будет обладать описателем на 
+процесс B с соответствующими правами.
+                </p>
+            <br />
+                <p>
+Таким образом, единственными способами выделения исполняемой памяти в процессе с 
+включенным механизмом ACG являются:
+                </p>
+                <ol>
+<li>выделение исполняемой памяти другим процессом, для которого выключен механизм ACG</li>
+<li>загрузка DLL в процесс</li>
+                </ol>
+            <br />
+                <p>
+Для обработки второй ситуации Microsoft предусмотрела еще один механизм - CIG (
+<a target="_blank" href="https://blogs.windows.com/msedgedev/2017/02/23/mitigating-arbitrary-native-code-execution/#PemDwtd6jQyUQmAL.97">Code Integrity Guard</a>). 
+С включенным механизмом CIG процесс может загружать только подписанные 
+Microsoft'ом DLL-файлы.
+                </p>
+            <br />
+<h2>Насколько эффективен ACG?</h2>
+            <br />
+                <p>
+Существует несколько подходов, используемых злоумышленниками, в ситуации, когда 
+невозможно выделить исполняемую память:
+                </p>
+                <ol>
+<li>Если злоумышленнику не нужно выходить из текущего процесса, то можно 
+выполнить data-only атаку (использовать только неисполняемую память). Применимо 
+к браузеру это может означать перезаписывание соответствующих полей, чтобы 
+отключить или обмануть проверки политик, что эквивалентно атаке Universal XSS 
+(Примечание: в Google Chrome с включенной изоляцией сайта реализация такой атаки 
+сильно усложнена).</li>
+<li>В противном случае, когда злоумышленнику не доступны скрипты, единственным 
+путем остаются техники пере-использования существующего кода, такие как ROP. 
+Стоит обратить внимание, что злоумышленник не может использовать ROP только для 
+того, чтобы сделать область памяти полезной нагрузки исполняемой, а затем 
+передать туда управление (как это часто делается в эксплоитах сегодня). Вместо 
+этого вся полезная нагрузка должна быть записана на ROP. В настоящее время это 
+будет трудоемкой задачей, но масштабное применение ACG может послужить стимулом 
+к разработке автоматизированных инструментов, которые облегчили бы эту задачу.</li>
+<li>Если же присутствует среда исполнения скриптов, то у злоумышленника есть 
+третий (более простой) подход. Вместо написания полезной нагрузки на ROP, 
+атакующий с примитивом чтения и записи может использовать среду исполнения 
+скриптов, которая уже присутствует в этом процессе (например, JavaScript в 
+Edge). Это позволит создать интерфейс, который позволит:
+<ul>
+<li>вызывать произвольную нативную функцию с произвольными аргументами из среды исполнения скриптов</li>
+<li>передавать возвращаемое значение обратно в  среду исполнения скриптов</li>
+</ul>
+Имея библиотеку эксплуатации с такими возможностями, атакующий, вместо написания 
+полезной нагрузки в нативном коде, пишет код на скриптовом языке, используя 
+библиотеку для нативных вызовов там, где это потребуется. Задача значительно 
+упрощается, если библиотека эксплуатации предоставляет вспомогательные методы, 
+такие как malloc(), memcpy() и т.п. На самом деле такая библиотека уже есть: 
+<a target="_blank" href="https://github.com/theori-io/pwnjs">pwn.js</a>.
+Вместо возможности вызова произвольной нативной функций, злоумышленнику может 
+быть достаточно возможности совершать произвольные системные вызовы (syscalls).
+</li>
+                </ol>
+            <br />
+                <p>
+Хотя из вышеизложенного может показаться, что ACG будет не очень полезен, 
+особенно в веб-браузере, нужно принять во внимание, что сценарии 2 и 3 
+предполагают злоумышленника, способного захватить поток управления. Другими 
+словами, атакующему необходимо обойти CFG (Control Flow Guard).
+                </p>
+            <br />
+                <p>
+В настоящее время, с 
+<a target="_blank" href="https://github.com/Microsoft/MSRC-Security-Research/blob/master/presentations/2018_02_OffensiveCon/The%20Evolution%20of%20CFI%20Attacks%20and%20Defenses.pdf">большим количеством известных подходов</a>, 
+обход CFG в Windows не составляет труда. Однако, если Microsoft сможет исправить 
+все известные недостатки CFG (а Microsoft уже проявила намерение это сделать), 
+ситуация может измениться в ближайшие пару лет.
+                </p>
+            <br />
+                <p>
+Таком образом, успешное применение ACG напрямую зависит от успешного применения 
+CFG и CIG (<a target="_blank" href="https://blogs.windows.com/msedgedev/2017/02/23/mitigating-arbitrary-native-code-execution/#PemDwtd6jQyUQmAL.97">Code Integrity Guard</a>). 
+Все эти механизмы должны работать вместе, чтобы предотвратить выполнение кода 
+злоумышленника:
+                </p>
+                <ul>
+<li>При использовании CIG и ACG, но без CFG, как описано выше, атакующий может 
+закодировать полезную нагрузку в виде ROP-цепочки или злоупотребить средой 
+исполнения скриптов для выполнения произвольного кода.</li>
+<li>При использовании CFG и CIG, но без ACG, атакующий может проецировать 
+исполняемую память в текущий процесс.</li>
+<li>При использовании CFG и ACG, но без CIG, атакующий может загрузить 
+вредоносную библиотеку в текущий процесс.</li>
+                </ul>
+            <br />
+<h2>Chakra (JIT-сервер)</h2>
+            <br />
+                <p>
+Для реализации JIT в Chakra (JavaScript Engine в Microsoft Edge) при включенном 
+механизме ACG, Microsoft запускает части Chakra, которые ответственны за 
+компиляцию кода, в отдельном процессе - JIT-сервере. Основное взаимодействие 
+процесса содержимого и JIT-сервера показано на рисунке ниже:
+                </p>
+                <p>
+<img src="../images/ACG_chakra.png" alt="ACG: PowerShell" />
+                </p>
+            <br />
+                <p>
+При такой архитектуре процесс содержимого по-прежнему обрабатывает все задачи, 
+связанные с запуском JavaScript, кроме компиляции (JIT'инга) скриптов. Когда 
+Chakra определяет, что функция JavaScript (или цикл) должна быть скомпилирована 
+в нативный код (обычно это происходит после интерпретации одного и того же 
+участка скрипта несколько раз), вместо того, чтобы делать это текущем процессе, 
+происходит вызов JIT-сервера, которому передается байт-код целевой функции. 
+Затем JIT-сервер компилирует байт-код и записывает полученный исполняемый 
+нативный код обратно в вызывающий процесс с использованием разделяемой памяти 
+(объекта секции). После этого процесс содержимого может выполнить полученный 
+исполняемый код без нарушения политики динамического кода.
+                </p>
+            <br />
+                <p>
+С точки зрения запущенных процессов, JIT-сервер выглядит так же, как и другой 
+процесс содержимого, и даже использует тот же exe-файл: MicrosoftEdgeCP.exe. 
+Существенное отличие заключается в том, что для JIT-процесса механизм ACG не 
+включен, что и позволяет ему проецировать исполняемый код обратно в процесс 
+содержимого. При этом запускается только один процесс JIT-сервера, который 
+обслуживает все существующие процессы содержимого.
+                </p>
+            <br />
+<h2>Заключение</h2>
+            <br />
+                <p>
+ACG преуспевает в достижении своей непосредственной цели: предотвращение 
+выделения и модификации исполняемой памяти. Однако из-за взаимной зависимости 
+CFG, ACG и CIG с одной стороны, а так же недостатков текущей реализации CFG в 
+Microsoft Windows с другой, ACG не является достаточным средством предотвращения 
+продвинутых атак по выходу из песочницы браузера. Таким образом, Microsoft 
+должна исправить все известные недостатки CFG, прежде чем ACG станет 
+существенным препятствием для эксплойтов.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

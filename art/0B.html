@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Поиск скрытых процессов python’вским скриптом в WinDbg</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, WinDbg, python, py, phide, phide2, hidecmd, PsActiveProcessHead, PspCidTable, pykd, pykd.pyd" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Поиск скрытых процессов python’вским скриптом в WinDbg
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+В природе существует немало модулей, позволяющих исполнять python’вские 
+скрипты в WinDbg. Зачем? Для автоматизации процесса отладки с необходимыми 
+возможностями использования логики. Конечно, для простых if-else/for 
+конструкций можно использовать встроенный язык WinDbg, но если нужно чуть 
+больше уже начинаются проблемы.
+                </p>
+            <br />
+                <p>
+В качестве питоновского движка я предлагаю использовать 
+<a target="_blank" href="http://pykd.codeplex.com/">pykd.pyd</a>. 
+Это развивающееся расширение к WinDbg с открытым исходным кодом, использующее 
+boost. Для того, что бы начать работу нужно немного:
+                </p>
+<ul>
+  <li>установить WinDbg: с сайта <a target="_blank" href="http://www.microsoft.com/whdc/devtools/debugging/installx86.mspx">Microsoft</a> (в составе SDK или WDK). Или можно воспользоваться <a target="_blank" href="../kd/WinDBG_Download.html">прямыми ссылками</a></li>
+  <li>установить <a target="_blank" href="http://www.python.org/download/releases/">Python 2.6.x</a></li>
+  <li>скачать сам <a target="_blank" href="http://pykd.codeplex.com/">pykd</a>. Из архива необходимо выбрать <b> pykd.pyd</b> соответствующий сборке WinDbg и скопировать его в директорию расширений, например winext</li>
+  <li>перед выполнением скрипта нужно загрузить расширение командой <b>!load pykd.pyd</b></li>
+</ul>
+            <br />
+                <p>
+На этом, пожалуй, приготовления закончены. Теперь немного теории о том, что 
+именно будем искать и каким образом. В качестве цели я выбрал движок 
+<b>phide2</b>, опубликованный в 
+<a target="_blank" href="http://www.flavioweb.it/ezines/29a-8.zip">8-ом номере 29A</a> 
+(в архиве его можно найти ~\Utilities\29A-8.011\src\). В частности, будем 
+тестировать драйвер <b>hidecmd</b>, который при загрузке выкашивает себя 
+из списка загруженных модулей (функция HideDriver) и скрывает все процессы 
+cmd.exe: как работающие в настоящее время, так и те, что будут запущены. После 
+выгрузки драйвера все новосозданные cmd.exe будут видны в Task Manager’е. Нас 
+интересует только функционал скрытия процесса. Если не вникать в детали поиска 
+не экспортируемого символа ядра, то способ скрытия процесса 
+достаточно простой: процесс удаляется из списка <b>nt!PsActiveProcessHead</b>. 
+Это гарантирует, что при перечислении процессов функциями ядра, процесс никогда 
+не будет найден. Плюс такого подхода в том, что список 
+<b>nt!PsActiveProcessHead</b> используется только для перечисления процессов и 
+удаление элемента из него никак не отражается на работоспособности системы или 
+самого процесса. В целом, движок <b>phide2</b> это много больше, но сейчас 
+рассматривается именно эта его функциональность
+                </p>
+            <br />
+                <p>
+Я уже касался не экспортируемой переменной <b>nt!PspCidTable</b> в 
+<a target="_blank" href="03.html">статье про описатели Windows</a>. 
+В нашем случае это будет эталонное хранилище всех процессов работающей системы. 
+<b>nt!PspCidTable</b> это таблица описателей, хранящая созданные объекты 
+процессов и нитей. Если уничтожить запись о процессе в таблице 
+<b>nt!PspCidTable</b>, то будет невозможно получить процесс по его PID’у. 
+Например функция 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff551920(VS.85).aspx">PsLookupProcessByProcessId</a> 
+вернет статус <b>STATUS_INVALID_PARAMETER</b>. Это чревато ошибками при работе 
+процесса, поэтому метод скрытия процесса унчтожением записи в 
+<b>nt!PspCidTable</b> будет не универсальным. 
+                </p>
+            <br />
+                <p>
+Для разбора таблицы описателей будем использовать функцию 
+<b>ntobj.getListByHandleTable(pHandleTable, pType=0, bContainHeaders=True)</b>, 
+которая реализована на python’е в модуле ntobj.py.
+                </p>
+            <br />
+                <p>
+Формат организации таблицы описателей достаточно прост и описывается структурой 
+<b>nt!_HANDLE_TABLE</b>. Элемент таблицы описывается структурой 
+<b>nt!_HANDLE_TABLE_ENTRY</b>. Для перечисления описателей в таблице ключевыми 
+полями структуры <b>nt!_HANDLE_TABLE</b> являются:
+                </p>
+<ul>
+  <li><b>.TableCode</b> - указатель на содержимое таблицы. Важно, что двух в младших битах этого поля содержится численное значение уровня вложенности таблицы описателей</li>
+  <li><b>.NextHandleNeedingPool</b> - максимальный индекс элемента таблицы описателей. Фактически, количество элементов таблицы, умноженное на <b>HANDLE_VALUE_INC</b>(== 4)</li>
+</ul>
+            <br />
+                <p>
+Обработав эти два поля, мы получаем три параметра, необходимых для перечисления 
+параметра: указатель на содержимое, количество элементов и уровень вложенности 
+таблицы. Уровень вложенности таблицы может быть 0, 1 или 2. Если уровень 
+вложенности 0, то содержимое таблицы трактуется как массив структур 
+<b>nt!_HANDLE_TABLE_ENTRY</b>. Если уровень 1, то содержимое является массивом 
+указателей на массивы уровня 0. И, соответственно, если уровень 2, то содержимое 
+это массив указателей на таблицы уровня 1. Детали можно подсмотреть в функции 
+<b>nt!ExpLookupHandleTableEntry</b>, реализация которой есть в файле WRK: 
+~\base\ntos\ex\handle.c. Небольшая тонкость заключается в том, что обычные 
+таблицы описателей (<b>nt!_EPROCESS.ObjectTable</b>) содержат указатели на 
+заголовок объекта - <b>nt!_OBJECT_HEADER </b>. A таблица 
+<b><b>nt!PspCidTable</b></b> содержит указатели на сами объекты.
+                </p>
+            <br />
+                <p>
+А теперь перейдем к реализации метода детекта скрытых процессов. Тут все достаточно 
+просто: формируем список объектов <b>nt!PsActiveProcessHead</b>. Затем 
+формируем список из объектов таблицы <b>nt!PspCidTable</b>, имеющих тип 
+<b>nt!PsProcessType</b>. Найдя элемент из второго списка, не содержащегося в 
+первом мы детектируем скрытый процесс:
+                </p>
+                <pre class="brush: py;">
+  # build list from PsActiveProcessHead
+  pActivePrcList = getOffset("nt", "PsActiveProcessHead")
+  lstTypedActiveProcesses = typedVarList(pActivePrcList, "nt", "_EPROCESS", "ActiveProcessLinks")
+  lstActiveProcesses = [process.getAddress() for process in lstTypedActiveProcesses]
+
+  # build list from PspCidTable
+  pCidTable = ptrPtr(getOffset("nt", "PspCidTable"))
+  pProcessType = ptrPtr(getOffset("nt", "PsProcessType"))
+  lstProcessTable = ntobj.getListByHandleTable(pCidTable, pProcessType, False)
+
+  # compare lists and print result
+  founded = 0
+  for processFromTable in lstProcessTable:
+    if (0 == lstActiveProcesses.count(processFromTable)):
+      dprintln("!process 0x%X removed from PsActiveProcessHead" % processFromTable)
+      founded += 1
+  resout = "checked %u processes" % len(lstProcessTable)
+  dprintln(resout + (", %u hidden" % founded if (0 != founded) else ", hidden not found"))
+                </pre>
+            <br /><hr /><br />
+                <p>
+Описанные выше скрипты можно скачать <a href="../download/phidecheck.rar">одним архивом</a>
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Потроха отладчика в помощь при исследовании внутренностей ядра</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, KeNumberProcessors, nt!KeNumberProcessors, KeGetCurrentProcessorNumber, функции kdexts!GetProcessorCount " />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Потроха отладчика в помощь при исследовании внутренностей ядра
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Всем хорошо известен экспортируемый символ ядра 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff552975(v=vs.85).aspx">CCHAR KeNumberProcessors</a> 
+- переменная, содержащая количество процессоров. Так же не является тайной, что 
+последние версии Windows поддерживают количество процессоров, выходящее за 
+пределы разрядной сетки одного байта. Так а что же стало с переменной? 
+Документация гласит, что переменная стала <b>obsolete</b>. Но взглянем на 
+использование этой переменной в Windows 2008 R2 (начало функции 
+nt!ExSizeOfRundownProtectionCacheAware):
+                </p>
+            <br />
+                <pre class="brush: asm;">
+  mov          ecx,[KeNumberProcessors]
+  cmp          ecx,1
+                </pre>
+            <br />
+                <p>
+По приведенному коду сразу становится видно, что глобальная переменная 
+nt!KeNumberProcessors стала четыре байта. И тут возник вопрос: когда это 
+произошло? Можно, конечно, пройтись дизассемблером по коллекции файлов ядра, 
+если она под рукой. Но мне пришла в голову другая идея - отладчик. Ведь он умеет 
+определять количество процессоров, и делает он это точно не вызовом 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff552063(v=vs.85).aspx">KeGetCurrentProcessorNumber()</a>. 
+Ответ можно найти в коде функции kdexts!GetProcessorCount:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+  cmp          d,[g_BuildNo],000001900 ; == 6400
+  push         esi
+  jnc         .0100EEEB9 --1
+  mov          esi,01004A508 ;'nt!KeNumberProcessors'
+  push         esi
+  call         d,[01013D2F8]
+  mov          ecx,eax
+  or           ecx,edx
+  jnz         .0100EEEAD --3
+  push         esi
+  push         01004A378 ;'unable to get %s'
+  call         d,[01013D2F4]
+  pop          ecx
+  pop          ecx
+  xor          al,al
+  jmp         .0100EEEB4 --5
+3 push         edx
+  push         eax
+  call         GetByteFromAddress
+5 movzx        eax,al
+  pop          esi
+  retn ; -^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-
+1 push         01004A508 ;'nt!KeNumberProcessors'
+  call         GetUlongValue
+  pop          esi
+  retn ; -^-^-^-^-^-^-^-^-^-^-^-^-^-^-^- 
+                </pre>
+            <br />
+                <p>
+Сразу становится понятно, что nt!KeNumberProcessors стала ULONG'ом в ядре с 
+номером сборки 6400. Так что отладчик может пригодится не только как средство, 
+но и как объект изучения ядра Windows.
+                </p>
+            <br />
+                <p>
+<b>P.S.</b> Файл kdexts.dll является реализацией основных встроенных расширений 
+отладки ядра. Сам файл можно найти в поддиректории winxp директории WinDbg.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

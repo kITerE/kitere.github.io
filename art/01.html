@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Размер буфера данных при соединении с [A]LPC-портом</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, LPC port, ALPC port" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Размер буфера данных при соединении с [A]LPC-портом
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Для создания LPC-порта в ядре ОС присутствуют две функции:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+NTSTATUS
+NTAPI
+NtCreatePort (
+    __out PHANDLE PortHandle,
+    __in POBJECT_ATTRIBUTES ObjectAttributes,
+    __in ULONG MaxConnectionInfoLength,
+    __in ULONG MaxMessageLength,
+    __in_opt ULONG MaxPoolUsage
+    );
+                </pre>
+            <br />
+                <p>
+и
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+NTSTATUS
+NTAPI
+NtCreateWaitablePort (
+    __out PHANDLE PortHandle,
+    __in POBJECT_ATTRIBUTES ObjectAttributes,
+    __in ULONG MaxConnectionInfoLength,
+    __in ULONG MaxMessageLength,
+    __in_opt ULONG MaxPoolUsage
+    );
+                </pre>
+            <br />
+                <p>
+Функция NtCreateWaitablePort появилась в ядре Windows 2000 (в NT ее не было), 
+то есть можно считать, что она присутствует на всех машинах. Обе функции имеют 
+одинаковые параметры, среди которых есть MaxConnectionInfoLength. Этот 
+параметр содержит максимальный размер буфера данных, который может быть 
+передан при соединении с объектом порта. На самом деле параметр довольно 
+странный потому, что основной цикл обработки входящих сообщений, включая 
+сообщения о входящем соединении, как правило, организуется в одной функции и 
+буфер для данных выделяется один. Его размер, в данном случае, должен быть 
+максимальным значением из MaxConnectionInfoLength и MaxMessageLength.
+                </p>
+            <br />
+                <p>
+Если посмотреть на ядро ОС Vista+, то можно увидеть, что там присутствует еще 
+одна функция, которая создает ALPC-порт:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+NTSTATUS
+NTAPI
+NtAlpcCreatePort(
+    __out PHANDLE PortObject,
+    __in POBJECT_ATTRIBUTES ObjectAttributes,
+    __in PALPC_PORT_ATTRIBUTES pPortInformation
+);
+                </pre>
+            <br />
+                <p>
+Если немного поковырять pdb-файлы, то можно получить структуру 
+_ALPC_PORT_ATTRIBUTES:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+typedef struct _ALPC_PORT_ATTRIBUTES {
+    ULONG Flags;
+    SECURITY_QUALITY_OF_SERVICE SecurityQos;
+    ULONG MaxMessageLength;
+    ULONG MemoryBandwidth;
+    ULONG MaxPoolUsage;
+    ULONG MaxSectionSize;
+    ULONG MaxViewSize;
+    ULONG MaxTotalSectionSize;
+    ULONG DupObjectTypes;
+} ALPC_PORT_ATTRIBUTES, *PALPC_PORT_ATTRIBUTES;
+                </pre>
+            <br />
+                <p>
+Внимательно взглянув на эту структуру, мы поймем, что параметр максимальной 
+длины данных сообщения connect'а в ней нет. Затем обратимся к реализации 
+функций NtCreatePort и NtCreateWaitablePort. Можно видеть, что все три функции 
+(в том числе и NtAlpcCreatePort) сводятся к вызову внутренней не экспортируемой 
+функции nt!AlpcpCreateConnectionPort(...). Но параметр MaxConnectionInfoLength в 
+функциях NtCreatePort и NtCreateWaitablePort просто не используется. Как показал 
+дальнейший анализ, максимальный размер данных сообщения connect'а для всех портов 
+эквивалентен значению максимального размера сообщения для этого порта.
+                </p>
+            <br />
+                <p>
+Это не критично, в свете написанного выше. Но следует учитывать, что на ОС Vista+, 
+даже если мы создадим порт со значением MaxConnectionInfoLength большим, чем 
+максимальный размер данных сообщений, то послать такое сообщение будет невозможным.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

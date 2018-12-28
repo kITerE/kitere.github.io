@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Установка устройства аудио-воспроизведения по умолчанию, используя недокументированный COM-интерфейс IPolicyConfig</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, недокументированный COM-интерфейс, IPolicyConfig, установка аудио устротсва по умолчанию, 870af99c-171d-4f9e-af0d-e63df40c2bc9, f8679f50-850a-41cf-9c72-430f290290c8, 294935CE-F637-4E7C-A41B-AB255460B862, 568b9108-44bf-40b4-9006-86afe5b5a620" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Установка устройства аудио-воспроизведения по умолчанию, используя недокументированный COM-интерфейс IPolicyConfig
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+В настоящее время ситуация, когда на машине установлено несколько звуковых 
+плат, уже редкостью не назовешь. Вот и я, став обладателем "внешнего" 
+телевизора, который подключается через HDMI, для своего ноутбука, стал активно 
+пользоваться установкой устройства аудио-воспроизведения по умолчанию. Как 
+оказалось, единственный доступный способ переключить устройство 
+аудио-воспроизведения - <b>MmSys.cpl</b>.
+                </p>
+            <br />
+                <p>
+Постоянно вызывать свойства звуковых устройств это не решение. Поэтому я решил 
+написать небольшую утилиту 
+<a href="https://defsound.codeplex.com/releases" target="_blank">DefSound</a>. 
+Основное назначение - висеть в 
+системном трее и переключать устройство по-умолчанию.
+                </p>
+            <br />
+                <p>
+Как выяснилось, установить устройство воспроизведения по умолчанию 
+документированным способом не возможно. Пришлось вооружиться стандартным 
+боекомплектом: <b>IDA</b> и <b>WinDBG</b>. Тестовой системой выступила 
+Windows <b>Vista</b>.
+                </p>
+            <br />
+                <p>
+Для начала статически анализируем дизассемблированный листинг <b>MmSys.cpl</b>. 
+Немного поковырявшись, приходим к методу <b>CEndpoint::MakeDefault</b>. Это 
+метод отвечает за обработку события  установки пользователем нового 
+аудиоустройства по умолчанию. Метод инициирует ATL'ное получение 
+COM-интерфейса :
+                </p>
+            <br />
+                <pre class="brush: asm;">
+push    17h             ; dwClsContext
+push    0               ; pUnkOuter
+; CLSID запрашиваемого интерфейса
+push    offset __GUID_294935CE_F637_4E7C_A41B_AB255460B862
+lea     ecx, [ebp+var_10]
+; вызов ATL::CComPtrBase&lt;IPolicyConfig&gt;::CoCreateInstance(_GUID const &amp;,IUnknown *,ulong)
+call    1CD32850h
+                </pre>
+            <br />
+                <p>
+Из приведенного листинга мы получаем интересующий нас 
+<b>CLSID: GUID{294935CE-F637-4E7C-A41B-AB255460B862}</b>. Но для получения 
+COM-интерфейса также необходим IID, его мы с легкостью получим, посмотрев 
+дизассемблированный листинг метода 
+<b>ATL::CComPtrBase::IPolicyConfig::CoCreateInstance</b> :
+                </p>
+            <br />
+                <pre class="brush: asm;">
+mov     [ebp+ppv], ecx
+mov     eax, [ebp+ppv]
+push    eax             ; ppv
+; IID запрашиваемого интерфейса
+push    offset __GUID_568b9108_44bf_40b4_9006_86afe5b5a620 ; riid
+mov     ecx, [ebp+dwClsContext]
+push    ecx             ; dwClsContext
+mov     edx, [ebp+pUnkOuter]
+push    edx             ; pUnkOuter
+mov     eax, [ebp+rclsid]
+push    eax             ; rclsid
+; вызов ole32!CoCreateInstance(...)
+call    ds:__imp__CoCreateInstance@20
+
+                </pre>
+            <br />
+                <p>
+Вот мы и добрались до <b>ole32!CoCreateInstance(...)</b>. Тем самым получаем 
+интересующий нас идентификатор интерфейса 
+<b>IID: GUID{568b9108-44bf-40b4-9006-86afe5b5a620}</b>.
+                </p>
+            <br />
+                <p>
+Полученных данных не достаточно, так как мы все еще не можем восстановить 
+список виртуальных методов интерфейса. Поэтому продолжаем трассировку метода 
+CEndpoint::MakeDefault и приходим к вызову метода полученного интерфейса.
+                </p>
+            <br />
+                <p>
+В итоге трассировки мы попадаем в метод 
+<b>CPolicyConfigClient::SetDefaultEndpoint</b>, реализованный в динамической 
+библиотеке AudioSes.dll.
+                </p>
+            <br />
+                <p>
+Загружаем динамическую библиотеку AudioSes.dll в IDA, и получаем искомый 
+символ <b>ATL::CComObject&lt;class CPolicyConfigClient&gt;::`vftable'</b>: 
+таблицу виртуальных функций интерфейса IPolicyConfig
+                </p>
+            <br />
+                <p>
+На основе вышеописанного небольшого исследования я написал небольшую утилиту 
+<a href="https://defsound.codeplex.com/releases" target="_blank">DefSound</a>, 
+которая позволяет по правой кнопке мыши, в выпадающем меню, выбрать устройство 
+аудио-воспроизведения по умолчанию.
+                </p>
+            <br />
+                <a name="UPD_22_09_2010"></a>
+                <h2>Updated (22.09.2010)</h2>
+            <br />
+                <p>
+Получив отзыв об этом небольшом исследовании от <b>Robert Bacs</b>, я обнаружил, 
+что часть методов IPolicyConfig на Windows 7 возвращают <b>ERROR_NOT_SUPPORTED</b>(0x32). 
+Беглое дизассемблирование показало, что на в Windows 7 класс IPolicyConfig переименован в 
+<b>IPolicyConfigVista</b>, соответственно CPolicyConfigClient переименован в 
+<b>CPolicyConfigVistaClient</b>. Этот интерфейс присутствует на обоих ОС (Vista и 7) и 
+метод SetDefaultEndpoint(...) успешно работает, поэтому 
+утилита <a href="https://defsound.codeplex.com/releases" target="_blank">DefSound</a> оказалась работоспособной 
+на обеих версиях ОС. 
+                </p>
+            <br />
+                <p>
+Продолжив, я нашел новый интерфейс <b>CLSID: GUID{870af99c-171d-4f9e-af0d-e63df40c2bc9}</b> и 
+<b>IID: GUID{f8679f50-850a-41cf-9c72-430f290290c8}</b>, который в Windows 7 
+называется <b>IPolicyConfig</b>. Я тоже решил перейти к новому именованию 
+интерфейсов.  В <b>IPolicyConfig</b> реализованы методы, которые в интерфейсе 
+<b>CPolicyConfigVistaClient</b> на Windows 7 возвращают <b>ERROR_NOT_SUPPORTED</b>:
+                </p>
+<ul>
+  <li>GetMixFormat(...)</li>
+  <li>GetProcessingPeriod(...)</li>
+  <li>SetProcessingPeriod(...)</li>
+  <li>GetShareMode(...)</li>
+  <li>SetShareMode(...)</li>
+  <li>SetEndpointVisibility(...)</li>
+</ul>
+
+            <br />
+                <p>
+Следовательно, эти методы стоит использовать следующим образом: на Windows Vista, 
+где <b>IPolicyConfig</b> не зарегистрирован, необходимо вызвать эти методы у 
+интерфейса <b>IPolicyConfigVista</b>. На ОС Windows 7 эти методы необходимо 
+вызывать из <b>IPolicyConfig</b>.
+                </p>
+            <br />
+                <p>
+Из вышесказанного, я дополнил заголовочный файл 
+<a href="https://defsound.svn.codeplex.com/svn/PolicyConfig.h" target="_blank">PolicyConfig.h</a>, в котором старый 
+интерфейс имеет суффикс Vista и присутствует новый интерфейс IPolicyConfig, 
+доступный только в Windows 7.
+                </p>
+            <br />
+                <p>
+Скачать утилиту 
+<a href="https://defsound.codeplex.com/releases" target="_blank">DefSound</a>
+и
+<a href="https://defsound.codeplex.com/SourceControl/latest" target="_blank">исходные тексты</a>
+к ней.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

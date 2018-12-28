@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Анализ splice-перехватов функций системных вызов или использование XDE–дизассемблера в “мирных” целях</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, XDE, splice перехват, перехват функции, анализ перехвата функций" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Анализ splice-перехватов функций системных вызов или использование XDE–дизассемблера в “мирных” целях
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+В этой статье я хочу привести пример использования 
+<a href=" http://vx.netlux.org/vx.php?id=ex01" target="_blank">XDE – дизассемблера от Z0mbie</a> 
+в целях анализа кода системных функций. Для начала можно почитать 
+<a href="http://vxheavens.com/lib/vzo02.html" target="_blank">статью Z0mbie</a> 
+(собственно автора XDE) в которой описывается практическое применение 
+дизассемблера в написании вирусов.
+                </p>
+            <br />
+                <p>
+В этой статье я опишу небольшую утилиту 
+<a href="../download/SplChk_withSrc.rar">SplChk</a>, 
+которая анализирует функции системных вызовов по указанному списку. Утилита 
+состоит из user mod’ной части, которая анализирует <b>ntdll.dll</b> и драйвера, 
+который проверяет системный вызов со стороны ядра. Драйвер влинковывается в 
+ресурсы EXE-модуля. Для загрузки используется класс 
+<a href="06.html">TResourceDrv</a>.
+                </p>
+            <br />
+                <p>
+Начнем с того, что рассмотрим суть splice – перехватов. Splice – перехват 
+(splice hook, detour) это технология перехвата управления работы функции путем 
+изменения ее кода. В данной статье не рассматривается весь спектр возможных 
+способов установки. Утилита проверяет только первую инструкцию функции.
+                </p>
+            <br />
+                <p>
+Работу утилиты можно описать следующими шагами:
+                </p>
+                <ul>
+<li><i>user mode:</i> читаем файл со списком функций. Имя файла передается в командной строке, формат списка: каждое имя функции на отдельной строке.</li>
+<li><i>user mode:</i> пытаемся загрузить драйвер. Если драйвер не загружен, то функционал приложения усекается.</li>
+<li><i>user mode:</i> для каждой функции из списка получаем адрес функции из <b>ntdll.dll</b></li>
+<li><i>user mode:</i> анализируем то, что функция принадлежит диапазону модуля <b>ntdll.dll</b>, если нет, то считаем, что произошла подмена экспорта</li>
+<li><i>user mode:</i> дизассемблируем первую инструкцию функции</li>
+<li><i>user mode:</i> если первая инструкция осуществляет переход, то считаем, что на функцию установлен splice – перехват</li>
+<li><i>user mode:</i> инструкция должна осуществлять загрузку в регистр константы, иначе считаем, что формат функции неизвестен</li>
+<li><i>user mode:</i> по константным данным инструкции определяем номер системного сервиса</li>
+<li><i>user mode:</i> отдаем номер системного вызова в драйвер для анализа</li>
+<li><i>kernel mode:</i> анализируем адрес из SDT (таблица вызовов системных сервисов) по указанному индексу</li>
+<li><i>kernel mode:</i> если адрес не находится в диапазоне модуля ядра, то считаем, что установлен перехват в SDT</li>
+<li><i>kernel mode:</i> дизассемблируем первую инструкцию функции </li>
+<li><i>kernel mode:</i> если первая инструкция осуществляет переход, то считаем, что на функцию установлен splice – перехват </li>
+                </ul>
+            <br />
+                <p>
+Перейдем к рассмотрению реализации вышеописанного алгоритма. Сразу хочу 
+заметить, что XDE в проекте компилируется один раз в статическую библиотеку. 
+Затем библиотека прилинковывается к EXE'шнику и SYS-файлу. То есть код 
+полностью переносимый и может пригодиться для множества применений.
+                </p>
+                <p>
+Рассмотрим функцию, которая производит дизассемблирование:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+int __cdecl xde_disasm(/* IN */  unsigned char *opcode,
+                       /* OUT */ struct xde_instr *diza,
+                       /* IN */  int xde_default_addr,
+                       /* IN */  int xde_default_data);
+
+                </pre>
+            <br />
+                <p>
+На вход ей подается адрес памяти, в которой расположен код, а на выходе – 
+заполненная структура, описывающая инструкцию. Не буду вдаваться в детали, 
+рассмотрим лишь то, что нам необходимо для реализации данной задачи.
+                </p>
+            <br />
+                <p>
+Splice – перехват определяется флагом инструкции: <b>C_CMD_CALL</b> или 
+<b>C_STOP</b>. Адрес функции – перехватчика получаем чтением конца инструкции. 
+Если инструкция использует относительный адрес (флаг <b>C_REL</b>), то 
+складываем получившийся адрес с адресом следующей инструкции (адрес 
+дизассемблированной инструкции + длина инструкции).
+                </p>
+            <br />
+                <p>
+Номер системного вызова, после дизассемблирования функции из <b>ntdll.dll</b>, 
+расположен в xde_instr.data_d.
+                </p>
+            <br />
+                <p>
+Исходный код я полностью открываю, так что дальше рассказывать нет смысла. Кому 
+интересно – качайте, компилируйте, трассируйте :). Утилиту с исходными кодами 
+можно скачать 
+<a href="../download/SplChk_withSrc.rar">здесь</a>
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

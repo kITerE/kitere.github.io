@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Дескриптор безопасности объекта нити или почему при создании процесса игнорируется имперсонированность нити</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, WinDbg, !sd, _KTHERAD, _ETHREAD, _ACCESS_STATE, SeCreateAccessStateEx, SeCreateAccessState" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Дескриптор безопасности объекта нити или почему при создании процесса игнорируется имперсонированность нити
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Не так давно мы с коллегой задались вопросом: а по какому принципу формируется 
+DACL дескриптора безопасности объекта нити? В частности стало интересно: а есть 
+ли какое-то наследование между создающей нитью и создаваемой.
+                </p>
+            <br />
+                <p>
+Ответ достаточно легко найти к коде WRK. И, начав смотреть ядра Windows, я сразу 
+вспомнил, что уже изучал этот код, когда рассматривал особенность создания 
+процессов. Не секрет, что если мы получим токен привилегированного процесса, 
+имперсонируемся под этим токеном и запустим процесс, то новый процесс не будет 
+привилегированным. Это же относится и к созданию нитей процессов. Функции 
+создания процесса и нити используют расширенную функцию создания 
+nt!_ACCESS_STATE’а: SeCreateAccessStateEx, которая явно парметризуется объектом 
+нити и объектом процесса. Но при создании нити или процесса вызывающая функцию 
+передает в SeCreateAccessStateEx NULL в качестве параметра нити, что обеспечивает 
+игнорирование имперсонированности вызывающей нити, а в расчет берется только 
+основной токен вызывающего процесса. Никаких действий по наследованию 
+описателя безопасности между нитями не предпринимается.
+                </p>
+            <br />
+                <p>
+Это достаточно легко проверить на практике: напишем некоторый тест, который 
+будет содержать в себе обработчик нити, запускающий вторую нить. В конце 
+каждого из обработчиков поставим бесконечный Sleep. И запустим нить с адресов 
+входа первого обработчика из первой нити процесса и из внешнего процесса-сервиса. 
+В качестве целевой системы возьмем WinXP SP2, а анализировать результаты будем 
+следующим простеньким скриптом для 
+<a target="_blank" href="http://pykd.codeplex.com/">pykd</a>:
+                </p>
+                <pre class="brush: py;">
+import sys
+if len(sys.argv) != 2:
+    print("Usage : " + sys.argv[0] + " &lt;EPROCESS_ADDR&gt;")
+    exit()
+
+import pykd
+if not pykd.isKernelDebugging():
+    print("This script is for kernel debugging only")
+
+nt = pykd.module("nt")
+
+# list the thread and collect the unique SDs
+print("\t***\n")
+lstSecDesc = []
+prcObj = nt.typedVar("_EPROCESS", pykd.expr(sys.argv[1]))
+for thrdObj in nt.typedVarList(prcObj.ThreadListHead.getAddress(), 
+                               "_ETHREAD",
+                               "ThreadListEntry"):
+    thrdObjHeader = nt.containingRecord(thrdObj.getAddress(),
+                                        "_OBJECT_HEADER",
+                                        "Body")
+    sdArrd = (thrdObjHeader.SecurityDescriptor &amp; ~7)
+    print("\tThread 0x%x, SD: 0x%x" % (thrdObj.getAddress(), sdArrd))
+    if not(sdArrd in lstSecDesc):
+        lstSecDesc.append(sdArrd)
+
+# print the unique SDs
+print("\n\t***\n")
+for sdArrd in lstSecDesc:
+    print("\tSD: 0x%x" % sdArrd)
+    print(pykd.dbgCommand("!sd 0x%x" % sdArrd))
+                </pre>
+            <br />
+                <p>
+В результате исполнения скрипта мы получим пять нитей:
+                </p>
+                <div class="code">
+	Thread 0xffffffff823dd868, SD: 0xffffffffe1d69680
+	Thread 0xffffffff82600420, SD: 0xffffffffe1d69680
+	Thread 0xffffffff8279cbf0, SD: 0xffffffffe1d69680
+	Thread 0xffffffff8275fb78, SD: <b><i>0xffffffffe1002c08</i></b>
+	Thread 0xffffffff82765020, SD: 0xffffffffe1d69680
+                </div>
+            <br />
+                <p>
+Как и ожидалось, только одна нить имеет отличный от других описатель 
+безопасности, потому, что даже запущенная из нее нить была создана из целевого 
+процесса. Сами описатели безопасности тоже имеют ожидаемое содержимое:
+                </p>
+                <div class="code">
+	SD: 0xffffffffe1d69680
+-&gt;Revision: 0x1
+-&gt;Sbz1    : 0x0
+-&gt;Control : 0x8004
+            SE_DACL_PRESENT
+            SE_SELF_RELATIVE
+-&gt;Owner   : S-1-5-21-xxxxxxxxx-xxxxxxxxxx-xxxxxxxxx-xxxx
+-&gt;Group   : S-1-5-21-yyyyyyyyy-yyyyyyyyyy-yyyyyyyyy-yyy
+-&gt;Dacl    : 
+-&gt;Dacl    : -&gt;AclRevision: 0x2
+-&gt;Dacl    : -&gt;Sbz1       : 0x0
+-&gt;Dacl    : -&gt;AclSize    : 0x40
+-&gt;Dacl    : -&gt;AceCount   : 0x2
+-&gt;Dacl    : -&gt;Sbz2       : 0x0
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceType: ACCESS_ALLOWED_ACE_TYPE
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceFlags: 0x0
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceSize: 0x24
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;Mask : 0x001f03ff
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;SID: S-1-5-21-xxxxxxxxx-xxxxxxxxxx-xxxxxxxxx-xxxx
+
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceType: ACCESS_ALLOWED_ACE_TYPE
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceFlags: 0x0
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceSize: 0x14
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;Mask : 0x001f03ff
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;SID: S-1-5-18
+
+-&gt;Sacl    :  is NULL
+
+	SD: 0xffffffffe1002c08
+-&gt;Revision: 0x1
+-&gt;Sbz1    : 0x0
+-&gt;Control : 0x8004
+            SE_DACL_PRESENT
+            SE_SELF_RELATIVE
+-&gt;Owner   : S-1-5-32-544
+-&gt;Group   : S-1-5-18
+-&gt;Dacl    : 
+-&gt;Dacl    : -&gt;AclRevision: 0x2
+-&gt;Dacl    : -&gt;Sbz1       : 0x0
+-&gt;Dacl    : -&gt;AclSize    : 0x44
+-&gt;Dacl    : -&gt;AceCount   : 0x2
+-&gt;Dacl    : -&gt;Sbz2       : 0x0
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceType: ACCESS_ALLOWED_ACE_TYPE
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceFlags: 0x0
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;AceSize: 0x14
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;Mask : 0x001f03ff
+-&gt;Dacl    : -&gt;Ace[0]: -&gt;SID: S-1-5-18
+
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceType: ACCESS_ALLOWED_ACE_TYPE
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceFlags: 0x0
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;AceSize: 0x18
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;Mask : 0x00120048
+-&gt;Dacl    : -&gt;Ace[1]: -&gt;SID: S-1-5-32-544
+
+-&gt;Sacl    :  is NULL
+                </div>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

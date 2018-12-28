@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; diabind: DIA (Debug Interface Access) SDK для Python</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, diabind, DIA, MSDIA, MS DIA, Debug Interface Access, python, pyd" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Tools.html">Утилиты</a> &raquo; diabind: DIA (Debug Interface Access) SDK для Python
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+<a target="_blank" href="https://diabind.codeplex.com/releases"><img src="../images/download.png" alt="diabind releases" align="right" /></a>
+                <p>
+Участвуя в разработке проекта 
+<a target="_blank" href="http://pykd.codeplex.com/">pykd</a> 
+часто возникает необходимость прототипирования работы с 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/x93ctkx8(v=vs.71).aspx">DIA SDK</a>. 
+Ну а на чем же писать прототипы, как не на питоне :) В конечном итоге появился 
+проект 
+<a target="_blank" href="http://diabind.codeplex.com/">diabind</a>, 
+который реализует возможность работы с DIA SDK из питона.
+                </p>
+            <br />
+                <p>
+Сейчас реализована работа с интерфейсами сессий, символов, исходного кода и 
+номерами строк. Так же модуль может работать с DIA от различных версий 
+Visual Studio: 8.0, 9.0, 10.0 и 11.0. Выбор версии происходит поиском 
+зарегистрированного COM-интерфейса от более старших версий к младшим. Загрузка 
+отладочной информации возможна как из pdb-файла (функция load_pdb), так и из 
+pe-файла (функция load_exe) с возможностью указать строку поиска отладочных 
+символов. Обе функции возвращают сесиию. Дальнейшая работа с которой аналогична 
+работе с COM-объектами DIA.
+                </p>
+            <br />
+                <p>
+Скачать <a target="_blank" href="https://diabind.codeplex.com/releases">diabind</a>
+                </p>
+            <br />
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

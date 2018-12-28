@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Отсутствие DACL'а у security descriptor'а и Lowbox-процессы (AppContainer)</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver, TOKEN_LOWBOX, Lowbox, AppContainer, SE_DACL_PRESENT" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Отсутствие DACL'а у security descriptor'а и Lowbox-процессы (AppContainer)
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Для одной повседневной задачи мне понадобилось дать весь доступ любому процессу 
+к созданному мной объекту ядра. Самый простой способ это сделать - повесить на 
+этот объект security descriptor, у которого будет отсутствовать DACL. О таком 
+поведении, в частности, написано в описании 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff562781(v=vs.85).aspx">функции RtlSetDaclSecurityDescriptor(...)</a>:
+                </p>
+            <br />
+                <div class="quote">
+A NULL DACL pointer unconditionally grants all access to an object and is not 
+the same as an empty DACL. An empty DACL denies all access to an object
+                </div>
+            <br />
+                <p>
+Сказано-сделано. Но начались жалобы с машин Windows 8/8.1/10. При расследовании 
+оказалось, что некоторые процессы не могут получить доступ к объектам ядра, на 
+который назначен security descriptor без DACL'а. Первый процесс, на котором мне 
+удалось воспроизвести это поведение - Metro-версия IE. После трассировки 
+не-экспортируемой функции  nt!SepAccessCheck выяснилось, что в ветке, где 
+проверяется отсутствие DACL'а у security descriptor'а, появился новое условие: 
+если у токена во флагах (nt!_TOKEN::TokenFlags) есть флаг <b>TOKEN_LOWBOX</b> (0x4000), 
+то безусловно возвращается STATUS_ACCESS_DENIED. Процессы с флагом 
+<b>TOKEN_LOWBOX</b> так же называются AppContainer и используются как 
+<a target="_blank" href="http://blogs.msdn.com/b/ieinternals/archive/2012/03/23/understanding-ie10-enhanced-protected-mode-network-security-addons-cookies-metro-desktop.aspx">новый механизм изоляции, в том числе для IE</a>.
+                </p>
+            <br />
+                <p>
+Как мотивировано изменение логики применения security descriptor'ов без DACL'а 
+я не нашел. Как не нашел и упоминания изменения самой логики, что и послужило 
+причиной написания это небольшой заметки.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

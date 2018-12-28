@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Открытие объекта по имени в ядре Windows 7</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Открытие объекта по имени в ядре Windows 7
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+            <br />
+                <p>
+Для многих не секрет, что в ядре ОС присутствует функция открытия объекта по 
+имени, которая, в случае успешного исполнения, создает описатель на объект. 
+Она экспортируемая и удобна в использовании. Если заглянуть в WRK, то можно 
+скопировать себе ее объявление:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+NTKERNELAPI
+NTSTATUS
+ObOpenObjectByName(
+    __in POBJECT_ATTRIBUTES ObjectAttributes,
+    __in_opt POBJECT_TYPE ObjectType,
+    __in KPROCESSOR_MODE AccessMode,
+    __inout_opt PACCESS_STATE AccessState,
+    __in_opt ACCESS_MASK DesiredAccess,
+    __inout_opt PVOID ParseContext,
+    __out PHANDLE Handle
+    );
+              </pre>
+            <br />
+                <p>
+То есть, как видно из декларации, параметр типа объекта (ObjectType) 
+опциональный. Так и было до Windows 7. Но взглянем на потроха этой функции 
+в ядре семерки:
+                </p>
+            <br />
+                <pre class="brush: asm;">
+82a72b46 33c0            xor     eax,eax
+...
+; выход с ошибкой
+82a72b55 b80d0000c0      mov     eax,0C000000Dh ; STATUS_INVALID_PARAMETER
+82a72b5a e9c2030000      jmp     nt!ObOpenObjectByName+0x3ea (82a72f21)
+...
+82a72b5f 39450c          cmp     dword ptr [ebp+0Ch],eax ; проверка на NULL
+82a72b62 74f1            je      nt!ObOpenObjectByName+0x1e (82a72b55)
+                </pre>
+            <br />
+                <p>
+Как видно из приведенных строк, параметр указателя типа (ebp+0Ch) перестал 
+быть опциональным. К сожалению не все типы объектов ядра экспортируются. И 
+к тому же, функция создания типа объектов (ObCreateObjectType) 
+экспортирована. Это позволяет создавать типы объектов ядра в драйверах. 
+Довольно элегантное решение предложил jibe. В ядре Windows 7 экспортируется 
+функция ObGetObjectType:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+POBJECT_TYPE NTAPI ObGetObjectType(
+    __in PVOID Object
+    );
+                </pre>
+            <br />
+                <p>
+Эта функция позволяет получить тип объекта ядра по указателю на сам объект. Достаточно вызвать ее один раз, указав в качестве параметра любой тип объекта (например: ExEventObjectType) и мы получим внутренний указатель на объект типа объектов, то есть не экспортируемый символ ObpTypeObjectType. Это позволит нам открывать любой объект типа объектов по имени той же функцией ObOpenObjectByName. Имея на руках указатель на не экспортируемый тип, мы с легкостью можем создавать описатели (вызывать ObOpenObjectByName) на объекты по имени, как и на младших версиях ОС.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

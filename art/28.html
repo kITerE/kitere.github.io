@@ -1,0 +1,429 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Собственные данные в системном дампе падения Windows</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver, BSOD, pykd, KeRegisterBugCheckReasonCallback, BugCheckSecondaryDumpDataCallback, KBUGCHECK_SECONDARY_DUMP_DATA" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Собственные данные в системном дампе падения Windows
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+<a target="_blank" href="https://habr.com/post/350406/"><img src="https://habr.com/images/favicons/favicon-32x32.png" alt="Хабрахабр: Собственные данные в системном дампе падения Windows" align="right" /></a>
+            <br />
+                <p>
+Это <b>копия</b> моей статьи, опубликованной на 
+<a target="_blank" href="https://habr.com/post/350406/">Хабрахабр: Собственные данные в системном дампе падения Windows</a>.
+                </p>
+            <br />
+                <p>
+По роду своей деятельности (Windows Kernel) мне регулярно приходится разбирать 
+дампы BSOD'ов. Не единичны случаи, когда у конечного пользователя успешно 
+пишутся только Mini-дампы, в которых сохраняется только значение регистров 
+процессора и стек падения. А другого средства отладки клиентской машины просто 
+нет. Но что делать, если в стеке нет нашего драйвера, а заказчик настаивает, 
+что падения начались после установки продукта и закончились после отключения 
+драйвера этого продукта? В моем случае хорошим решением оказалось ведение 
+небольшого журнала последних событий в циклическом буфере. Осталось только 
+сохранить этот циклический буфер в дампе.
+                </p>
+            <br />
+                <p>
+Начиная с Windows XP SP1 и 2003 Server система предоставляет возможность 
+драйверам добавлять в дамп падения ядра собственные данные: <b>Secondary Callback 
+Data</b>. Для того, что бы система запросила эти данные у драйвера, необходимо 
+зарегистрировать свою callback-функцию вызовом 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-keregisterbugcheckreasoncallback">KeRegisterBugCheckReasonCallback</a>.
+При регистрации нужно указать адрес функции, которая будет вызваться при 
+падении ядра и, в нашем случае (
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nc-wdm-kbugcheck_reason_callback_routine">BugCheckSecondaryDumpDataCallback</a>
+), предоставлять данные, которыми нужно дополнить системный дамп. Указанная 
+callback-функция будет вызвана дважды: 
+                </p>
+                <ol>
+<li>Первый раз система вызывает драйвер, что бы определить размер буфера. Уже 
+на этом этапе во входных данных ОС указывает максимальный размер данных (
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/ns-wdm-_kbugcheck_secondary_dump_data">KBUGCHECK_SECONDARY_DUMP_DATA</a>.MaximumAllowed
+), который можно сохранить в дапме. Этот размер зависит от типа системного 
+дампа, который будет сгенерирован. В Windows XP при установленной настройке 
+записи Mini-дампа система предоставляет 4096 байт (одну страницу памяти).</li>
+<li>Второй раз система запрашивает сами данные.</li>
+                </ol>
+            <br />
+                <p>
+Из-за того, что  callback-функция вызывается в момент падения ядра операционной 
+системы, на код этой функции накладываются серьезные ограничения: не 
+использовать выделение памяти (все выделяется заранее), не обращаться к 
+Paged-памяти (подкачка страниц невозможна), не использовать механизмы 
+синхронизации (риск взаимоблокировок). Более подробные детали можно найти в 
+статье MSDN 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/writing-a-bug-check-callback-routine">Writing a Bug Check Callback Routine</a>.
+                </p>
+            <br />
+                <p>
+Достаточно странно, но примера использования функции 
+<b>KeRegisterBugCheckReasonCallback</b>, нет в 
+<a target="_blank" href="https://github.com/Microsoft/Windows-driver-samples">коллекции примеров к WDK</a>. 
+Зато пример обнаружился в открытых Microsoft'ом исходниках KMDF (Kernel-Mode Driver Framework) - 
+<a target="_blank" href="https://github.com/Microsoft/Windows-Driver-Frameworks/blob/b72d691fbfd505dcb3c23c4bfc37d5322dea4990/src/framework/kmdf/src/core/fxbugcheckcallback.cpp">fxbugcheckcallback.cpp</a>.
+Регистрация обработчика (куски функции FxInitializeBugCheckDriverInfo):
+                </p>
+                <pre class="brush: cpp;">
+    //
+    // The KeRegisterBugCheckReasonCallback exists for xp sp1 and above. So
+    // check whether this function is defined on the current OS and register
+    // for the bugcheck callback only if this function is defined.
+    //
+    RtlInitUnicodeString(&amp;funcName, L&quot;KeRegisterBugCheckReasonCallback&quot;);
+    funcPtr = (PFN_KE_REGISTER_BUGCHECK_REASON_CALLBACK)
+        MmGetSystemRoutineAddress(&amp;funcName);
+
+    if (NULL == funcPtr) {
+        goto Done;
+    }
+                </pre>
+                <pre class="brush: cpp;">
+    //
+    // Initialize the callback record.
+    //
+    KeInitializeCallbackRecord(callbackRecord);
+
+
+    //
+    // Register the bugcheck callback.
+    //
+    funcPtr(callbackRecord,
+            FxpLibraryBugCheckCallback,
+            KbCallbackSecondaryDumpData,
+            (PUCHAR)WdfLdrType);
+
+    ASSERT(callbackRecord-&gt;CallbackRoutine != NULL);
+                </pre>
+            <br />
+                <p>
+Реализация обработчика (функция FxpLibraryBugCheckCallback):
+                </p>
+                <pre class="brush: cpp;">
+VOID
+FxpLibraryBugCheckCallback(
+    __in    KBUGCHECK_CALLBACK_REASON Reason,
+    __in    PKBUGCHECK_REASON_CALLBACK_RECORD /* Record */,
+    __inout PVOID ReasonSpecificData,
+    __in    ULONG ReasonSpecificLength
+    )
+
+/*++
+
+Routine Description:
+
+    Global (framework-library) BugCheck callback routine for WDF
+
+Arguments:
+
+    Reason               - Must be KbCallbackSecondaryData
+    Record               - Supplies the bugcheck record previously registered
+    ReasonSpecificData   - Pointer to KBUGCHECK_SECONDARY_DUMP_DATA
+    ReasonSpecificLength - Sizeof(ReasonSpecificData)
+
+Return Value:
+
+    None
+
+Notes:
+    When a bugcheck happens the kernel bugcheck processor will make two passes
+    of all registered BugCheckCallbackRecord routines.  The first pass, called
+    the &quot;sizing pass&quot; essentially queries all the callbacks to collect the
+    total size of the secondary dump data. In the second pass the actual data
+    is captured to the dump.
+
+--*/
+
+{
+    PKBUGCHECK_SECONDARY_DUMP_DATA  dumpData;
+    ULONG                           dumpSize;
+
+    UNREFERENCED_PARAMETER(Reason);
+    UNREFERENCED_PARAMETER(ReasonSpecificLength);
+
+    ASSERT(ReasonSpecificLength &gt;= sizeof(KBUGCHECK_SECONDARY_DUMP_DATA));
+    ASSERT(Reason == KbCallbackSecondaryDumpData);
+    
+    dumpData = (PKBUGCHECK_SECONDARY_DUMP_DATA) ReasonSpecificData;
+    dumpSize = FxLibraryGlobals.BugCheckDriverInfoIndex * 
+                sizeof(FX_DUMP_DRIVER_INFO_ENTRY);
+    //
+    // See if the bugcheck driver info is more than can fit in the dump
+    //
+    if (dumpData-&gt;MaximumAllowed &lt; dumpSize) {
+        dumpSize = EXP_ALIGN_DOWN_ON_BOUNDARY( 
+                        dumpData-&gt;MaximumAllowed,
+                        sizeof(FX_DUMP_DRIVER_INFO_ENTRY));
+    }
+
+    if (0 == dumpSize) {
+        goto Done;
+    }
+    
+    //
+    // Ok, provide the info about the bugcheck data.
+    //
+    dumpData-&gt;OutBuffer = FxLibraryGlobals.BugCheckDriverInfo;
+    dumpData-&gt;OutBufferLength  = dumpSize;
+    dumpData-&gt;Guid = WdfDumpGuid2;
+
+Done:;
+}
+                </pre>
+            <br />
+                <p>
+В качестве демонстрации, именно эти данные и будем извлекать из дампа. Данными 
+является массив структур 
+<a target="_blank" href="https://github.com/Microsoft/Windows-Driver-Frameworks/blob/b72d691fbfd505dcb3c23c4bfc37d5322dea4990/src/framework/kmdf/inc/private/fxbugcheck.h#L76">FX_DUMP_DRIVER_INFO_ENTRY</a>, 
+каждая структура имеет в своих полях версию и имя драйвера. Ключом к данным в 
+дампе выступает указанный при записи GUID, в нашем случае это 
+<a target="_blank" href="https://github.com/Microsoft/Windows-Driver-Frameworks/blob/b72d691fbfd505dcb3c23c4bfc37d5322dea4990/src/framework/shared/inc/private/common/fxifr.h#L65">{F87E4A4C-C5A1-4d2f-BFF0-D5DE63A5E4C3}</a>.
+                </p>
+            <br />
+                <p>
+Для просмотра сохраненных в дампе данных есть команда отладчика 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/-enumtag--enumerate-secondary-callback-data-">.enumtag</a>. 
+В результате выполнения команды мы увидим сырой дамп памяти. Вот пример интересующих нас данных:
+                </p>
+            <br />
+                <div class="code">
+1: kd&gt; .enumtag
+{65755A40-F146-43EA-8C9136B85728FD35} - 0x0 bytes
+&lt;...&gt;
+{F87E4A4C-C5A1-4D2F-BFF0D5DE63A5E4C3} - 0x508 bytes
+  00 00 00 00 00 00 00 00 01 00 00 00 0D 00 00 00  ................
+  00 00 00 00 57 64 66 30 31 30 30 30 00 00 00 00  ....Wdf01000....
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  00 00 00 00 00 00 00 00 90 AC 55 00 00 E0 FF FF  ..........U.....
+  01 00 00 00 0B 00 00 00 00 00 00 00 61 63 70 69  ............acpi
+  65 78 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ex..............
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  30 81 F6 00 00 E0 FF FF 01 00 00 00 0B 00 00 00  0...............
+  00 00 00 00 6D 73 69 73 61 64 72 76 00 00 00 00  ....msisadrv....
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  00 00 00 00 00 00 00 00 A0 D3 EB 00 00 E0 FF FF  ................
+  01 00 00 00 0B 00 00 00 00 00 00 00 76 64 72 76  ............vdrv
+&lt;...&gt;
+                </div>
+            <br />
+                <p>
+Работать с таким форматом можно, но не удобно. 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/reading-bug-check-callback-data#span-iddisplaying-secondary-callback-dataspanspan-iddisplaying-secondary-callback-dataspandisplaying-secondary-callback-data">Microsoft предлагает написать свое расширение к отладчику</a>:
+                </p>
+                <div class="quote">
+To use this data in a more practical way, it is recommended that you write your own debugger extension.
+                </div>
+            <br />
+                <p>
+Но я являюсь одним из разработчиков проекта 
+<a target="_blank" href="https://githomelab.ru/pykd/pykd">pykd</a>. Модуль pykd 
+может выступать расширением отладчика, позволяющим использовать Python для 
+автоматизации отладки. Поэтому я покажу как с его помощью извлечь и 
+визуализировать данные. Сразу оговорюсь, что перечисление и извлечение Secondary 
+Callback Data было добавлено в последнем (на момент написания статьи) релизе - 
+0.3.3.3. Поэтому, если у вас уже установлена более старая версия, нужно обновить 
+pykd (<a target="_blank" href="https://githomelab.ru/pykd/pykd/wikis/Last%20Release">Last Release</a>).
+                </p>
+            <br />
+                <p>
+В качестве тестового дампа я буду использовать файл, используемый для unit-тестов pykd - 
+<a target="_blank" href="https://githomelab.ru/kdlibcpp/kdlibcpp/blob/dev-1.0/kdlib/tests/dumps/win8_x64_mem.cab">win8_x64_mem.cab</a>.
+                </p>
+            <br />
+                <p>
+Собственно, весь скрипт чтения и форматирования данных:
+                </p>
+                <pre class="brush: py;">
+import os
+import sys
+import pykd
+import struct
+
+def print_command(command):
+    if pykd.getDebugOptions() &amp; pykd.debugOptions.PreferDml:
+        pykd.dprint( &#39;&lt;exec cmd=&quot;{}&quot;&gt;{}&lt;/exec&gt;&#39;.format(command, command),
+                     dml = True )
+    else:
+        pykd.dprint( command )
+
+def parse():
+    buff = bytearray( pykd.loadTaggedBuffer(&quot;F87E4A4C-C5A1-4d2f-BFF0-D5DE63A5E4C3&quot;) )
+    entry_type = pykd.typeInfo(&quot;Wdf01000!_FX_DUMP_DRIVER_INFO_ENTRY&quot;)
+
+    _struct = struct.Struct( &quot;&lt;{}III&quot;.format(&quot;Q&quot; if pykd.is64bitSystem() else &quot;L&quot;) )
+
+    name_offset = entry_type.fieldOffset(&quot;DriverName&quot;)
+    name_size = entry_type.DriverName.size()
+
+    entry_size = entry_type.size()
+
+    if len(buff) % entry_size:
+        raise RuntimeError( &quot;The buffer size ({}) is not a multiple of entry size ({})&quot;.format(len(buff), entry_size) )
+
+    print(&quot;[FxLibraryGlobals.BugCheckDriverInfo]&quot;)
+
+    while len(buff):
+        ptr, mj, mn, build = _struct.unpack_from(buff)
+
+        name = str(buff[name_offset : name_offset + name_size]).strip(&quot;\0&quot;)
+
+        command = &quot;!drvobj {} 7&quot;.format(name)
+        print_command( command )
+
+        pykd.dprint( &quot; &quot; * (24 - len(name)) )
+
+        pykd.dprint( &quot; {:12} &quot;.format(&quot;({}.{}.{})&quot;.format(mj, mn, build)) )
+        if ptr:
+            command = &quot;dx ((Wdf01000!{})0x{:x})&quot;.format(entry_type.FxDriverGlobals.name(), ptr)
+            print_command( command )
+
+        pykd.dprintln( &quot;&quot; )
+
+        buff = buff[entry_size:]
+
+if __name__ == &quot;__main__&quot;:
+    if len(sys.argv) == 1:
+        parse()
+    else:
+        for file_name in sys.argv[1:]:
+            print(file_name)
+            dump_id = pykd.loadDump(file_name)
+            parse()
+            pykd.closeDump(dump_id)
+                </pre>
+            <br />
+                <p>
+Содержимое скипта, на мой взгляд, достаточно простое (функция parse):
+                </p>
+<ul>
+<li>Вызовом pykd.loadTaggedBuffer считываем содержимое сохраненных данных, 
+указывая в качестве ключа-аргумента GUID в виде строки.</li>
+<li>Используя информацию из отладочных символов (создание экземпляра объекта 
+pykd.typeInfo), получаем смещение до имени драйвера (name_offset), размер буфера 
+имени драйвера (name_size) и размер одной структуры FX_DUMP_DRIVER_INFO_ENTRY 
+(entry_size).</li>
+<li>Для каждой структуры FX_DUMP_DRIVER_INFO_ENTRY в вычитанном буфере с помощью 
+стандартного 
+<a target="_blank" href="https://docs.python.org/2/library/struct.html">python-модуля struct</a> 
+распаковываем поля структуры, содержащие указатель на глобальный объект драйвера 
+и версию. А затем получаем имя драйвера, преобразуя его в строку, отбрасывая 
+0-символы. И печатаем полученные данные, используя 
+<a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-markup-language-commands">DML</a>, 
+если текущее окружение позволяет использовать этот язык разметки (функция print_command).</li>
+</ul>
+            <br />
+                <p>
+Исполняем скрипт в отладчике WinDbg:
+                </p>
+                <div class="code">
+1: kd&gt; !py kmdf_tagged.py
+[FxLibraryGlobals.BugCheckDriverInfo]
+!drvobj Wdf01000 7                 (1.13.0)     
+!drvobj acpiex 7                   (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe0000055ac90)
+!drvobj msisadrv 7                 (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe00000f68130)
+!drvobj vdrvroot 7                 (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe00000ebd3a0)
+!drvobj vmbus 7                    (1.7.6001)   dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000005fe3a0)
+!drvobj b06bdrv 7                  (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe00002652100)
+!drvobj ebdrv 7                    (1.7.6001)   dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe0000102be20)
+!drvobj EhStorClass 7              (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000011b6e20)
+!drvobj EhStorTcgDrv 7             (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000011b9e20)
+!drvobj UCX01000 7                 (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000011e5d60)
+!drvobj USBHUB3 7                  (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000011efe20)
+!drvobj storflt 7                  (1.9.7600)   dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe0000112a500)
+!drvobj USBXHCI 7                  (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000011349e0)
+!drvobj intelpep 7                 (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000017f5a30)
+!drvobj cdrom 7                    (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe00001260010)
+!drvobj CompositeBus 7             (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000013af010)
+!drvobj umbus 7                    (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000013afd40)
+!drvobj HDAudBus 7                 (1.7.6001)   dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000013acc20)
+!drvobj gencounter 7               (1.9.7600)   dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000026403e0)
+!drvobj intelppm 7                 (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000013d8600)
+!drvobj NdisVirtualBus 7           (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe0000210f600)
+!drvobj monitor 7                  (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe0000008f010)
+!drvobj PEAUTH 7                   (1.7.6001)   dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000022081c0)
+                </div>
+            <br />
+                <p>
+Если посмотреть на содержимое скрипта после функции parse, то можно заметить, 
+что скрипт может принимать аргумент. Скрипт kmdf_tagged.py написан так, что бы 
+продемонстрировать работу в <i>автономном</i> режиме (вне отладчика), если ему 
+указан аргумент командной строки. Каждый переданный аргумент скрипт трактует как 
+путь в файлу дампа, загружает этот дамп и извлекает из него целевые данные. В 
+частности, скриптом можно в пакетном режиме обработать файлы дампов:
+                </p>
+            <br />
+                <div class="code">
+~&gt; for /R .\dumps %i in (*.*) do @python.exe kmdf_tagged.py %i
+~\dumps\win8_x64_mem.cab
+[FxLibraryGlobals.BugCheckDriverInfo]
+!drvobj Wdf01000 7                 (1.13.0)
+!drvobj acpiex 7                   (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe0000055ac90)
+&lt;...&gt;
+!drvobj PEAUTH 7                   (1.7.6001)   dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000022081c0)
+~\dumps\win8_x64_mem2.cab
+[FxLibraryGlobals.BugCheckDriverInfo]
+!drvobj Wdf01000 7                 (1.13.0)
+!drvobj acpiex 7                   (1.11.0)     dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe0000055ac90)
+&lt;...&gt;
+!drvobj PEAUTH 7                   (1.7.6001)   dx ((Wdf01000!_FX_DRIVER_GLOBALS*)0xffffe000022081c0)
+                </div>
+            <br />
+                <p>
+Надеюсь, что мой опыт (и содержимое этой статьи) будет кому-то полезным. А 
+количество BSOD'ов, причина которых остается загадкой,  будет стремиться к 0.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>

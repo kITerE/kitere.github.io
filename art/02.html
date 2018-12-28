@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<script type="text/javascript" src="../js/ppm.js"></script>
+<title>EreTIk's Box &raquo; Противодействие splice-перехватам системных библиотек: обходим Hacker Defender с помощью ONTL</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, XDE, splice перехват, перехват функции, ONTL, NTL, Hacker Defender, HXDef, противодействие перехватам, обход перехватов" />
+<link rel="stylesheet" type="text/css" href="../style.css" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
+<script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushAsm.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushCpp.js"></script>
+<script type="text/javascript" src="../js/syntax_hl/shBrushPython.js"></script>
+<link type="text/css" rel="stylesheet" href="../shCoreEkBox.css"/>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;</script>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body>
+        <div id="wrapper">
+            <div id="header">
+                <h1>EreTIk's Box</h1>
+                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+            </div>
+        <div id="strap">
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Противодействие splice-перехватам системных библиотек: обходим Hacker Defender с помощью ONTL
+        </div>
+<br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
+        <div id="navigation">
+            <ul id="menu">
+                <li><a href="../index.htm">Стартовая страница</a></li>
+                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
+                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
+                <li><a href="../Downloads.html">Скачать</a></li>
+                <li><a href="../Links.html">Внешние ссылки</a></li>
+                <li><a href="../Overview.html">Обо всем</a></li>
+                <li><a href="../Contacts.html">Контакты</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                  <script type="text/javascript">
+                  <!--
+                    nav_tools("../");
+                  // -->
+                  </script>
+                </li>
+            </ul>
+        </div>
+        <div style="clear:both"></div>
+</td><td>
+        <div id="content">
+        <br />
+            <div class="epigraph">
+<p>...вариантов, сука, ноль:</p>
+<p>кто-то предал, кто-то свой.</p>
+<p>Агата Кристи - "Подвиг"</p>
+            </div>
+            <br />
+                <p>
+В своей статье 
+<a href="05.html">"Анализ splice-перехватов функций системных вызов"</a> 
+я уже описывал применение дизассемблера для анализа detour'ов. Я решил 
+продолжить, и в данной статье я хочу описать способ противодействия перехватам 
+в системной библиотеке. Обходить будем известный <i>"учебный" rootkit</i> 
+<a href="http://www.rootkit.com/board_project_fused.php?did=proj5" target="_blank">Hacker Defender</a>. 
+Программа использует 32-х битный дизассемблер длин (LDE v1.05), который 
+является ранней версией 
+<a href=" http://vx.netlux.org/vx.php?id=ex01" target="_blank">XDE - дизассемблера от Z0mbie</a>. 
+Противодействовать будет из user mod'а, не прибегая к драйверам.
+                </p>
+            <br />
+                <p>
+<a href="http://www.rootkit.com/board_project_fused.php?did=proj5" target="_blank">Hacker Defender</a> 
+ставит detour'ы на целый ряд системных вызовов из ntdll.dll, защищая свои 
+процессы, файлы и ключи реестра. Запускаем утилиту анализа 
+<a href="../download/SplChk_withSrc.rar">SplChk</a> 
+и наблюдаем обнаруженные splice-перехваты:
+                </p>
+            <br />
+                <div class="code">
+... 
+Routine: NtCreateFile
+Address : 0x7C90D0AE
+ &gt; Splice-detour detected. Detoured to 0x7FFA47D8, module &lt;unknown&gt;
+
+Routine: NtDeviceIoControlFile
+Address : 0x7C90D27E
+ &gt; Splice-detour detected. Detoured to 0x7FFA444E, module &lt;unknown&gt;
+
+Routine: NtEnumerateKey
+Address : 0x7C90D2CE
+ &gt; Splice-detour detected. Detoured to 0x7FFA3CCC, module &lt;unknown&gt;
+
+Routine: NtEnumerateValueKey
+Address : 0x7C90D2EE
+ &gt; Splice-detour detected. Detoured to 0x7FFA3DC1, module &lt;unknown&gt;
+
+Routine: NtOpenFile
+Address : 0x7C90D59E
+ &gt; Splice-detour detected. Detoured to 0x7FFA4861, module &lt;unknown&gt;
+...
+                </div>
+            <br />
+                <p>
+Рассмотрим основы функционирования splice-перехватов. Обобщенная схема работы 
+такого рода перехвата показана на рисунке ниже:
+                </p>
+<br /><p><img src="../images/splice_desc.jpg" alt="" /></p>
+            <br />
+                <p>
+Основной особенностью <b>splice-перехвата</b>, которого так же часто называют 
+<b>detour</b>, заключается в том, что при inject'е такого перехвата, часть 
+кода перехватываемой функции безвозвратно модифицируется. Самый 
+распространенный способ - установка перехвата в начало функции, записью 5-ти байтовой 
+инструкции безусловного перехода jmp. Если перехват ориентирован на 
+стандартные MicroSoft'овские библиотеки, то необходимость дизассемблера 
+отпадает. Начало экспортируемых C-функций, как правило, совпадает на всех версиях 
+ОС (необходимо только учитывать Hotpatching на современных версиях). Но 
+дизассемблер может понадобиться в случае, если, например, нужно "спрятать" 
+перехват глубже в функции, пропустив несколько команд.
+                </p>
+            <br />
+                <p>
+Алгоритм установки перехвата в начало функции с использованием дизассемблера 
+приблизительно таков:
+                </p>
+                <ul>
+<li>1. дизассемблируем очередную инструкцию от начала функции</li>
+<li>2. копируем байт-код в свой буфер (на рисунке это блок <font color="red"><b>copy</b></font>)</li>
+<li>3. если длина скопированного кода меньше 5-ти байт (long jump), то возвращается к п.1</li>
+<li>4. запоминаем адрес оригинального кода, с которого необходимо будет возобновить исполнение перехваченной функции: адрес последней скопированной инструкции + ее длина</li>
+<li>5. в <font color="red"><b>copy</b></font>-буфере, после скопированного байт-кода, формируем команду jmp на адрес, сформированный в п.4</li>
+<li>6. вписываем в начало функции jmp на адрес своего обработчика перехвата</li>
+                </ul>
+            <br />
+                <p>
+Перехват установлен. Теперь, если мы захотим в перехвате отдать управление 
+оригинальной функции, то просто нужно передать управление на 
+блок <font color="red"><b>copy</b></font>. В реальности, алгоритм стоит 
+усложнить обработкой относительных смещений в скопированном байт-коде.
+                </p>
+            <br />
+                <p>
+Теперь, собственно, мы подошли к тому, что бы организовать противодействие 
+перехватам в системных библиотеках. Сразу понятно, что при реализации, нам 
+будет необходимо работать с PE-модулями. Что бы не писать еще один 
+<i>"велосипед"</i>, я решил использовать библиотеку 
+<a href="http://code.google.com/p/ontl/" target="_blank">Open NT Native Template Library (ONTL)</a>.
+                </p>
+            <br />
+                <p>
+Суть предлагаемого мной обхода в следующем: загрузка модуля системной библиотеки 
+"вручную". То есть необходимо вычитать заголовок файла, выделить памяти для 
+всего модуля и загрузить по - секциям содержимое PE-образа. Для этого я написал 
+класс <b>TRemappedImage</b>, который успешно прошел тестирование на ntdll.dll и 
+ole32.dll. После загрузки данных и кода из файла в выделенный буфер, собственно 
+и наступает черед работы <a href="http://code.google.com/p/ontl/" target="_blank">ONTL</a>. 
+Для начала необходимо обработать reloc'и загруженного образа. У класса ntl::pe::image 
+есть метод, который именно для этого и предназначен: relocate(). Но он не 
+подходит для нашей задачи потому, что нам нужно "динамически" обрабатывать 
+дельту смещения reloc'а. Поэтому я отнаследовался от класса ntl::pe::image и 
+написал свой <b>TImageReloc</b>, в котором практически скопировал функцию релокации:
+                </p>
+            <br />
+                <pre class="brush: cpp;">
+// потомок ntl::pe::image с кастомизированным методом релоцирования
+class TImageReloc : public image {
+public:
+    template &lt;class TDeltaFunc&gt;
+    bool relocate_f(TDeltaFunc &amp;Func)
+    {
+        const data_directory * const reloc_dir = 
+            get_data_directory(data_directory::basereloc_table);
+        if ( ! reloc_dir || ! reloc_dir-&gt;VirtualAddress ) return false;
+        const base_relocation * fixups = va&lt;base_relocation*&gt;(
+          reloc_dir-&gt;VirtualAddress);
+        const uintptr_t end = va(reloc_dir-&gt;VirtualAddress + reloc_dir-&gt;Size);
+        while ( reinterpret_cast&lt;uintptr_t&gt;(fixups) &lt; end )
+        {
+            const uintptr_t addr = va(fixups-&gt;VirtualAddress);
+            const uintptr_t end = fixups-&gt;SizeOfBlock
+                + reinterpret_cast&lt;uintptr_t&gt;(fixups);
+            const base_relocation::entry_t * entry = &amp;fixups-&gt;entry[0];
+            
+            for ( ; reinterpret_cast&lt;uintptr_t&gt;(entry) &lt; end; ++entry )
+            switch ( entry-&gt;Type )
+            {
+            
+            case base_relocation::type32::highlow:
+                {
+                    uint32_t * vaddr = reinterpret_cast&lt;uint32_t *&gt;(
+                      addr + entry-&gt;Offset);
+                    const ptrdiff_t delta = Func( 
+                      rva(reinterpret_cast&lt;uintptr_t&gt;(vaddr)) );
+                    *vaddr += static_cast&lt;uint32_t&gt;(delta);
+                }
+                break;
+            default:
+              break;
+            }
+            fixups = reinterpret_cast&lt;const base_relocation *&gt;(entry);
+        }
+        return true;
+    }
+};
+                </pre>
+            <br />
+                <p>
+Далее нужно обработать импорты, вызовом ntl::pe::image::bind_import. Все эти 
+не нехитрые манипуляции производит написанный мною метод 
+<b>TRemappedImage::ReadImage(...)</b>. Код всего класса <b>TRemappedImage</b>, 
+как я надеюсь, написан достаточно наглядно, и описывать его в деталях не имеет 
+смысла. Поэтому можно просто скачать, посмотреть исходники и работу 
+<a href="../download/KeyView_withSrc.rar">утилиты KeyView</a>.
+                </p>
+            <br />
+                <p>
+Проверяем результат. Запускаем собранную утилиту без противодействия 
+splice-перехватам в ntdll.dll:
+                </p>
+                <div class="code">
+KeyView.exe -k \REGISTRY\MACHINE\SYSTEM\CurrentControlSet\Services -d
+                </div>
+            <br />
+                <p>
+Результат работы:
+                </p>
+            <br />
+                <div class="code">
+  ...
+  [&gt;] Ftdisk (lwt: 25.03.2010 17:02:38)
+  [&gt;] Gpc (lwt: 25.03.2010 17:02:38)
+  [&gt;] helpsvc (lwt: 25.03.2010 17:02:38)
+  [&gt;] HidServ (lwt: 03.03.2010 21:25:05)
+  [&gt;] hidusb (lwt: 25.03.2010 17:03:00)
+  ...
+                </div>
+            <br />
+                <p>
+И с загрузкой второй копии ntdll.dll:
+                </p>
+                <div class="code">
+KeyView.exe -k \REGISTRY\MACHINE\SYSTEM\CurrentControlSet\Services
+                </div>
+            <br />
+                <p>
+Результат работы:
+                </p>
+            <br />
+                <div class="code">
+  ...
+  [&gt;] Ftdisk (lwt: 25.03.2010 17:02:38)
+  [&gt;] Gpc (lwt: 25.03.2010 17:02:38)
+  <b><i>[&gt;] HackerDefender100 (lwt: 25.03.2010 17:02:38)
+  [&gt;] HackerDefenderDrv100 (lwt: 25.03.2010 17:02:38)</i></b>
+  [&gt;] helpsvc (lwt: 25.03.2010 17:02:38)
+  [&gt;] HidServ (lwt: 03.03.2010 21:25:05)
+  [&gt;] hidusb (lwt: 25.03.2010 17:03:00)
+  ...
+                </div>
+            <br />
+                <p>
+Как видим, скрытые ключи прекрасно отображаются. Минусом данного подхода 
+является ситуация, когда функция из загруженного вручную модуля передает 
+управление по адресу некоторого callback'а, который формируется в секции 
+данных, доступной на запись.
+                </p>
+            <br />
+                <p>
+Утилиту с исходными кодами можно скачать <a href="../download/KeyView_withSrc.rar">здесь</a>.
+                </p>
+<br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
+        </div>
+</td></tr></table>
+    </div>
+<div>
+<!--Openstat-->
+<span id="openstat2069613"></span><script type="text/javascript"> var openstat = { counter: 2069613, image: 37, next: openstat , track_links: "all" }; document.write(unescape("%3Cscript%20src=%22http" +
+(("https:" == document.location.protocol) ? "s" : "") +
+"://openstat.net/cnt.js%22%20defer=%22defer%22%3E%3C/script%3E")); </script>
+<!--Openstat-->
+</div>
+
+</body>
+</html>
