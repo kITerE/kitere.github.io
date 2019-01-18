@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Alternate Data Streams на ReFS</title>
+<title>EreTIk's Box &raquo; Alternate Data Streams РЅР° ReFS</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, ReFS, Resilient File System, ADS, named stream, RefsAddAllocationForResidentWrite, ERROR_FILE_SYSTEM_LIMITATION, STATUS_FILE_SYSTEM_LIMITATION" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Alternate Data Streams на ReFS
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; Alternate Data Streams РЅР° ReFS
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,15 +48,15 @@
         <div id="content">
             <br />
                 <p>
-На днях пришлось столкнуться с ADS'ами на новой Resilient файловой системе (ReFS). 
-По публичным документам от Micosoft складывалось двоякое впечатление: 
-по одним данным ADS были убраны из ReFS, по другим - оставлены.
+РќР° РґРЅСЏС… РїСЂРёС€Р»РѕСЃСЊ СЃС‚РѕР»РєРЅСѓС‚СЊСЃСЏ СЃ ADS'Р°РјРё РЅР° РЅРѕРІРѕР№ Resilient С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ (ReFS). 
+РџРѕ РїСѓР±Р»РёС‡РЅС‹Рј РґРѕРєСѓРјРµРЅС‚Р°Рј РѕС‚ Micosoft СЃРєР»Р°РґС‹РІР°Р»РѕСЃСЊ РґРІРѕСЏРєРѕРµ РІРїРµС‡Р°С‚Р»РµРЅРёРµ: 
+РїРѕ РѕРґРЅРёРј РґР°РЅРЅС‹Рј ADS Р±С‹Р»Рё СѓР±СЂР°РЅС‹ РёР· ReFS, РїРѕ РґСЂСѓРіРёРј - РѕСЃС‚Р°РІР»РµРЅС‹.
                 </p>
             <br />
                 <p>
-Публикации публикациями, но можно проверить вызовом 
+РџСѓР±Р»РёРєР°С†РёРё РїСѓР±Р»РёРєР°С†РёСЏРјРё, РЅРѕ РјРѕР¶РЅРѕ РїСЂРѕРІРµСЂРёС‚СЊ РІС‹Р·РѕРІРѕРј 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa364993(v=vs.85).aspx">::GetVolumeInformation(...)</a>.
-На моей тестовой Win8.1 я получил маску флагов 0x070400cf:
+РќР° РјРѕРµР№ С‚РµСЃС‚РѕРІРѕР№ Win8.1 СЏ РїРѕР»СѓС‡РёР» РјР°СЃРєСѓ С„Р»Р°РіРѕРІ 0x070400cf:
                 </p>
 <ul>
   <li>FILE_CASE_SENSITIVE_SEARCH</li>
@@ -72,18 +72,18 @@
 </ul>
             <br />
                 <p>
-Казалось бы, вот оно счастье - флаг <b>FILE_NAMED_STREAMS</b>. Создаем тестовый 
-stream, пишем в него тестовую строку - все работает на ура. Вызываем 
-::CopyFile(...), указывая в качестве целевого пути stream и... все завершается с 
-ошибкой <b>ERROR_FILE_SYSTEM_LIMITATION</b>, 665 (<b>STATUS_FILE_SYSTEM_LIMITATION</b>, 0xC0000427). 
-Протрассировав вызов, который завершается ошибкой, мы придем к функции 
-<b>RefsAddAllocationForResidentWrite</b>, которая проверяет размер stream'а и, 
-если он [размер] превышает 0x20000 (128 килобайт), то генерируется указанная ошибка.
+РљР°Р·Р°Р»РѕСЃСЊ Р±С‹, РІРѕС‚ РѕРЅРѕ СЃС‡Р°СЃС‚СЊРµ - С„Р»Р°Рі <b>FILE_NAMED_STREAMS</b>. РЎРѕР·РґР°РµРј С‚РµСЃС‚РѕРІС‹Р№ 
+stream, РїРёС€РµРј РІ РЅРµРіРѕ С‚РµСЃС‚РѕРІСѓСЋ СЃС‚СЂРѕРєСѓ - РІСЃРµ СЂР°Р±РѕС‚Р°РµС‚ РЅР° СѓСЂР°. Р’С‹Р·С‹РІР°РµРј 
+::CopyFile(...), СѓРєР°Р·С‹РІР°СЏ РІ РєР°С‡РµСЃС‚РІРµ С†РµР»РµРІРѕРіРѕ РїСѓС‚Рё stream Рё... РІСЃРµ Р·Р°РІРµСЂС€Р°РµС‚СЃСЏ СЃ 
+РѕС€РёР±РєРѕР№ <b>ERROR_FILE_SYSTEM_LIMITATION</b>, 665 (<b>STATUS_FILE_SYSTEM_LIMITATION</b>, 0xC0000427). 
+РџСЂРѕС‚СЂР°СЃСЃРёСЂРѕРІР°РІ РІС‹Р·РѕРІ, РєРѕС‚РѕСЂС‹Р№ Р·Р°РІРµСЂС€Р°РµС‚СЃСЏ РѕС€РёР±РєРѕР№, РјС‹ РїСЂРёРґРµРј Рє С„СѓРЅРєС†РёРё 
+<b>RefsAddAllocationForResidentWrite</b>, РєРѕС‚РѕСЂР°СЏ РїСЂРѕРІРµСЂСЏРµС‚ СЂР°Р·РјРµСЂ stream'Р° Рё, 
+РµСЃР»Рё РѕРЅ [СЂР°Р·РјРµСЂ] РїСЂРµРІС‹С€Р°РµС‚ 0x20000 (128 РєРёР»РѕР±Р°Р№С‚), С‚Рѕ РіРµРЅРµСЂРёСЂСѓРµС‚СЃСЏ СѓРєР°Р·Р°РЅРЅР°СЏ РѕС€РёР±РєР°.
                 </p>
             <br />
                 <p>
-P.S. Уже со знанием этого лимита мне удалось найти его описание в статье 
-<a target="_blank" href="http://technet.microsoft.com/en-us/library/hh831724.aspx">Resilient File System Overview на TechNet</a>:
+P.S. РЈР¶Рµ СЃРѕ Р·РЅР°РЅРёРµРј СЌС‚РѕРіРѕ Р»РёРјРёС‚Р° РјРЅРµ СѓРґР°Р»РѕСЃСЊ РЅР°Р№С‚Рё РµРіРѕ РѕРїРёСЃР°РЅРёРµ РІ СЃС‚Р°С‚СЊРµ 
+<a target="_blank" href="http://technet.microsoft.com/en-us/library/hh831724.aspx">Resilient File System Overview РЅР° TechNet</a>:
                 </p>
             <br />
                 <div class="quote">

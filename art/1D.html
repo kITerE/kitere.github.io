@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Потроха отладчика в помощь при исследовании внутренностей ядра</title>
-<meta name="keywords" content="EreTIk, kernel, ring0, driver development, KeNumberProcessors, nt!KeNumberProcessors, KeGetCurrentProcessorNumber, функции kdexts!GetProcessorCount " />
+<title>EreTIk's Box &raquo; РџРѕС‚СЂРѕС…Р° РѕС‚Р»Р°РґС‡РёРєР° РІ РїРѕРјРѕС‰СЊ РїСЂРё РёСЃСЃР»РµРґРѕРІР°РЅРёРё РІРЅСѓС‚СЂРµРЅРЅРѕСЃС‚РµР№ СЏРґСЂР°</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, KeNumberProcessors, nt!KeNumberProcessors, KeGetCurrentProcessorNumber, С„СѓРЅРєС†РёРё kdexts!GetProcessorCount " />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
 <script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Потроха отладчика в помощь при исследовании внутренностей ядра
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РџРѕС‚СЂРѕС…Р° РѕС‚Р»Р°РґС‡РёРєР° РІ РїРѕРјРѕС‰СЊ РїСЂРё РёСЃСЃР»РµРґРѕРІР°РЅРёРё РІРЅСѓС‚СЂРµРЅРЅРѕСЃС‚РµР№ СЏРґСЂР°
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,13 +48,13 @@
         <div id="content">
             <br />
                 <p>
-Всем хорошо известен экспортируемый символ ядра 
+Р’СЃРµРј С…РѕСЂРѕС€Рѕ РёР·РІРµСЃС‚РµРЅ СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹Р№ СЃРёРјРІРѕР» СЏРґСЂР° 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff552975(v=vs.85).aspx">CCHAR KeNumberProcessors</a> 
-- переменная, содержащая количество процессоров. Так же не является тайной, что 
-последние версии Windows поддерживают количество процессоров, выходящее за 
-пределы разрядной сетки одного байта. Так а что же стало с переменной? 
-Документация гласит, что переменная стала <b>obsolete</b>. Но взглянем на 
-использование этой переменной в Windows 2008 R2 (начало функции 
+- РїРµСЂРµРјРµРЅРЅР°СЏ, СЃРѕРґРµСЂР¶Р°С‰Р°СЏ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕС†РµСЃСЃРѕСЂРѕРІ. РўР°Рє Р¶Рµ РЅРµ СЏРІР»СЏРµС‚СЃСЏ С‚Р°Р№РЅРѕР№, С‡С‚Рѕ 
+РїРѕСЃР»РµРґРЅРёРµ РІРµСЂСЃРёРё Windows РїРѕРґРґРµСЂР¶РёРІР°СЋС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕС†РµСЃСЃРѕСЂРѕРІ, РІС‹С…РѕРґСЏС‰РµРµ Р·Р° 
+РїСЂРµРґРµР»С‹ СЂР°Р·СЂСЏРґРЅРѕР№ СЃРµС‚РєРё РѕРґРЅРѕРіРѕ Р±Р°Р№С‚Р°. РўР°Рє Р° С‡С‚Рѕ Р¶Рµ СЃС‚Р°Р»Рѕ СЃ РїРµСЂРµРјРµРЅРЅРѕР№? 
+Р”РѕРєСѓРјРµРЅС‚Р°С†РёСЏ РіР»Р°СЃРёС‚, С‡С‚Рѕ РїРµСЂРµРјРµРЅРЅР°СЏ СЃС‚Р°Р»Р° <b>obsolete</b>. РќРѕ РІР·РіР»СЏРЅРµРј РЅР° 
+РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ СЌС‚РѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РІ Windows 2008 R2 (РЅР°С‡Р°Р»Рѕ С„СѓРЅРєС†РёРё 
 nt!ExSizeOfRundownProtectionCacheAware):
                 </p>
             <br />
@@ -64,13 +64,13 @@ nt!ExSizeOfRundownProtectionCacheAware):
                 </pre>
             <br />
                 <p>
-По приведенному коду сразу становится видно, что глобальная переменная 
-nt!KeNumberProcessors стала четыре байта. И тут возник вопрос: когда это 
-произошло? Можно, конечно, пройтись дизассемблером по коллекции файлов ядра, 
-если она под рукой. Но мне пришла в голову другая идея - отладчик. Ведь он умеет 
-определять количество процессоров, и делает он это точно не вызовом 
+РџРѕ РїСЂРёРІРµРґРµРЅРЅРѕРјСѓ РєРѕРґСѓ СЃСЂР°Р·Сѓ СЃС‚Р°РЅРѕРІРёС‚СЃСЏ РІРёРґРЅРѕ, С‡С‚Рѕ РіР»РѕР±Р°Р»СЊРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ 
+nt!KeNumberProcessors СЃС‚Р°Р»Р° С‡РµС‚С‹СЂРµ Р±Р°Р№С‚Р°. Р С‚СѓС‚ РІРѕР·РЅРёРє РІРѕРїСЂРѕСЃ: РєРѕРіРґР° СЌС‚Рѕ 
+РїСЂРѕРёР·РѕС€Р»Рѕ? РњРѕР¶РЅРѕ, РєРѕРЅРµС‡РЅРѕ, РїСЂРѕР№С‚РёСЃСЊ РґРёР·Р°СЃСЃРµРјР±Р»РµСЂРѕРј РїРѕ РєРѕР»Р»РµРєС†РёРё С„Р°Р№Р»РѕРІ СЏРґСЂР°, 
+РµСЃР»Рё РѕРЅР° РїРѕРґ СЂСѓРєРѕР№. РќРѕ РјРЅРµ РїСЂРёС€Р»Р° РІ РіРѕР»РѕРІСѓ РґСЂСѓРіР°СЏ РёРґРµСЏ - РѕС‚Р»Р°РґС‡РёРє. Р’РµРґСЊ РѕРЅ СѓРјРµРµС‚ 
+РѕРїСЂРµРґРµР»СЏС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕС†РµСЃСЃРѕСЂРѕРІ, Рё РґРµР»Р°РµС‚ РѕРЅ СЌС‚Рѕ С‚РѕС‡РЅРѕ РЅРµ РІС‹Р·РѕРІРѕРј 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff552063(v=vs.85).aspx">KeGetCurrentProcessorNumber()</a>. 
-Ответ можно найти в коде функции kdexts!GetProcessorCount:
+РћС‚РІРµС‚ РјРѕР¶РЅРѕ РЅР°Р№С‚Рё РІ РєРѕРґРµ С„СѓРЅРєС†РёРё kdexts!GetProcessorCount:
                 </p>
             <br />
                 <pre class="brush: asm;">
@@ -103,14 +103,14 @@ nt!KeNumberProcessors стала четыре байта. И тут возник вопрос: когда это
                 </pre>
             <br />
                 <p>
-Сразу становится понятно, что nt!KeNumberProcessors стала ULONG'ом в ядре с 
-номером сборки 6400. Так что отладчик может пригодится не только как средство, 
-но и как объект изучения ядра Windows.
+РЎСЂР°Р·Сѓ СЃС‚Р°РЅРѕРІРёС‚СЃСЏ РїРѕРЅСЏС‚РЅРѕ, С‡С‚Рѕ nt!KeNumberProcessors СЃС‚Р°Р»Р° ULONG'РѕРј РІ СЏРґСЂРµ СЃ 
+РЅРѕРјРµСЂРѕРј СЃР±РѕСЂРєРё 6400. РўР°Рє С‡С‚Рѕ РѕС‚Р»Р°РґС‡РёРє РјРѕР¶РµС‚ РїСЂРёРіРѕРґРёС‚СЃСЏ РЅРµ С‚РѕР»СЊРєРѕ РєР°Рє СЃСЂРµРґСЃС‚РІРѕ, 
+РЅРѕ Рё РєР°Рє РѕР±СЉРµРєС‚ РёР·СѓС‡РµРЅРёСЏ СЏРґСЂР° Windows.
                 </p>
             <br />
                 <p>
-<b>P.S.</b> Файл kdexts.dll является реализацией основных встроенных расширений 
-отладки ядра. Сам файл можно найти в поддиректории winxp директории WinDbg.
+<b>P.S.</b> Р¤Р°Р№Р» kdexts.dll СЏРІР»СЏРµС‚СЃСЏ СЂРµР°Р»РёР·Р°С†РёРµР№ РѕСЃРЅРѕРІРЅС‹С… РІСЃС‚СЂРѕРµРЅРЅС‹С… СЂР°СЃС€РёСЂРµРЅРёР№ 
+РѕС‚Р»Р°РґРєРё СЏРґСЂР°. РЎР°Рј С„Р°Р№Р» РјРѕР¶РЅРѕ РЅР°Р№С‚Рё РІ РїРѕРґРґРёСЂРµРєС‚РѕСЂРёРё winxp РґРёСЂРµРєС‚РѕСЂРёРё WinDbg.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

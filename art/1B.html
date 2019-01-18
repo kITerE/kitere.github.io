@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; diaview: пример использования MS DIA из питона (diabind)</title>
+<title>EreTIk's Box &raquo; diaview: РїСЂРёРјРµСЂ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ MS DIA РёР· РїРёС‚РѕРЅР° (diabind)</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, MSDIA, DIA, Debug Interface Access, diabind, diaview, python" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; diaview: пример использования MS DIA из питона (diabind)
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; diaview: РїСЂРёРјРµСЂ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ MS DIA РёР· РїРёС‚РѕРЅР° (diabind)
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,49 +48,49 @@
         <div id="content">
 <a target="_blank" href="https://diabind.codeplex.com/releases"><img src="../images/download.png" alt="diabind releases" align="right" /></a>
                 <p>
-Не так давно я анонсировал свой проект 
+РќРµ С‚Р°Рє РґР°РІРЅРѕ СЏ Р°РЅРѕРЅСЃРёСЂРѕРІР°Р» СЃРІРѕР№ РїСЂРѕРµРєС‚ 
 <a target="_blank" href="https://diabind.codeplex.com/releases">diabind</a>, 
-который является python-биндингом возможностей 
+РєРѕС‚РѕСЂС‹Р№ СЏРІР»СЏРµС‚СЃСЏ python-Р±РёРЅРґРёРЅРіРѕРј РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/x93ctkx8(v=vs.71).aspx">DIA SDK</a>. 
-Самое вкусное из того, что предоставляет DIA SDK (на мой взгляд), обернуто в интерфейс 
+РЎР°РјРѕРµ РІРєСѓСЃРЅРѕРµ РёР· С‚РѕРіРѕ, С‡С‚Рѕ РїСЂРµРґРѕСЃС‚Р°РІР»СЏРµС‚ DIA SDK (РЅР° РјРѕР№ РІР·РіР»СЏРґ), РѕР±РµСЂРЅСѓС‚Рѕ РІ РёРЅС‚РµСЂС„РµР№СЃ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/w0edf0x4.aspx">IDiaSymbol</a>. 
-Это интерфейс с большим числом методов, которые возвращают что-то или генерирую 
-ошибку вызова в зависимости от того, интерпретацией чего они являются. 
-Например: метод get_callingConvention будет работать только для типов функций. 
-В документации достаточно расплывчато и не точно описано для каких символов 
-какие getter'ы будут работать.
+Р­С‚Рѕ РёРЅС‚РµСЂС„РµР№СЃ СЃ Р±РѕР»СЊС€РёРј С‡РёСЃР»РѕРј РјРµС‚РѕРґРѕРІ, РєРѕС‚РѕСЂС‹Рµ РІРѕР·РІСЂР°С‰Р°СЋС‚ С‡С‚Рѕ-С‚Рѕ РёР»Рё РіРµРЅРµСЂРёСЂСѓСЋ 
+РѕС€РёР±РєСѓ РІС‹Р·РѕРІР° РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ, РёРЅС‚РµСЂРїСЂРµС‚Р°С†РёРµР№ С‡РµРіРѕ РѕРЅРё СЏРІР»СЏСЋС‚СЃСЏ. 
+РќР°РїСЂРёРјРµСЂ: РјРµС‚РѕРґ get_callingConvention Р±СѓРґРµС‚ СЂР°Р±РѕС‚Р°С‚СЊ С‚РѕР»СЊРєРѕ РґР»СЏ С‚РёРїРѕРІ С„СѓРЅРєС†РёР№. 
+Р’ РґРѕРєСѓРјРµРЅС‚Р°С†РёРё РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ СЂР°СЃРїР»С‹РІС‡Р°С‚Рѕ Рё РЅРµ С‚РѕС‡РЅРѕ РѕРїРёСЃР°РЅРѕ РґР»СЏ РєР°РєРёС… СЃРёРјРІРѕР»РѕРІ 
+РєР°РєРёРµ getter'С‹ Р±СѓРґСѓС‚ СЂР°Р±РѕС‚Р°С‚СЊ.
                 </p>
             <br />
                 <p>
-Поэтому для GUI-визуализации содержимого отладочной информации я написал скрипт 
-diaview.py, который может рассматриваться и как пример использования diabind. 
-В качестве GUI в скрипте используется PySide 
+РџРѕСЌС‚РѕРјСѓ РґР»СЏ GUI-РІРёР·СѓР°Р»РёР·Р°С†РёРё СЃРѕРґРµСЂР¶РёРјРѕРіРѕ РѕС‚Р»Р°РґРѕС‡РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё СЏ РЅР°РїРёСЃР°Р» СЃРєСЂРёРїС‚ 
+diaview.py, РєРѕС‚РѕСЂС‹Р№ РјРѕР¶РµС‚ СЂР°СЃСЃРјР°С‚СЂРёРІР°С‚СЊСЃСЏ Рё РєР°Рє РїСЂРёРјРµСЂ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ diabind. 
+Р’ РєР°С‡РµСЃС‚РІРµ GUI РІ СЃРєСЂРёРїС‚Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ PySide 
 <a target="_blank" href="http://qt-project.org/wiki/PySide_Binaries_Windows">(Binaries for Microsoft Windows)</a>.
                 </p>
             <br />
                 <p>
-После открытия файла с отладочной информацией (или исполняемого файла, по 
-которому доступна отладочная информация) появляется основная вкладка 
-<b>global scope</b>. Это корневой символ полученный последовательностью вызовов:
+РџРѕСЃР»Рµ РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° СЃ РѕС‚Р»Р°РґРѕС‡РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРµР№ (РёР»Рё РёСЃРїРѕР»РЅСЏРµРјРѕРіРѕ С„Р°Р№Р»Р°, РїРѕ 
+РєРѕС‚РѕСЂРѕРјСѓ РґРѕСЃС‚СѓРїРЅР° РѕС‚Р»Р°РґРѕС‡РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ) РїРѕСЏРІР»СЏРµС‚СЃСЏ РѕСЃРЅРѕРІРЅР°СЏ РІРєР»Р°РґРєР° 
+<b>global scope</b>. Р­С‚Рѕ РєРѕСЂРЅРµРІРѕР№ СЃРёРјРІРѕР» РїРѕР»СѓС‡РµРЅРЅС‹Р№ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊСЋ РІС‹Р·РѕРІРѕРІ:
                 </p>
             <br />
 <ul>
-<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/2008hf0e.aspx">IDiaDataSource::loadDataFromPdb</a> или <a target="_blank" href="http://msdn.microsoft.com/en-us/library/12kk9t39.aspx">IDiaDataSource::loadDataForExe</a></li>
+<li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/2008hf0e.aspx">IDiaDataSource::loadDataFromPdb</a> РёР»Рё <a target="_blank" href="http://msdn.microsoft.com/en-us/library/12kk9t39.aspx">IDiaDataSource::loadDataForExe</a></li>
 <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/3tw26387.aspx">IDiaDataSource::openSession</a></li>
 <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/fkcc8hx6.aspx">IDiaSession::get_globalScope</a></li>
 </ul>
             <br />
                 <p>
-Вся дальнейшая работа идет раскрытием дерева символов и исполнением поиска 
-дочерних элементов символа (пункт меню "Find children for IDiaSymbol"). Важно 
-понимать, что поиск дочерних элементов может быть только у символов. И сам 
-поиск применяется именно к тому символу, который в настоящий момент выбран в дереве.
+Р’СЃСЏ РґР°Р»СЊРЅРµР№С€Р°СЏ СЂР°Р±РѕС‚Р° РёРґРµС‚ СЂР°СЃРєСЂС‹С‚РёРµРј РґРµСЂРµРІР° СЃРёРјРІРѕР»РѕРІ Рё РёСЃРїРѕР»РЅРµРЅРёРµРј РїРѕРёСЃРєР° 
+РґРѕС‡РµСЂРЅРёС… СЌР»РµРјРµРЅС‚РѕРІ СЃРёРјРІРѕР»Р° (РїСѓРЅРєС‚ РјРµРЅСЋ "Find children for IDiaSymbol"). Р’Р°Р¶РЅРѕ 
+РїРѕРЅРёРјР°С‚СЊ, С‡С‚Рѕ РїРѕРёСЃРє РґРѕС‡РµСЂРЅРёС… СЌР»РµРјРµРЅС‚РѕРІ РјРѕР¶РµС‚ Р±С‹С‚СЊ С‚РѕР»СЊРєРѕ Сѓ СЃРёРјРІРѕР»РѕРІ. Р СЃР°Рј 
+РїРѕРёСЃРє РїСЂРёРјРµРЅСЏРµС‚СЃСЏ РёРјРµРЅРЅРѕ Рє С‚РѕРјСѓ СЃРёРјРІРѕР»Сѓ, РєРѕС‚РѕСЂС‹Р№ РІ РЅР°СЃС‚РѕСЏС‰РёР№ РјРѕРјРµРЅС‚ РІС‹Р±СЂР°РЅ РІ РґРµСЂРµРІРµ.
                 </p>
             <br />
                 <p>
-Для демонстрации получим список параметров DllMain. Выбираем единственный 
-символ в <b>global scope</b> и ищем функцию DllMain. Данные поиска идентичны 
-параметрам метода 
+Р”Р»СЏ РґРµРјРѕРЅСЃС‚СЂР°С†РёРё РїРѕР»СѓС‡РёРј СЃРїРёСЃРѕРє РїР°СЂР°РјРµС‚СЂРѕРІ DllMain. Р’С‹Р±РёСЂР°РµРј РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ 
+СЃРёРјРІРѕР» РІ <b>global scope</b> Рё РёС‰РµРј С„СѓРЅРєС†РёСЋ DllMain. Р”Р°РЅРЅС‹Рµ РїРѕРёСЃРєР° РёРґРµРЅС‚РёС‡РЅС‹ 
+РїР°СЂР°РјРµС‚СЂР°Рј РјРµС‚РѕРґР° 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/yfx1573w.aspx">IDiaSymbol::findChildren</a>:
                 </p>
                 <p>
@@ -98,16 +98,16 @@ diaview.py, который может рассматриваться и как пример использования diabind.
                 </p>
             <br />
                 <p>
-Для найденного символа ищем все дочерние символы SymTagData:
+Р”Р»СЏ РЅР°Р№РґРµРЅРЅРѕРіРѕ СЃРёРјРІРѕР»Р° РёС‰РµРј РІСЃРµ РґРѕС‡РµСЂРЅРёРµ СЃРёРјРІРѕР»С‹ SymTagData:
                 </p>
                 <p>
 <img src="../images/diaview_DllMain_SymTagData.png" alt="diaview_DllMain_SymTagData" />
                 </p>
             <br />
                 <p>
-Скрипт diaview.py включен в новый релиз 
+РЎРєСЂРёРїС‚ diaview.py РІРєР»СЋС‡РµРЅ РІ РЅРѕРІС‹Р№ СЂРµР»РёР· 
 <a target="_blank" href="https://diabind.codeplex.com/releases">diabind 0.1.0.2</a>, 
-который теперь поддерживает MS DIA от Visual Studio 12.0.
+РєРѕС‚РѕСЂС‹Р№ С‚РµРїРµСЂСЊ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ MS DIA РѕС‚ Visual Studio 12.0.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

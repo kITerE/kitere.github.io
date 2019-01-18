@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Новый бит маски доступа к объекту нити (thread) в Windows 8.1: THREAD_RESUME</title>
+<title>EreTIk's Box &raquo; РќРѕРІС‹Р№ Р±РёС‚ РјР°СЃРєРё РґРѕСЃС‚СѓРїР° Рє РѕР±СЉРµРєС‚Сѓ РЅРёС‚Рё (thread) РІ Windows 8.1: THREAD_RESUME</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, ResumeThread, NtResumeThread, THREAD_SUSPEND_RESUME, THREAD_RESUME" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Новый бит маски доступа к объекту нити (thread) в Windows 8.1: THREAD_RESUME
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РќРѕРІС‹Р№ Р±РёС‚ РјР°СЃРєРё РґРѕСЃС‚СѓРїР° Рє РѕР±СЉРµРєС‚Сѓ РЅРёС‚Рё (thread) РІ Windows 8.1: THREAD_RESUME
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,8 +48,8 @@
         <div id="content">
             <br />
                 <p>
-До Windows 8.1 операции приостановки и возобновления нити контролировались одной 
-маской доступа, что отражает статья 
+Р”Рѕ Windows 8.1 РѕРїРµСЂР°С†РёРё РїСЂРёРѕСЃС‚Р°РЅРѕРІРєРё Рё РІРѕР·РѕР±РЅРѕРІР»РµРЅРёСЏ РЅРёС‚Рё РєРѕРЅС‚СЂРѕР»РёСЂРѕРІР°Р»РёСЃСЊ РѕРґРЅРѕР№ 
+РјР°СЃРєРѕР№ РґРѕСЃС‚СѓРїР°, С‡С‚Рѕ РѕС‚СЂР°Р¶Р°РµС‚ СЃС‚Р°С‚СЊСЏ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms686769(v=vs.85).aspx">Thread Security and Access Rights</a>:
                 </p>
             <br />
@@ -58,7 +58,7 @@ THREAD_SUSPEND_RESUME (0x0002) Required to suspend or resume a thread (see Suspe
                 </div>
             <br />
                 <p>
-И это подтверждалось телом функции NtResumeThread (6.2.9200.16384):
+Р СЌС‚Рѕ РїРѕРґС‚РІРµСЂР¶РґР°Р»РѕСЃСЊ С‚РµР»РѕРј С„СѓРЅРєС†РёРё NtResumeThread (6.2.9200.16384):
                 </p>
             <br />
                 <pre class="brush: asm;">
@@ -68,7 +68,7 @@ call         ObReferenceObjectByHandleWithTag
                 </pre>
             <br />
                 <p>
-Но в ядре Windows 8.1 маска доступа сменилась (6.3.9600.16384):
+РќРѕ РІ СЏРґСЂРµ Windows 8.1 РјР°СЃРєР° РґРѕСЃС‚СѓРїР° СЃРјРµРЅРёР»Р°СЃСЊ (6.3.9600.16384):
                 </p>
             <br />
                 <pre class="brush: asm;">
@@ -85,8 +85,8 @@ retn
                 </pre>
             <br />
                 <p>
-Что характерно, новое ядро полностью потеряло совместимость со старой маской 
-доступа. Новую константу 0x1000 можно найти в wdm.h от WDK 8.1:
+Р§С‚Рѕ С…Р°СЂР°РєС‚РµСЂРЅРѕ, РЅРѕРІРѕРµ СЏРґСЂРѕ РїРѕР»РЅРѕСЃС‚СЊСЋ РїРѕС‚РµСЂСЏР»Рѕ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ СЃРѕ СЃС‚Р°СЂРѕР№ РјР°СЃРєРѕР№ 
+РґРѕСЃС‚СѓРїР°. РќРѕРІСѓСЋ РєРѕРЅСЃС‚Р°РЅС‚Сѓ 0x1000 РјРѕР¶РЅРѕ РЅР°Р№С‚Рё РІ wdm.h РѕС‚ WDK 8.1:
                 </p>
             <br />
                 <pre class="brush: cpp;">
@@ -94,8 +94,8 @@ retn
                 </pre>
             <br />
                 <p>
-MSDN про новый флаг ничего не рассказывает, но есть косвенное упоминание у 
-Alex Ionescu в статье 
+MSDN РїСЂРѕ РЅРѕРІС‹Р№ С„Р»Р°Рі РЅРёС‡РµРіРѕ РЅРµ СЂР°СЃСЃРєР°Р·С‹РІР°РµС‚, РЅРѕ РµСЃС‚СЊ РєРѕСЃРІРµРЅРЅРѕРµ СѓРїРѕРјРёРЅР°РЅРёРµ Сѓ 
+Alex Ionescu РІ СЃС‚Р°С‚СЊРµ 
 <a target="_blank" href="http://www.alex-ionescu.com/?p=116">The Evolution of Protected Processes Part 2: Exploit/Jailbreak Mitigations, Unkillable Processes and Protected Services</a>:
                 </p>
             <br />
@@ -104,8 +104,8 @@ and THREAD_RESUME are the rights normally given, the latter being another new Wi
                 </div>
             <br />
                 <p>
-Остается только порадоваться, что теперь операции приостановки и возобновления 
-нити являются разными с точки зрения безопасности.
+РћСЃС‚Р°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РїРѕСЂР°РґРѕРІР°С‚СЊСЃСЏ, С‡С‚Рѕ С‚РµРїРµСЂСЊ РѕРїРµСЂР°С†РёРё РїСЂРёРѕСЃС‚Р°РЅРѕРІРєРё Рё РІРѕР·РѕР±РЅРѕРІР»РµРЅРёСЏ 
+РЅРёС‚Рё СЏРІР»СЏСЋС‚СЃСЏ СЂР°Р·РЅС‹РјРё СЃ С‚РѕС‡РєРё Р·СЂРµРЅРёСЏ Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё.
                 </p>
             <br />
                 <p>

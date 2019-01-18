@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Нюансы использования FsRtlIsNameInExpression</title>
+<title>EreTIk's Box &raquo; РќСЋР°РЅСЃС‹ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ FsRtlIsNameInExpression</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, FsRtlIsNameInExpression, FsRtlIsDbcsInExpression, RtlpIsNameInExpressionPrivate, RtlRaiseStatus" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Нюансы использования FsRtlIsNameInExpression
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РќСЋР°РЅСЃС‹ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ FsRtlIsNameInExpression
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,47 +48,47 @@
         <div id="content">
             <br />
                 <p>
-Разработчикам драйверов режима ядра доступна функция 
+Р Р°Р·СЂР°Р±РѕС‚С‡РёРєР°Рј РґСЂР°Р№РІРµСЂРѕРІ СЂРµР¶РёРјР° СЏРґСЂР° РґРѕСЃС‚СѓРїРЅР° С„СѓРЅРєС†РёСЏ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff546850(v=vs.85).aspx">FsRtlIsNameInExpression</a>. 
-Эта функция позволяет сравнивать строковое имя с шаблоном, содержащим wildcard'ы.
+Р­С‚Р° С„СѓРЅРєС†РёСЏ РїРѕР·РІРѕР»СЏРµС‚ СЃСЂР°РІРЅРёРІР°С‚СЊ СЃС‚СЂРѕРєРѕРІРѕРµ РёРјСЏ СЃ С€Р°Р±Р»РѕРЅРѕРј, СЃРѕРґРµСЂР¶Р°С‰РёРј wildcard'С‹.
                 </p>
             <br />
                 <p>
-Сразу настораживает, что такая не простая функция не возвращает статус 
-<b>NTSTATUS</b>, если происходит ошибка ее исполнения. Взглянем на эту функцию в 
-Windows 8 (build 9200) под дизассемблером (можно параллельно смотреть в код WRK, 
-там ситуация аналогична, Windows 8 выбрана как более актуальная сборка ядра). 
-Сразу бросается в глаза, что если задан параметр IgnoreCase и не задан 
-UpcaseTable, то функция делает локальную копию строки Name в верхнем регистре 
-вызовом 
+РЎСЂР°Р·Сѓ РЅР°СЃС‚РѕСЂР°Р¶РёРІР°РµС‚, С‡С‚Рѕ С‚Р°РєР°СЏ РЅРµ РїСЂРѕСЃС‚Р°СЏ С„СѓРЅРєС†РёСЏ РЅРµ РІРѕР·РІСЂР°С‰Р°РµС‚ СЃС‚Р°С‚СѓСЃ 
+<b>NTSTATUS</b>, РµСЃР»Рё РїСЂРѕРёСЃС…РѕРґРёС‚ РѕС€РёР±РєР° РµРµ РёСЃРїРѕР»РЅРµРЅРёСЏ. Р’Р·РіР»СЏРЅРµРј РЅР° СЌС‚Сѓ С„СѓРЅРєС†РёСЋ РІ 
+Windows 8 (build 9200) РїРѕРґ РґРёР·Р°СЃСЃРµРјР±Р»РµСЂРѕРј (РјРѕР¶РЅРѕ РїР°СЂР°Р»Р»РµР»СЊРЅРѕ СЃРјРѕС‚СЂРµС‚СЊ РІ РєРѕРґ WRK, 
+С‚Р°Рј СЃРёС‚СѓР°С†РёСЏ Р°РЅР°Р»РѕРіРёС‡РЅР°, Windows 8 РІС‹Р±СЂР°РЅР° РєР°Рє Р±РѕР»РµРµ Р°РєС‚СѓР°Р»СЊРЅР°СЏ СЃР±РѕСЂРєР° СЏРґСЂР°). 
+РЎСЂР°Р·Сѓ Р±СЂРѕСЃР°РµС‚СЃСЏ РІ РіР»Р°Р·Р°, С‡С‚Рѕ РµСЃР»Рё Р·Р°РґР°РЅ РїР°СЂР°РјРµС‚СЂ IgnoreCase Рё РЅРµ Р·Р°РґР°РЅ 
+UpcaseTable, С‚Рѕ С„СѓРЅРєС†РёСЏ РґРµР»Р°РµС‚ Р»РѕРєР°Р»СЊРЅСѓСЋ РєРѕРїРёСЋ СЃС‚СЂРѕРєРё Name РІ РІРµСЂС…РЅРµРј СЂРµРіРёСЃС‚СЂРµ 
+РІС‹Р·РѕРІРѕРј 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff563005(v=vs.85).aspx">RtlUpcaseUnicodeString</a>. 
-Куда же попадает статус ошибки, если перевод в верхний регистр не успешен? 
-В вызов RtlRaiseStatus! 
-То есть генерируется исключение, к которому должен быть готов вызывающий код. 
-Но об этом нет ни слова на странице описания функции. Конечно, именно этот 
-случай легко обойти: в вызывающем коде переводить строку в верхний регистр и 
-указывать сравнение с учетом регистра. Но стоит посмотреть немного глубже. Далее 
-управление передается в неэкспортируемую функцию RtlpIsNameInExpressionPrivate. 
-По одной из веток исполнения этой функции происходит вызов 
-ExAllocatePoolWithTag. Если выделение памяти не удастся, то вызовется 
+РљСѓРґР° Р¶Рµ РїРѕРїР°РґР°РµС‚ СЃС‚Р°С‚СѓСЃ РѕС€РёР±РєРё, РµСЃР»Рё РїРµСЂРµРІРѕРґ РІ РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ РЅРµ СѓСЃРїРµС€РµРЅ? 
+Р’ РІС‹Р·РѕРІ RtlRaiseStatus! 
+РўРѕ РµСЃС‚СЊ РіРµРЅРµСЂРёСЂСѓРµС‚СЃСЏ РёСЃРєР»СЋС‡РµРЅРёРµ, Рє РєРѕС‚РѕСЂРѕРјСѓ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РіРѕС‚РѕРІ РІС‹Р·С‹РІР°СЋС‰РёР№ РєРѕРґ. 
+РќРѕ РѕР± СЌС‚РѕРј РЅРµС‚ РЅРё СЃР»РѕРІР° РЅР° СЃС‚СЂР°РЅРёС†Рµ РѕРїРёСЃР°РЅРёСЏ С„СѓРЅРєС†РёРё. РљРѕРЅРµС‡РЅРѕ, РёРјРµРЅРЅРѕ СЌС‚РѕС‚ 
+СЃР»СѓС‡Р°Р№ Р»РµРіРєРѕ РѕР±РѕР№С‚Рё: РІ РІС‹Р·С‹РІР°СЋС‰РµРј РєРѕРґРµ РїРµСЂРµРІРѕРґРёС‚СЊ СЃС‚СЂРѕРєСѓ РІ РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ Рё 
+СѓРєР°Р·С‹РІР°С‚СЊ СЃСЂР°РІРЅРµРЅРёРµ СЃ СѓС‡РµС‚РѕРј СЂРµРіРёСЃС‚СЂР°. РќРѕ СЃС‚РѕРёС‚ РїРѕСЃРјРѕС‚СЂРµС‚СЊ РЅРµРјРЅРѕРіРѕ РіР»СѓР±Р¶Рµ. Р”Р°Р»РµРµ 
+СѓРїСЂР°РІР»РµРЅРёРµ РїРµСЂРµРґР°РµС‚СЃСЏ РІ РЅРµСЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјСѓСЋ С„СѓРЅРєС†РёСЋ RtlpIsNameInExpressionPrivate. 
+РџРѕ РѕРґРЅРѕР№ РёР· РІРµС‚РѕРє РёСЃРїРѕР»РЅРµРЅРёСЏ СЌС‚РѕР№ С„СѓРЅРєС†РёРё РїСЂРѕРёСЃС…РѕРґРёС‚ РІС‹Р·РѕРІ 
+ExAllocatePoolWithTag. Р•СЃР»Рё РІС‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё РЅРµ СѓРґР°СЃС‚СЃСЏ, С‚Рѕ РІС‹Р·РѕРІРµС‚СЃСЏ 
 RtlRaiseStatus(STATUS_NO_MEMORY).
                 </p>
             <br />
                 <p>
-Вывод из всего вышесказанного простой: вызывать функцию 
+Р’С‹РІРѕРґ РёР· РІСЃРµРіРѕ РІС‹С€РµСЃРєР°Р·Р°РЅРЅРѕРіРѕ РїСЂРѕСЃС‚РѕР№: РІС‹Р·С‹РІР°С‚СЊ С„СѓРЅРєС†РёСЋ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff546850(v=vs.85).aspx">FsRtlIsNameInExpression</a> 
-нужно всегда внутри блоки обработки исключений.
+РЅСѓР¶РЅРѕ РІСЃРµРіРґР° РІРЅСѓС‚СЂРё Р±Р»РѕРєРё РѕР±СЂР°Р±РѕС‚РєРё РёСЃРєР»СЋС‡РµРЅРёР№.
                 </p>
             <br />
                 <p>
-P.S. Функция 
+P.S. Р¤СѓРЅРєС†РёСЏ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff546803(v=vs.85).aspx">FsRtlIsDbcsInExpression</a> 
-обладает тем же подводным камнем: может бросить исключение.
+РѕР±Р»Р°РґР°РµС‚ С‚РµРј Р¶Рµ РїРѕРґРІРѕРґРЅС‹Рј РєР°РјРЅРµРј: РјРѕР¶РµС‚ Р±СЂРѕСЃРёС‚СЊ РёСЃРєР»СЋС‡РµРЅРёРµ.
                 </p>
             <br />
                 <p>
-Если посмотреть на описание соседних функций FsRtlXxx то, для некоторых явно 
-указано, что они бросают исключение, например:
+Р•СЃР»Рё РїРѕСЃРјРѕС‚СЂРµС‚СЊ РЅР° РѕРїРёСЃР°РЅРёРµ СЃРѕСЃРµРґРЅРёС… С„СѓРЅРєС†РёР№ FsRtlXxx С‚Рѕ, РґР»СЏ РЅРµРєРѕС‚РѕСЂС‹С… СЏРІРЅРѕ 
+СѓРєР°Р·Р°РЅРѕ, С‡С‚Рѕ РѕРЅРё Р±СЂРѕСЃР°СЋС‚ РёСЃРєР»СЋС‡РµРЅРёРµ, РЅР°РїСЂРёРјРµСЂ:
                 </p>
                 <ul>
 <li><a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff545675(v=vs.85).aspx">FsRtlAllocatePoolWithTag</a> (<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff545651(v=vs.85).aspx">FsRtlAllocatePool</a>)</li>

@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Сюрпризы от Windows 10 build 17133: новый системный процесс Registry</title>
+<title>EreTIk's Box &raquo; РЎСЋСЂРїСЂРёР·С‹ РѕС‚ Windows 10 build 17133: РЅРѕРІС‹Р№ СЃРёСЃС‚РµРјРЅС‹Р№ РїСЂРѕС†РµСЃСЃ Registry</title>
 <meta name="keywords" content="EreTIk, kernel, Windows Windows 10, Windows 10 build 17133, Registry, CmpRegistryProcess" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Сюрпризы от Windows 10 build 17133: новый системный процесс Registry
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РЎСЋСЂРїСЂРёР·С‹ РѕС‚ Windows 10 build 17133: РЅРѕРІС‹Р№ СЃРёСЃС‚РµРјРЅС‹Р№ РїСЂРѕС†РµСЃСЃ Registry
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,11 +48,11 @@
         <div id="content">
             <br />
                 <p>
-<a href="29.html">Вторым</a> сюрпризом Windows 10 build 17133, который я хочу описать, стал 
-новый системный процесс Registry. Лично меня сильно удивило, что теперь при 
-старте BOOT-драйвера есть не только процессы 
+<a href="29.html">Р’С‚РѕСЂС‹Рј</a> СЃСЋСЂРїСЂРёР·РѕРј Windows 10 build 17133, РєРѕС‚РѕСЂС‹Р№ СЏ С…РѕС‡Сѓ РѕРїРёСЃР°С‚СЊ, СЃС‚Р°Р» 
+РЅРѕРІС‹Р№ СЃРёСЃС‚РµРјРЅС‹Р№ РїСЂРѕС†РµСЃСЃ Registry. Р›РёС‡РЅРѕ РјРµРЅСЏ СЃРёР»СЊРЅРѕ СѓРґРёРІРёР»Рѕ, С‡С‚Рѕ С‚РµРїРµСЂСЊ РїСЂРё 
+СЃС‚Р°СЂС‚Рµ BOOT-РґСЂР°Р№РІРµСЂР° РµСЃС‚СЊ РЅРµ С‚РѕР»СЊРєРѕ РїСЂРѕС†РµСЃСЃС‹ 
 <a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/mm64bitphysicaladdress">PsInitialSystemProcess</a>
-и nt!PsIdleProcess, но и новый процесс Registry:
+Рё nt!PsIdleProcess, РЅРѕ Рё РЅРѕРІС‹Р№ РїСЂРѕС†РµСЃСЃ Registry:
                 </p>
             <br />
                 <div class="code">
@@ -121,7 +121,7 @@ PROCESS 89b20a00  SessionId: none  Cid: 0058    Peb: 00000000  ParentCid: 0004
                 </div>
             <br />
                 <p>
-Адрес нового процесса хранится в не-экспортируемой переменной ядра CmpRegistryProcess:
+РђРґСЂРµСЃ РЅРѕРІРѕРіРѕ РїСЂРѕС†РµСЃСЃР° С…СЂР°РЅРёС‚СЃСЏ РІ РЅРµ-СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ СЏРґСЂР° CmpRegistryProcess:
                 </p>
                 <div class="code">
 .data:00688DB0 _CmpRegistryProcess dd ?                ; DATA XREF: CmSiProcessTupleInitialize(x)|w
@@ -134,16 +134,16 @@ PROCESS 89b20a00  SessionId: none  Cid: 0058    Peb: 00000000  ParentCid: 0004
                 </div>
             <br />
                 <p>
-По перекрестным ссылкам и boot-log'у (см. картинку ниже) видно, что в этот 
-процесс, как минимум, перенесен код работы с hive- файлами реестра:
+РџРѕ РїРµСЂРµРєСЂРµСЃС‚РЅС‹Рј СЃСЃС‹Р»РєР°Рј Рё boot-log'Сѓ (СЃРј. РєР°СЂС‚РёРЅРєСѓ РЅРёР¶Рµ) РІРёРґРЅРѕ, С‡С‚Рѕ РІ СЌС‚РѕС‚ 
+РїСЂРѕС†РµСЃСЃ, РєР°Рє РјРёРЅРёРјСѓРј, РїРµСЂРµРЅРµСЃРµРЅ РєРѕРґ СЂР°Р±РѕС‚С‹ СЃ hive- С„Р°Р№Р»Р°РјРё СЂРµРµСЃС‚СЂР°:
                 </p>
                 <p>
 <img src="../images/17133_Registry_BootLog.png" alt="" />
                 </p>
             <br />
                 <p>
-Внешне процесс Registry похож на уже известный process MemCompression. Оба 
-этих процесса созданы вызовом не-экспортируемой функции PsCreateMinimalProcess:
+Р’РЅРµС€РЅРµ РїСЂРѕС†РµСЃСЃ Registry РїРѕС…РѕР¶ РЅР° СѓР¶Рµ РёР·РІРµСЃС‚РЅС‹Р№ process MemCompression. РћР±Р° 
+СЌС‚РёС… РїСЂРѕС†РµСЃСЃР° СЃРѕР·РґР°РЅС‹ РІС‹Р·РѕРІРѕРј РЅРµ-СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјРѕР№ С„СѓРЅРєС†РёРё PsCreateMinimalProcess:
                 </p>
                 <div class="code">
 PAGE:00815084 _PsCreateMinimalProcess@40 proc near    ; CODE XREF: SmFirstTimeInit(ulong,ulong)+35E|p
@@ -154,8 +154,8 @@ PAGE:00815084                                         ; VmCreateMemoryProcess(x,
                 </div>
             <br />
                 <p>
-Про Minimal процессы можно обзорно почитать в соотвествующей главе статьи про
-<a target="_blank" href="https://blogs.msdn.microsoft.com/wsl/2016/05/23/pico-process-overview/">Pico процессы</a>.
+РџСЂРѕ Minimal РїСЂРѕС†РµСЃСЃС‹ РјРѕР¶РЅРѕ РѕР±Р·РѕСЂРЅРѕ РїРѕС‡РёС‚Р°С‚СЊ РІ СЃРѕРѕС‚РІРµСЃС‚РІСѓСЋС‰РµР№ РіР»Р°РІРµ СЃС‚Р°С‚СЊРё РїСЂРѕ
+<a target="_blank" href="https://blogs.msdn.microsoft.com/wsl/2016/05/23/pico-process-overview/">Pico РїСЂРѕС†РµСЃСЃС‹</a>.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

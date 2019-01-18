@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Некоторые параметры командной строки отладчика</title>
+<title>EreTIk's Box &raquo; РќРµРєРѕС‚РѕСЂС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё РѕС‚Р»Р°РґС‡РёРєР°</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Некоторые параметры командной строки отладчика
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a> &raquo; РќРµРєРѕС‚РѕСЂС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё РѕС‚Р»Р°РґС‡РёРєР°
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,27 +48,27 @@
         <div id="content">
             <br />
                 <p>
-Ниже приведены некоторые параметры командной строки отладчика:
+РќРёР¶Рµ РїСЂРёРІРµРґРµРЅС‹ РЅРµРєРѕС‚РѕСЂС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё РѕС‚Р»Р°РґС‡РёРєР°:
                 </p>
             <br /><hr /><br />
 <div class="code">WinDbg.exe -I</div>
-<p>Установка WinDbg отладчиком по-умолчанию</p>
+<p>РЈСЃС‚Р°РЅРѕРІРєР° WinDbg РѕС‚Р»Р°РґС‡РёРєРѕРј РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ</p>
             <br /><hr /><br />
 <div class="code">WinDbg -z DUMP_FILE</div>
-<p>Открытие dump-файла падения с именем DUMP_FILE. В качестве файла можно указать обыкновенный PE-файл</p>
+<p>РћС‚РєСЂС‹С‚РёРµ dump-С„Р°Р№Р»Р° РїР°РґРµРЅРёСЏ СЃ РёРјРµРЅРµРј DUMP_FILE. Р’ РєР°С‡РµСЃС‚РІРµ С„Р°Р№Р»Р° РјРѕР¶РЅРѕ СѓРєР°Р·Р°С‚СЊ РѕР±С‹РєРЅРѕРІРµРЅРЅС‹Р№ PE-С„Р°Р№Р»</p>
             <br /><hr /><br />
-<p>Иногда бывает нужно скопировать файл с символами в директорию с исполняемым 
-файлом. Конечно, можно загрузить файл как dump-файл, набрать команду <b>lm</b> и 
-скопировать полное имя файла с символами. Но можно немного автоматизировать этот 
-процесс. Поэтому можно создать команду для 
-<a href="http://www.farmanager.com/" target="_blank">FAR’а</a>, которая выглядит 
-так:</p><br />
+<p>РРЅРѕРіРґР° Р±С‹РІР°РµС‚ РЅСѓР¶РЅРѕ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ С„Р°Р№Р» СЃ СЃРёРјРІРѕР»Р°РјРё РІ РґРёСЂРµРєС‚РѕСЂРёСЋ СЃ РёСЃРїРѕР»РЅСЏРµРјС‹Рј 
+С„Р°Р№Р»РѕРј. РљРѕРЅРµС‡РЅРѕ, РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» РєР°Рє dump-С„Р°Р№Р», РЅР°Р±СЂР°С‚СЊ РєРѕРјР°РЅРґСѓ <b>lm</b> Рё 
+СЃРєРѕРїРёСЂРѕРІР°С‚СЊ РїРѕР»РЅРѕРµ РёРјСЏ С„Р°Р№Р»Р° СЃ СЃРёРјРІРѕР»Р°РјРё. РќРѕ РјРѕР¶РЅРѕ РЅРµРјРЅРѕРіРѕ Р°РІС‚РѕРјР°С‚РёР·РёСЂРѕРІР°С‚СЊ СЌС‚РѕС‚ 
+РїСЂРѕС†РµСЃСЃ. РџРѕСЌС‚РѕРјСѓ РјРѕР¶РЅРѕ СЃРѕР·РґР°С‚СЊ РєРѕРјР°РЅРґСѓ РґР»СЏ 
+<a href="http://www.farmanager.com/" target="_blank">FARвЂ™Р°</a>, РєРѕС‚РѕСЂР°СЏ РІС‹РіР»СЏРґРёС‚ 
+С‚Р°Рє:</p><br />
 <div class="code">@start WinDbg -z !.! -c ".reload; .copysym .\; q"</div>
-<p>Где <b>!.!</b> - метасимвол FAR’а, интерпретируемый как полный путь к 
-выбранному файлу. А для копирования файла символов использована 
-<a href="http://msdn.microsoft.com/en-us/library/ff562262%28VS.85%29.aspx" target="_blank">команда WinDbg .copysym</a>.
-Важно помнить, что WinDbg не перезаписывает существующий файл символов при 
-копировании.</p>
+<p>Р“РґРµ <b>!.!</b> - РјРµС‚Р°СЃРёРјРІРѕР» FARвЂ™Р°, РёРЅС‚РµСЂРїСЂРµС‚РёСЂСѓРµРјС‹Р№ РєР°Рє РїРѕР»РЅС‹Р№ РїСѓС‚СЊ Рє 
+РІС‹Р±СЂР°РЅРЅРѕРјСѓ С„Р°Р№Р»Сѓ. Рђ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёСЏ С„Р°Р№Р»Р° СЃРёРјРІРѕР»РѕРІ РёСЃРїРѕР»СЊР·РѕРІР°РЅР° 
+<a href="http://msdn.microsoft.com/en-us/library/ff562262%28VS.85%29.aspx" target="_blank">РєРѕРјР°РЅРґР° WinDbg .copysym</a>.
+Р’Р°Р¶РЅРѕ РїРѕРјРЅРёС‚СЊ, С‡С‚Рѕ WinDbg РЅРµ РїРµСЂРµР·Р°РїРёСЃС‹РІР°РµС‚ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ С„Р°Р№Р» СЃРёРјРІРѕР»РѕРІ РїСЂРё 
+РєРѕРїРёСЂРѕРІР°РЅРёРё.</p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>
 </td></tr></table>

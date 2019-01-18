@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Таблица разрешенных символов в именах файлов для разных файловых систем</title>
-<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, имя файла, NTFS, FAT, FASTFAT, символы имени файла" />
+<title>EreTIk's Box &raquo; РўР°Р±Р»РёС†Р° СЂР°Р·СЂРµС€РµРЅРЅС‹С… СЃРёРјРІРѕР»РѕРІ РІ РёРјРµРЅР°С… С„Р°Р№Р»РѕРІ РґР»СЏ СЂР°Р·РЅС‹С… С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, РёРјСЏ С„Р°Р№Р»Р°, NTFS, FAT, FASTFAT, СЃРёРјРІРѕР»С‹ РёРјРµРЅРё С„Р°Р№Р»Р°" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
 <script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Таблица разрешенных символов в именах файлов для разных файловых систем
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РўР°Р±Р»РёС†Р° СЂР°Р·СЂРµС€РµРЅРЅС‹С… СЃРёРјРІРѕР»РѕРІ РІ РёРјРµРЅР°С… С„Р°Р№Р»РѕРІ РґР»СЏ СЂР°Р·РЅС‹С… С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,35 +48,35 @@
         <div id="content">
             <br />
                 <p>
-Эти данные располагаются в ядре, в массиве (0x80 элементов), на который указывет 
-<b>nt!FsRtlLegalAnsiCharacterArray</b>. Индекс элемента массива в нем является 
-численным значением символа. Каждый элемент – маска флагов, сигнализирующая: 
-для каких файловых систем разрешено использовать символ в имени файла.
+Р­С‚Рё РґР°РЅРЅС‹Рµ СЂР°СЃРїРѕР»Р°РіР°СЋС‚СЃСЏ РІ СЏРґСЂРµ, РІ РјР°СЃСЃРёРІРµ (0x80 СЌР»РµРјРµРЅС‚РѕРІ), РЅР° РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·С‹РІРµС‚ 
+<b>nt!FsRtlLegalAnsiCharacterArray</b>. РРЅРґРµРєСЃ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР° РІ РЅРµРј СЏРІР»СЏРµС‚СЃСЏ 
+С‡РёСЃР»РµРЅРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј СЃРёРјРІРѕР»Р°. РљР°Р¶РґС‹Р№ СЌР»РµРјРµРЅС‚ вЂ“ РјР°СЃРєР° С„Р»Р°РіРѕРІ, СЃРёРіРЅР°Р»РёР·РёСЂСѓСЋС‰Р°СЏ: 
+РґР»СЏ РєР°РєРёС… С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј СЂР°Р·СЂРµС€РµРЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃРёРјРІРѕР» РІ РёРјРµРЅРё С„Р°Р№Р»Р°.
                 </p>
                 <p>
-Флаги:
+Р¤Р»Р°РіРё:
                 </p>
 <ul>
   <li>
-    <b>0x01</b> - символ разрешен к использованию на файловой системе FAT
+    <b>0x01</b> - СЃРёРјРІРѕР» СЂР°Р·СЂРµС€РµРЅ Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЋ РЅР° С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ FAT
   </li>
   <li>
-    <b>0x02</b> - символ разрешен к использованию на файловой системе HPFS
+    <b>0x02</b> - СЃРёРјРІРѕР» СЂР°Р·СЂРµС€РµРЅ Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЋ РЅР° С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ HPFS
   </li>
   <li>
-    <b>0x04</b> - символ разрешен к использованию на файловой системе NTFS
+    <b>0x04</b> - СЃРёРјРІРѕР» СЂР°Р·СЂРµС€РµРЅ Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЋ РЅР° С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ NTFS
   </li>
   <li>
-    <b>0x08</b> - разрешен к использованию в качестве WILD-символа (задание маски)
+    <b>0x08</b> - СЂР°Р·СЂРµС€РµРЅ Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЋ РІ РєР°С‡РµСЃС‚РІРµ WILD-СЃРёРјРІРѕР»Р° (Р·Р°РґР°РЅРёРµ РјР°СЃРєРё)
   </li>
   <li>
-    <b>0x10</b> - символ разрешен к использованию на файловой системе NTFS в имени потока (stream)
+    <b>0x10</b> - СЃРёРјРІРѕР» СЂР°Р·СЂРµС€РµРЅ Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЋ РЅР° С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ NTFS РІ РёРјРµРЅРё РїРѕС‚РѕРєР° (stream)
   </li>
 </ul>
 <br />
-<p>Таблица взята из ядра Windows (актуальность проверена на линейке Windows 2000-Seven):</p>
+<p>РўР°Р±Р»РёС†Р° РІР·СЏС‚Р° РёР· СЏРґСЂР° Windows (Р°РєС‚СѓР°Р»СЊРЅРѕСЃС‚СЊ РїСЂРѕРІРµСЂРµРЅР° РЅР° Р»РёРЅРµР№РєРµ Windows 2000-Seven):</p>
   <table border="1">
-<tr><td>Символ</td><td>FAT</td><td>HPFS</td><td>NTFS</td><td>NTFS:Stream</td><td>WILD</td></tr>
+<tr><td>РЎРёРјРІРѕР»</td><td>FAT</td><td>HPFS</td><td>NTFS</td><td>NTFS:Stream</td><td>WILD</td></tr>
 <tr><td>0x00 ^@       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
 <tr><td>0x01 ^A       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
 <tr><td>0x02 ^B       </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
@@ -169,9 +169,10 @@
 <tr><td>0x59 Y        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
 <tr><td>0x5A Z        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
 <tr><td>0x5B [        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
-<tr><td>0x5C backslash</td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
-<tr><td>0x5D ]        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
-<tr><td>0x5E ^        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5C backslash</td><td><img src="../images/deny_rd_cr.png" alt="X" /cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5A Z        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5B [        </td><td><img src="../images/deny_rd_cr.png" alt="X" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
+<tr><td>0x5C backslash</td><td><img src="../images/deny_rd_cr.png" alt="X" /="X" /></td></tr>
 <tr><td>0x5F _        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
 <tr><td>0x60 `        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>
 <tr><td>0x61 a        </td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/OK_gr_cr.png" alt="V" /></td><td><img src="../images/deny_rd_cr.png" alt="X" /></td></tr>

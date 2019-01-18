@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Нотификация проверки цифровой подписи файла драйвера</title>
-<meta name="keywords" content="EreTIk, kernel, ring0, driver development, KeNumberProcessors, nt!KeNumberProcessors, KeGetCurrentProcessorNumber, функции kdexts!GetProcessorCount " />
+<title>EreTIk's Box &raquo; РќРѕС‚РёС„РёРєР°С†РёСЏ РїСЂРѕРІРµСЂРєРё С†РёС„СЂРѕРІРѕР№ РїРѕРґРїРёСЃРё С„Р°Р№Р»Р° РґСЂР°Р№РІРµСЂР°</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, KeNumberProcessors, nt!KeNumberProcessors, KeGetCurrentProcessorNumber, С„СѓРЅРєС†РёРё kdexts!GetProcessorCount " />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
 <script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Нотификация проверки цифровой подписи файла драйвера
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РќРѕС‚РёС„РёРєР°С†РёСЏ РїСЂРѕРІРµСЂРєРё С†РёС„СЂРѕРІРѕР№ РїРѕРґРїРёСЃРё С„Р°Р№Р»Р° РґСЂР°Р№РІРµСЂР°
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,16 +48,16 @@
         <div id="content">
         <br />
             <div class="epigraph">
-<p>Сохнут волосы, метёт метла</p>
-<p>В кобуре мороза пистолет тепла</p>
-<p>Гражданская Оборона - "Тошнота"</p>
+<p>РЎРѕС…РЅСѓС‚ РІРѕР»РѕСЃС‹, РјРµС‚С‘С‚ РјРµС‚Р»Р°</p>
+<p>Р’ РєРѕР±СѓСЂРµ РјРѕСЂРѕР·Р° РїРёСЃС‚РѕР»РµС‚ С‚РµРїР»Р°</p>
+<p>Р“СЂР°Р¶РґР°РЅСЃРєР°СЏ РћР±РѕСЂРѕРЅР° - "РўРѕС€РЅРѕС‚Р°"</p>
             </div>
             <br />
                 <p>
-Одним из новшеств в Windows 8.1 стала нотификация (объект обратного вызова, 
-callback object) проверки цифровой подписи исполняемых файлов драйверов: 
-SeRegisterImageVerificationCallback(...) и SeUnregisterImageVerificationCallback(...). 
-Эти функции документированы в заголовочных файлах WDK 8.1:
+РћРґРЅРёРј РёР· РЅРѕРІС€РµСЃС‚РІ РІ Windows 8.1 СЃС‚Р°Р»Р° РЅРѕС‚РёС„РёРєР°С†РёСЏ (РѕР±СЉРµРєС‚ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР°, 
+callback object) РїСЂРѕРІРµСЂРєРё С†РёС„СЂРѕРІРѕР№ РїРѕРґРїРёСЃРё РёСЃРїРѕР»РЅСЏРµРјС‹С… С„Р°Р№Р»РѕРІ РґСЂР°Р№РІРµСЂРѕРІ: 
+SeRegisterImageVerificationCallback(...) Рё SeUnregisterImageVerificationCallback(...). 
+Р­С‚Рё С„СѓРЅРєС†РёРё РґРѕРєСѓРјРµРЅС‚РёСЂРѕРІР°РЅС‹ РІ Р·Р°РіРѕР»РѕРІРѕС‡РЅС‹С… С„Р°Р№Р»Р°С… WDK 8.1:
                 </p>
             <br />
                 <pre class="brush: cpp;">
@@ -114,85 +114,85 @@ SeUnregisterImageVerificationCallback (
 #endif
                 </pre>
                 <p>
-<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/hh406359(v=vs.85).aspx">Структура BDCB_IMAGE_INFORMATION</a>
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/hh406359(v=vs.85).aspx">РЎС‚СЂСѓРєС‚СѓСЂР° BDCB_IMAGE_INFORMATION</a>
                 </p>
             <br />
                 <p>
-Несмотря на такое детальное описание в заголовочном файле wdm.h, статьи описания 
-работы функций SeRegisterImageVerificationCallback(...) и 
-SeUnregisterImageVerificationCallback(...) просто нет. Хочу немного восполнить 
-этот пробел.
+РќРµСЃРјРѕС‚СЂСЏ РЅР° С‚Р°РєРѕРµ РґРµС‚Р°Р»СЊРЅРѕРµ РѕРїРёСЃР°РЅРёРµ РІ Р·Р°РіРѕР»РѕРІРѕС‡РЅРѕРј С„Р°Р№Р»Рµ wdm.h, СЃС‚Р°С‚СЊРё РѕРїРёСЃР°РЅРёСЏ 
+СЂР°Р±РѕС‚С‹ С„СѓРЅРєС†РёР№ SeRegisterImageVerificationCallback(...) Рё 
+SeUnregisterImageVerificationCallback(...) РїСЂРѕСЃС‚Рѕ РЅРµС‚. РҐРѕС‡Сѓ РЅРµРјРЅРѕРіРѕ РІРѕСЃРїРѕР»РЅРёС‚СЊ 
+СЌС‚РѕС‚ РїСЂРѕР±РµР».
                 </p>
             <br />
                 <p>
-Хотя функция регистрации SeRegisterImageVerificationCallback получает достаточно 
-много параметров, большинство из них просто проверяются на валидность и 
-не используются:
+РҐРѕС‚СЏ С„СѓРЅРєС†РёСЏ СЂРµРіРёСЃС‚СЂР°С†РёРё SeRegisterImageVerificationCallback РїРѕР»СѓС‡Р°РµС‚ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ 
+РјРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂРѕРІ, Р±РѕР»СЊС€РёРЅСЃС‚РІРѕ РёР· РЅРёС… РїСЂРѕСЃС‚Рѕ РїСЂРѕРІРµСЂСЏСЋС‚СЃСЏ РЅР° РІР°Р»РёРґРЅРѕСЃС‚СЊ Рё 
+РЅРµ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ:
                 </p>
 <ul>
-  <li><b>ImageType</b> == SeImageTypeDriver, иначе функция вернет STATUS_INVALID_PARAMETER_1</li>
-  <li><b>CallbackType</b> == SeImageVerificationCallbackInformational, иначе функция вернет STATUS_INVALID_PARAMETER_2</li>
-  <li><b>Token</b> == NULL, иначе функция вернет STATUS_INVALID_PARAMETER_5</li>
+  <li><b>ImageType</b> == SeImageTypeDriver, РёРЅР°С‡Рµ С„СѓРЅРєС†РёСЏ РІРµСЂРЅРµС‚ STATUS_INVALID_PARAMETER_1</li>
+  <li><b>CallbackType</b> == SeImageVerificationCallbackInformational, РёРЅР°С‡Рµ С„СѓРЅРєС†РёСЏ РІРµСЂРЅРµС‚ STATUS_INVALID_PARAMETER_2</li>
+  <li><b>Token</b> == NULL, РёРЅР°С‡Рµ С„СѓРЅРєС†РёСЏ РІРµСЂРЅРµС‚ STATUS_INVALID_PARAMETER_5</li>
 </ul>
             <br />
                 <p>
-То есть сейчас, фактически, функция принимает адрес функции обратного вызова, 
-контекст функции обратного вызова и возвращает описатель зарегистрированного 
-обратного вызова или статус ошибки.
+РўРѕ РµСЃС‚СЊ СЃРµР№С‡Р°СЃ, С„Р°РєС‚РёС‡РµСЃРєРё, С„СѓРЅРєС†РёСЏ РїСЂРёРЅРёРјР°РµС‚ Р°РґСЂРµСЃ С„СѓРЅРєС†РёРё РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР°, 
+РєРѕРЅС‚РµРєСЃС‚ С„СѓРЅРєС†РёРё РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РѕРїРёСЃР°С‚РµР»СЊ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅРѕРіРѕ 
+РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° РёР»Рё СЃС‚Р°С‚СѓСЃ РѕС€РёР±РєРё.
                 </p>
             <br />
                 <p>
-Хочется отметить, что сам объект нотификации имеет имя в дереве объектов: 
-"\Callback\SeImageVerificationDriverInfo". Так же есть не экспортируемый символ 
-объекта обратного вызова - <b>nt!ExCbSeImageVerificationDriverInfo</b>. Но 
-регистрировать нотификацию нужно именно <b>Se</b>-функциями: в ядре присутствует 
-счетчик, имя которого не включено в отладочную информацию. Но этот счетчик 
-атомарно инкрементируется при регистрации, декрементируется при де-регистрации 
-<b>Se</b>-функциями. Но самое важное - он проверяется на 0 перед вызовом самой 
-нотификации. Это, видимо, своеобразная оптимизация: если нет подписчиков 
-нотификации, то нет необходимости копировать структуру <b>BDCB_IMAGE_INFORMATION</b> 
-и ставить WORK_ITEM для вызова нотификации.
+РҐРѕС‡РµС‚СЃСЏ РѕС‚РјРµС‚РёС‚СЊ, С‡С‚Рѕ СЃР°Рј РѕР±СЉРµРєС‚ РЅРѕС‚РёС„РёРєР°С†РёРё РёРјРµРµС‚ РёРјСЏ РІ РґРµСЂРµРІРµ РѕР±СЉРµРєС‚РѕРІ: 
+"\Callback\SeImageVerificationDriverInfo". РўР°Рє Р¶Рµ РµСЃС‚СЊ РЅРµ СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹Р№ СЃРёРјРІРѕР» 
+РѕР±СЉРµРєС‚Р° РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° - <b>nt!ExCbSeImageVerificationDriverInfo</b>. РќРѕ 
+СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РЅРѕС‚РёС„РёРєР°С†РёСЋ РЅСѓР¶РЅРѕ РёРјРµРЅРЅРѕ <b>Se</b>-С„СѓРЅРєС†РёСЏРјРё: РІ СЏРґСЂРµ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ 
+СЃС‡РµС‚С‡РёРє, РёРјСЏ РєРѕС‚РѕСЂРѕРіРѕ РЅРµ РІРєР»СЋС‡РµРЅРѕ РІ РѕС‚Р»Р°РґРѕС‡РЅСѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ. РќРѕ СЌС‚РѕС‚ СЃС‡РµС‚С‡РёРє 
+Р°С‚РѕРјР°СЂРЅРѕ РёРЅРєСЂРµРјРµРЅС‚РёСЂСѓРµС‚СЃСЏ РїСЂРё СЂРµРіРёСЃС‚СЂР°С†РёРё, РґРµРєСЂРµРјРµРЅС‚РёСЂСѓРµС‚СЃСЏ РїСЂРё РґРµ-СЂРµРіРёСЃС‚СЂР°С†РёРё 
+<b>Se</b>-С„СѓРЅРєС†РёСЏРјРё. РќРѕ СЃР°РјРѕРµ РІР°Р¶РЅРѕРµ - РѕРЅ РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ РЅР° 0 РїРµСЂРµРґ РІС‹Р·РѕРІРѕРј СЃР°РјРѕР№ 
+РЅРѕС‚РёС„РёРєР°С†РёРё. Р­С‚Рѕ, РІРёРґРёРјРѕ, СЃРІРѕРµРѕР±СЂР°Р·РЅР°СЏ РѕРїС‚РёРјРёР·Р°С†РёСЏ: РµСЃР»Рё РЅРµС‚ РїРѕРґРїРёСЃС‡РёРєРѕРІ 
+РЅРѕС‚РёС„РёРєР°С†РёРё, С‚Рѕ РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РєРѕРїРёСЂРѕРІР°С‚СЊ СЃС‚СЂСѓРєС‚СѓСЂСѓ <b>BDCB_IMAGE_INFORMATION</b> 
+Рё СЃС‚Р°РІРёС‚СЊ WORK_ITEM РґР»СЏ РІС‹Р·РѕРІР° РЅРѕС‚РёС„РёРєР°С†РёРё.
                 </p>
             <br />
                 <p>
-Вторая особенность этой нотификации заключается в том, что вызов обработчиков 
-всегда происходит из WORK_ITEM'а, то есть не в контексте нити проверки подписи. 
-Оригинальная операция никак не блокируется, все данные копируются через пул. 
-Последовательность вызовов:
+Р’С‚РѕСЂР°СЏ РѕСЃРѕР±РµРЅРЅРѕСЃС‚СЊ СЌС‚РѕР№ РЅРѕС‚РёС„РёРєР°С†РёРё Р·Р°РєР»СЋС‡Р°РµС‚СЃСЏ РІ С‚РѕРј, С‡С‚Рѕ РІС‹Р·РѕРІ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ 
+РІСЃРµРіРґР° РїСЂРѕРёСЃС…РѕРґРёС‚ РёР· WORK_ITEM'Р°, С‚Рѕ РµСЃС‚СЊ РЅРµ РІ РєРѕРЅС‚РµРєСЃС‚Рµ РЅРёС‚Рё РїСЂРѕРІРµСЂРєРё РїРѕРґРїРёСЃРё. 
+РћСЂРёРіРёРЅР°Р»СЊРЅР°СЏ РѕРїРµСЂР°С†РёСЏ РЅРёРєР°Рє РЅРµ Р±Р»РѕРєРёСЂСѓРµС‚СЃСЏ, РІСЃРµ РґР°РЅРЅС‹Рµ РєРѕРїРёСЂСѓСЋС‚СЃСЏ С‡РµСЂРµР· РїСѓР». 
+РџРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ РІС‹Р·РѕРІРѕРІ:
                 </p>
 <ul>
   <li>MiValidateSectionCreate</li>
-  <li>SeValidateImageHeader (тут происходит проверка счетчика)</li>
+  <li>SeValidateImageHeader (С‚СѓС‚ РїСЂРѕРёСЃС…РѕРґРёС‚ РїСЂРѕРІРµСЂРєР° СЃС‡РµС‚С‡РёРєР°)</li>
   <li>SepScheduleImageVerificationCallbacks</li>
   <li>ExQueueWorkItem</li>
-  <li>...<b><i>миграция в другую нить</i></b>...</li>
+  <li>...<b><i>РјРёРіСЂР°С†РёСЏ РІ РґСЂСѓРіСѓСЋ РЅРёС‚СЊ</i></b>...</li>
   <li>SepImageVerificationCallbackWorker</li>
   <li>ExNotifyWithProcessing</li>
 </ul>
 <ol>
   <li>SepImageVerificationCallbackPreProcess</li>
-  <li><b><i>зарегистрированные обработчики нотификации</i></b></li>
+  <li><b><i>Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РѕР±СЂР°Р±РѕС‚С‡РёРєРё РЅРѕС‚РёС„РёРєР°С†РёРё</i></b></li>
 </ol>
             <br />
                 <p>
-Я думаю, что это сделано сознательно, что бы избежать взаимо-блокировок, так как 
-нотификация вызывается при загрузке файлов драйверов, сразу после работы 
-успешного вызова функции CI!CiValidateImageHeader. 
+РЇ РґСѓРјР°СЋ, С‡С‚Рѕ СЌС‚Рѕ СЃРґРµР»Р°РЅРѕ СЃРѕР·РЅР°С‚РµР»СЊРЅРѕ, С‡С‚Рѕ Р±С‹ РёР·Р±РµР¶Р°С‚СЊ РІР·Р°РёРјРѕ-Р±Р»РѕРєРёСЂРѕРІРѕРє, С‚Р°Рє РєР°Рє 
+РЅРѕС‚РёС„РёРєР°С†РёСЏ РІС‹Р·С‹РІР°РµС‚СЃСЏ РїСЂРё Р·Р°РіСЂСѓР·РєРµ С„Р°Р№Р»РѕРІ РґСЂР°Р№РІРµСЂРѕРІ, СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ СЂР°Р±РѕС‚С‹ 
+СѓСЃРїРµС€РЅРѕРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС†РёРё CI!CiValidateImageHeader. 
                 </p>
             <br />
                 <p>
-Хотя надо отметить, что в инсталляции "из коробки" Windows 8.1 имеет 
-зарегистрированный нотификатор WdFilter!MpImageVerificationCallback. При 
-изучении содержимого WdFilter.sys стоит учитывать, что адреса функций 
-SeRegisterImageVerificationCallback(...) и SeUnregisterImageVerificationCallback(...) 
-получаются вызовом 
+РҐРѕС‚СЏ РЅР°РґРѕ РѕС‚РјРµС‚РёС‚СЊ, С‡С‚Рѕ РІ РёРЅСЃС‚Р°Р»Р»СЏС†РёРё "РёР· РєРѕСЂРѕР±РєРё" Windows 8.1 РёРјРµРµС‚ 
+Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Р№ РЅРѕС‚РёС„РёРєР°С‚РѕСЂ WdFilter!MpImageVerificationCallback. РџСЂРё 
+РёР·СѓС‡РµРЅРёРё СЃРѕРґРµСЂР¶РёРјРѕРіРѕ WdFilter.sys СЃС‚РѕРёС‚ СѓС‡РёС‚С‹РІР°С‚СЊ, С‡С‚Рѕ Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№ 
+SeRegisterImageVerificationCallback(...) Рё SeUnregisterImageVerificationCallback(...) 
+РїРѕР»СѓС‡Р°СЋС‚СЃСЏ РІС‹Р·РѕРІРѕРј 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff554563(v=vs.85).aspx">MmGetSystemRoutineAddress(...)</a>, 
-(функция WdFilter!MpSetImageVerificationCallback).
+(С„СѓРЅРєС†РёСЏ WdFilter!MpSetImageVerificationCallback).
                 </p>
             <br />
                 <p>
-Для теста я тоже набросал драйвер, получающий нотификацию проверки цифровой 
-подписи и печатающий входные данные. Получилось что-то такое:
+Р”Р»СЏ С‚РµСЃС‚Р° СЏ С‚РѕР¶Рµ РЅР°Р±СЂРѕСЃР°Р» РґСЂР°Р№РІРµСЂ, РїРѕР»СѓС‡Р°СЋС‰РёР№ РЅРѕС‚РёС„РёРєР°С†РёСЋ РїСЂРѕРІРµСЂРєРё С†РёС„СЂРѕРІРѕР№ 
+РїРѕРґРїРёСЃРё Рё РїРµС‡Р°С‚Р°СЋС‰РёР№ РІС…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ. РџРѕР»СѓС‡РёР»РѕСЃСЊ С‡С‚Рѕ-С‚Рѕ С‚Р°РєРѕРµ:
                 </p>
             <br />
                 <div class="code">

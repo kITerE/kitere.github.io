@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Открытие описателя объекта нити процесса SYSTEM из процесса с правами администратора (Windows 7)</title>
+<title>EreTIk's Box &raquo; РћС‚РєСЂС‹С‚РёРµ РѕРїРёСЃР°С‚РµР»СЏ РѕР±СЉРµРєС‚Р° РЅРёС‚Рё РїСЂРѕС†РµСЃСЃР° SYSTEM РёР· РїСЂРѕС†РµСЃСЃР° СЃ РїСЂР°РІР°РјРё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° (Windows 7)</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver, _EPROCESS, _ETHREAD, Protedted Process, PspThreadOpen, NtOpenThread, Pico, PicoContext" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Открытие описателя объекта нити процесса SYSTEM из процесса с правами администратора (Windows 7)
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РћС‚РєСЂС‹С‚РёРµ РѕРїРёСЃР°С‚РµР»СЏ РѕР±СЉРµРєС‚Р° РЅРёС‚Рё РїСЂРѕС†РµСЃСЃР° SYSTEM РёР· РїСЂРѕС†РµСЃСЃР° СЃ РїСЂР°РІР°РјРё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° (Windows 7)
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,17 +48,17 @@
         <div id="content">
             <br />
                 <p>
-Исходные данные: Windows 7, процесс, работающий от лица администратора и нить 
-процесса SYSTEM
+РСЃС…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ: Windows 7, РїСЂРѕС†РµСЃСЃ, СЂР°Р±РѕС‚Р°СЋС‰РёР№ РѕС‚ Р»РёС†Р° Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° Рё РЅРёС‚СЊ 
+РїСЂРѕС†РµСЃСЃР° SYSTEM
                 </p>
             <br />
                 <p>
-Проблема: при попытке открытия нити получаем STATUS_ACCESS_DENIED
+РџСЂРѕР±Р»РµРјР°: РїСЂРё РїРѕРїС‹С‚РєРµ РѕС‚РєСЂС‹С‚РёСЏ РЅРёС‚Рё РїРѕР»СѓС‡Р°РµРј STATUS_ACCESS_DENIED
                 </p>
             <br />
                 <p>
-Расследование: Security Descriptor нити позволяет ее отрывать с достачно 
-широкими правами:
+Р Р°СЃСЃР»РµРґРѕРІР°РЅРёРµ: Security Descriptor РЅРёС‚Рё РїРѕР·РІРѕР»СЏРµС‚ РµРµ РѕС‚СЂС‹РІР°С‚СЊ СЃ РґРѕСЃС‚Р°С‡РЅРѕ 
+С€РёСЂРѕРєРёРјРё РїСЂР°РІР°РјРё:
                 </p>
                 <div class="code">
 0: kd&gt; !process poi(nt!PsInitialSustemProcess) 3
@@ -148,9 +148,9 @@ Object: fffffa800bcff040  Type: (fffffa8006cafbc0) Thread
                 </div>
             <br />
                 <p>
-Трассируем nt!NtOpenThread до функции nt!ObpIncrementHandleCountEx, которая 
-вызывает обработчик nt!PspThreadOpen (обработчик создания описателей объектов, типа 
-"нить"). В теле nt!PspThreadOpen видим (псевдо-код):
+РўСЂР°СЃСЃРёСЂСѓРµРј nt!NtOpenThread РґРѕ С„СѓРЅРєС†РёРё nt!ObpIncrementHandleCountEx, РєРѕС‚РѕСЂР°СЏ 
+РІС‹Р·С‹РІР°РµС‚ РѕР±СЂР°Р±РѕС‚С‡РёРє nt!PspThreadOpen (РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕР·РґР°РЅРёСЏ РѕРїРёСЃР°С‚РµР»РµР№ РѕР±СЉРµРєС‚РѕРІ, С‚РёРїР° 
+"РЅРёС‚СЊ"). Р’ С‚РµР»Рµ nt!PspThreadOpen РІРёРґРёРј (РїСЃРµРІРґРѕ-РєРѕРґ):
                 </p>
                 <pre class="brush: cpp;">
 NTSTATUS __stdcall PspThreadOpen(&lt;...&gt;)
@@ -168,7 +168,7 @@ NTSTATUS __stdcall PspThreadOpen(&lt;...&gt;)
                 </pre>
             <br />
                 <p>
-Маска 0x800 - проверка флага защищенного процесса. А процесс SYSTEM как раз защищенный:
+РњР°СЃРєР° 0x800 - РїСЂРѕРІРµСЂРєР° С„Р»Р°РіР° Р·Р°С‰РёС‰РµРЅРЅРѕРіРѕ РїСЂРѕС†РµСЃСЃР°. Рђ РїСЂРѕС†РµСЃСЃ SYSTEM РєР°Рє СЂР°Р· Р·Р°С‰РёС‰РµРЅРЅС‹Р№:
                 </p>
                 <div class="code">
 1: kd&gt; dt nt!_EPROCESS poi(nt!PsInitialSystemProcess) ProtectedProcess
@@ -176,26 +176,26 @@ NTSTATUS __stdcall PspThreadOpen(&lt;...&gt;)
                 </div>
             <br />
                 <p>
-Именно из-за этого и ошибка.
+РРјРµРЅРЅРѕ РёР·-Р·Р° СЌС‚РѕРіРѕ Рё РѕС€РёР±РєР°.
                 </p>
             <br />
                 <p>
-Ссылки по protected-процессам:
+РЎСЃС‹Р»РєРё РїРѕ protected-РїСЂРѕС†РµСЃСЃР°Рј:
                 </p>
                 <ul>
 <li><a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863(v=vs.85).aspx#CREATE_PROTECTED_PROCESS">MSDN: Process Creation Flags - CREATE_PROTECTED_PROCESS</a></li>
 <li><a target="_blank" href="https://technet.microsoft.com/en-us/magazine/2007.04.vistakernel.aspx">TechNet: Inside the Windows Vista Kernel: Part 3 - Protected Processes</a></li>
 <li><a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/desktop/dn313124(v=vs.85).aspx">MSDN: Protecting Anti-Malware Services</a></li>
-<li>И ряд постов из блога Alex Ionescu: <a target="_blank" href="http://www.alex-ionescu.com/?p=34">Why Protected Processes Are A Bad Idea</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=97">The Evolution of Protected Processes Part 1: Pass-the-Hash Mitigations in Windows 8.1</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=116">The Evolution of Protected Processes Part 2: Exploit/Jailbreak Mitigations, Unkillable Processes and Protected Services</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=146">Protected Processes Part 3 : Windows PKI Internals</a></li>
+<li>Р СЂСЏРґ РїРѕСЃС‚РѕРІ РёР· Р±Р»РѕРіР° Alex Ionescu: <a target="_blank" href="http://www.alex-ionescu.com/?p=34">Why Protected Processes Are A Bad Idea</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=97">The Evolution of Protected Processes Part 1: Pass-the-Hash Mitigations in Windows 8.1</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=116">The Evolution of Protected Processes Part 2: Exploit/Jailbreak Mitigations, Unkillable Processes and Protected Services</a>, <a target="_blank" href="http://www.alex-ionescu.com/?p=146">Protected Processes Part 3 : Windows PKI Internals</a></li>
                 </ul>
             <br />
                 <a name="UPD_30_09_2016"></a>
                 <h2>Updated (30.09.2016)</h2>
             <br />
                 <p>
-Все вышеперечисленное ограничения на открытие описателей касаются, в том числе, 
-и объекта процесса. Например на Windows 7 за создание описателя на процесс 
-отвечает PspProcessOpen с таким псевдо-кодом:
+Р’СЃРµ РІС‹С€РµРїРµСЂРµС‡РёСЃР»РµРЅРЅРѕРµ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ РЅР° РѕС‚РєСЂС‹С‚РёРµ РѕРїРёСЃР°С‚РµР»РµР№ РєР°СЃР°СЋС‚СЃСЏ, РІ С‚РѕРј С‡РёСЃР»Рµ, 
+Рё РѕР±СЉРµРєС‚Р° РїСЂРѕС†РµСЃСЃР°. РќР°РїСЂРёРјРµСЂ РЅР° Windows 7 Р·Р° СЃРѕР·РґР°РЅРёРµ РѕРїРёСЃР°С‚РµР»СЏ РЅР° РїСЂРѕС†РµСЃСЃ 
+РѕС‚РІРµС‡Р°РµС‚ PspProcessOpen СЃ С‚Р°РєРёРј РїСЃРµРІРґРѕ-РєРѕРґРѕРј:
                 </p>
                 <pre class="brush: cpp;">
   if ( PrevMode == 1
@@ -207,10 +207,10 @@ NTSTATUS __stdcall PspThreadOpen(&lt;...&gt;)
   }
                 </pre>
                 <p>
-Но с приходом Windows 10.0.14393 в ядре появилась поддержка Linux-процессов 
-(Windows Subsystem for Linux, WSL), которые называются 
-<a target="_blank" href="https://blogs.msdn.microsoft.com/wsl/2016/05/23/pico-process-overview/">Pico-процессами</a>. 
-И эти PICO-процессы обрабатываются по аналогии с защищенными процессами (псевдо-кодо из Windows 10.0.14393):
+РќРѕ СЃ РїСЂРёС…РѕРґРѕРј Windows 10.0.14393 РІ СЏРґСЂРµ РїРѕСЏРІРёР»Р°СЃСЊ РїРѕРґРґРµСЂР¶РєР° Linux-РїСЂРѕС†РµСЃСЃРѕРІ 
+(Windows Subsystem for Linux, WSL), РєРѕС‚РѕСЂС‹Рµ РЅР°Р·С‹РІР°СЋС‚СЃСЏ 
+<a target="_blank" href="https://blogs.msdn.microsoft.com/wsl/2016/05/23/pico-process-overview/">Pico-РїСЂРѕС†РµСЃСЃР°РјРё</a>. 
+Р СЌС‚Рё PICO-РїСЂРѕС†РµСЃСЃС‹ РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ РїРѕ Р°РЅР°Р»РѕРіРёРё СЃ Р·Р°С‰РёС‰РµРЅРЅС‹РјРё РїСЂРѕС†РµСЃСЃР°РјРё (РїСЃРµРІРґРѕ-РєРѕРґРѕ РёР· Windows 10.0.14393):
                 </p>
 <ul><li>PspThreadOpen</li></ul>
                 <pre class="brush: cpp;">
@@ -241,12 +241,12 @@ Evaluate expression: 1050625 = 00000000`00100801
 Evaluate expression: 1052673 = 00000000`00101001
                 </div>
                 <p>
-То есть из Win32-процесса (не Pico) можно открыть объект Pico-процесса максимум с 
-правами <b>PROCESS_TERMINATE</b> | <b>PROCESS_QUERY_LIMITED_INFORMATION</b> | <b>SYNCHRONIZE</b>. 
+РўРѕ РµСЃС‚СЊ РёР· Win32-РїСЂРѕС†РµСЃСЃР° (РЅРµ Pico) РјРѕР¶РЅРѕ РѕС‚РєСЂС‹С‚СЊ РѕР±СЉРµРєС‚ Pico-РїСЂРѕС†РµСЃСЃР° РјР°РєСЃРёРјСѓРј СЃ 
+РїСЂР°РІР°РјРё <b>PROCESS_TERMINATE</b> | <b>PROCESS_QUERY_LIMITED_INFORMATION</b> | <b>SYNCHRONIZE</b>. 
                 </p>
                 <p>
-А из Win32-процесса (не Pico) можно открыть объект нити Pico-процесса максимум с 
-правами <b>THREAD_TERMINATE</b> | <b>THREAD_QUERY_LIMITED_INFORMATION</b> | <b>SYNCHRONIZE</b>.
+Рђ РёР· Win32-РїСЂРѕС†РµСЃСЃР° (РЅРµ Pico) РјРѕР¶РЅРѕ РѕС‚РєСЂС‹С‚СЊ РѕР±СЉРµРєС‚ РЅРёС‚Рё Pico-РїСЂРѕС†РµСЃСЃР° РјР°РєСЃРёРјСѓРј СЃ 
+РїСЂР°РІР°РјРё <b>THREAD_TERMINATE</b> | <b>THREAD_QUERY_LIMITED_INFORMATION</b> | <b>SYNCHRONIZE</b>.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

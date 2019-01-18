@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Получение таблицы обработчиков RPC-сервера: скрипт для WinDbg</title>
-<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, RPC-server, RPC сервер, скрипт WinDbg" />
+<title>EreTIk's Box &raquo; РџРѕР»СѓС‡РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ RPC-СЃРµСЂРІРµСЂР°: СЃРєСЂРёРїС‚ РґР»СЏ WinDbg</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, RPC-server, RPC СЃРµСЂРІРµСЂ, СЃРєСЂРёРїС‚ WinDbg" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
 <script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Получение таблицы обработчиков RPC-сервера: скрипт для WinDbg
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a> &raquo; РџРѕР»СѓС‡РµРЅРёРµ С‚Р°Р±Р»РёС†С‹ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ RPC-СЃРµСЂРІРµСЂР°: СЃРєСЂРёРїС‚ РґР»СЏ WinDbg
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -49,23 +49,23 @@
 <a href="../download/DCMD/RpcServer_IfHandle.rar"><img src="../images/download.png" alt="Download RpcServer_IfHandle" align="right" /></a>
               <br />
                 <p>
-Довольно часто, во время исследования внутренних механизмов Windows, возникает 
-необходимость исследования RPC-NDR взаимодействия процессов. В этой небольшой 
-заметке я расскажу о скрипте для WinDbg, который может упростить жизнь при 
-исследовании RPC-сервера.
+Р”РѕРІРѕР»СЊРЅРѕ С‡Р°СЃС‚Рѕ, РІРѕ РІСЂРµРјСЏ РёСЃСЃР»РµРґРѕРІР°РЅРёСЏ РІРЅСѓС‚СЂРµРЅРЅРёС… РјРµС…Р°РЅРёР·РјРѕРІ Windows, РІРѕР·РЅРёРєР°РµС‚ 
+РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РёСЃСЃР»РµРґРѕРІР°РЅРёСЏ RPC-NDR РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РїСЂРѕС†РµСЃСЃРѕРІ. Р’ СЌС‚РѕР№ РЅРµР±РѕР»СЊС€РѕР№ 
+Р·Р°РјРµС‚РєРµ СЏ СЂР°СЃСЃРєР°Р¶Сѓ Рѕ СЃРєСЂРёРїС‚Рµ РґР»СЏ WinDbg, РєРѕС‚РѕСЂС‹Р№ РјРѕР¶РµС‚ СѓРїСЂРѕСЃС‚РёС‚СЊ Р¶РёР·РЅСЊ РїСЂРё 
+РёСЃСЃР»РµРґРѕРІР°РЅРёРё RPC-СЃРµСЂРІРµСЂР°.
                 </p>
               <br />
                 <p>
-Для примера возьмем RPC сервер 
+Р”Р»СЏ РїСЂРёРјРµСЂР° РІРѕР·СЊРјРµРј RPC СЃРµСЂРІРµСЂ 
 <a href="http://msdn.microsoft.com/en-us/library/ms685150%28VS.85%29.aspx" target="_blank">Service Control Manager (SCM)</a>. 
-<b>Задача:</b> получить список функций RPC-сервера <b><i>ntsvcs/svcctl</i></b>. В 
-качестве экспериментального стенда я использовал виртуальную машину VMWare 
-с установленной MS Windows 2003 SP2 и подключенным отладчиком WinDbg.
+<b>Р—Р°РґР°С‡Р°:</b> РїРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє С„СѓРЅРєС†РёР№ RPC-СЃРµСЂРІРµСЂР° <b><i>ntsvcs/svcctl</i></b>. Р’ 
+РєР°С‡РµСЃС‚РІРµ СЌРєСЃРїРµСЂРёРјРµРЅС‚Р°Р»СЊРЅРѕРіРѕ СЃС‚РµРЅРґР° СЏ РёСЃРїРѕР»СЊР·РѕРІР°Р» РІРёСЂС‚СѓР°Р»СЊРЅСѓСЋ РјР°С€РёРЅСѓ VMWare 
+СЃ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕР№ MS Windows 2003 SP2 Рё РїРѕРґРєР»СЋС‡РµРЅРЅС‹Рј РѕС‚Р»Р°РґС‡РёРєРѕРј WinDbg.
                 </p>
               <br />
                 <p>
-Итак, дожидаемся запуска процесса <b>services.exe</b> и устанавливаем точку 
-останова на регистрацию нового RPC-сервера:
+РС‚Р°Рє, РґРѕР¶РёРґР°РµРјСЃСЏ Р·Р°РїСѓСЃРєР° РїСЂРѕС†РµСЃСЃР° <b>services.exe</b> Рё СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С‚РѕС‡РєСѓ 
+РѕСЃС‚Р°РЅРѕРІР° РЅР° СЂРµРіРёСЃС‚СЂР°С†РёСЋ РЅРѕРІРѕРіРѕ RPC-СЃРµСЂРІРµСЂР°:
                 </p>
             <br />
                 <div class="code">
@@ -73,21 +73,21 @@ ba e 1 RPCRT4!RpcServerRegisterIfEx
                 </div>
               <br />
                 <p>
-Первый параметр функции <b>rpcrt4!RpcServerRegisterIfEx(...)</b> – указатель на 
-<b>_RPC_SERVER_INTERFACE</b>. Это и есть интересующий нас адрес. В этой 
-структуре нас интересуют 2-а поля: 
+РџРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ С„СѓРЅРєС†РёРё <b>rpcrt4!RpcServerRegisterIfEx(...)</b> вЂ“ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° 
+<b>_RPC_SERVER_INTERFACE</b>. Р­С‚Рѕ Рё РµСЃС‚СЊ РёРЅС‚РµСЂРµСЃСѓСЋС‰РёР№ РЅР°СЃ Р°РґСЂРµСЃ. Р’ СЌС‚РѕР№ 
+СЃС‚СЂСѓРєС‚СѓСЂРµ РЅР°СЃ РёРЅС‚РµСЂРµСЃСѓСЋС‚ 2-Р° РїРѕР»СЏ: 
                 </p>
                 <ul>
-<li> <b><i>DispatchTable</i></b> – указатель на структуру <b>RPC_DISPATCH_TABLE</b>, в первом ULONG’е которой хранится количество функций обработчиков.</li>
-<li> <b><i>InterpreterInfo</i></b> – указатель на структуру <b>_MIDL_SERVER_INFO_</b>. Второе поле структуры MIDL-информации (смещение sizeof(PVOID)) содержится адрес массива обработчиков RPC-сервера.</li>
+<li> <b><i>DispatchTable</i></b> вЂ“ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂСѓРєС‚СѓСЂСѓ <b>RPC_DISPATCH_TABLE</b>, РІ РїРµСЂРІРѕРј ULONGвЂ™Рµ РєРѕС‚РѕСЂРѕР№ С…СЂР°РЅРёС‚СЃСЏ РєРѕР»РёС‡РµСЃС‚РІРѕ С„СѓРЅРєС†РёР№ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ.</li>
+<li> <b><i>InterpreterInfo</i></b> вЂ“ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂСѓРєС‚СѓСЂСѓ <b>_MIDL_SERVER_INFO_</b>. Р’С‚РѕСЂРѕРµ РїРѕР»Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹ MIDL-РёРЅС„РѕСЂРјР°С†РёРё (СЃРјРµС‰РµРЅРёРµ sizeof(PVOID)) СЃРѕРґРµСЂР¶РёС‚СЃСЏ Р°РґСЂРµСЃ РјР°СЃСЃРёРІР° РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ RPC-СЃРµСЂРІРµСЂР°.</li>
                 </ul>
 <br /><p><img src="../images/RpcServer_IfHandle.jpg" alt="" /></p>
             <br />
                 <p>
-Итак, вызываем скрипт, который отобразит нам список функций-обработчиков 
-RPC-сервера <b>services.exe</b>. Думаю не нужно объяснять как получить первый 
-параметр функции, находясь на ее первой инструкции, лишь напомню, что в стеке 
-в начале будет лежать адрес возврата, поэтому пропускаем его:
+РС‚Р°Рє, РІС‹Р·С‹РІР°РµРј СЃРєСЂРёРїС‚, РєРѕС‚РѕСЂС‹Р№ РѕС‚РѕР±СЂР°Р·РёС‚ РЅР°Рј СЃРїРёСЃРѕРє С„СѓРЅРєС†РёР№-РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ 
+RPC-СЃРµСЂРІРµСЂР° <b>services.exe</b>. Р”СѓРјР°СЋ РЅРµ РЅСѓР¶РЅРѕ РѕР±СЉСЏСЃРЅСЏС‚СЊ РєР°Рє РїРѕР»СѓС‡РёС‚СЊ РїРµСЂРІС‹Р№ 
+РїР°СЂР°РјРµС‚СЂ С„СѓРЅРєС†РёРё, РЅР°С…РѕРґСЏСЃСЊ РЅР° РµРµ РїРµСЂРІРѕР№ РёРЅСЃС‚СЂСѓРєС†РёРё, Р»РёС€СЊ РЅР°РїРѕРјРЅСЋ, С‡С‚Рѕ РІ СЃС‚РµРєРµ 
+РІ РЅР°С‡Р°Р»Рµ Р±СѓРґРµС‚ Р»РµР¶Р°С‚СЊ Р°РґСЂРµСЃ РІРѕР·РІСЂР°С‚Р°, РїРѕСЌС‚РѕРјСѓ РїСЂРѕРїСѓСЃРєР°РµРј РµРіРѕ:
                 </p>
             <br />
                 <div class="code">
@@ -97,8 +97,8 @@ RPC-Server Routine Table 0x01001660, number of Routines 47(0x2f)
                 </div>
             <br />
                 <p>
-Таблица получена, теперь, можно ее распечатать. При наличие символов смысл 
-каждого обработчика становится ясен:
+РўР°Р±Р»РёС†Р° РїРѕР»СѓС‡РµРЅР°, С‚РµРїРµСЂСЊ, РјРѕР¶РЅРѕ РµРµ СЂР°СЃРїРµС‡Р°С‚Р°С‚СЊ. РџСЂРё РЅР°Р»РёС‡РёРµ СЃРёРјРІРѕР»РѕРІ СЃРјС‹СЃР» 
+РєР°Р¶РґРѕРіРѕ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃС‚Р°РЅРѕРІРёС‚СЃСЏ СЏСЃРµРЅ:
                 </p>
             <br />
                 <div class="code">
@@ -153,7 +153,7 @@ kd> dps 0x01001660 L 0x2f
                 </div>
             <br />
                 <p>
-<a href="../download/DCMD/RpcServer_IfHandle.rar">Скачать dcmd-файл, содержащий описанный выше скрипт</a>
+<a href="../download/DCMD/RpcServer_IfHandle.rar">РЎРєР°С‡Р°С‚СЊ dcmd-С„Р°Р№Р», СЃРѕРґРµСЂР¶Р°С‰РёР№ РѕРїРёСЃР°РЅРЅС‹Р№ РІС‹С€Рµ СЃРєСЂРёРїС‚</a>
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

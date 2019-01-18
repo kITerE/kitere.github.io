@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; FltSetInformationFile vs ZwSetInformationFile при переименовании файлов</title>
+<title>EreTIk's Box &raquo; FltSetInformationFile vs ZwSetInformationFile РїСЂРё РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёРё С„Р°Р№Р»РѕРІ</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, NTFS, ntfs.sys, FltCreateFile, FltSetInformationFile, ZwSetInformationFile, SeCaptureSubjectContext, SeAccessCheck, STATUS_ACCESS_DENIED" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; FltSetInformationFile vs ZwSetInformationFile при переименовании файлов
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; FltSetInformationFile vs ZwSetInformationFile РїСЂРё РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёРё С„Р°Р№Р»РѕРІ
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,12 +48,12 @@
         <div id="content">
             <br />
                 <p>
-Актуализируя один свой старый драйвер фильтра файловых систем, я стал портировать 
-логику работы с файлами с <b>Zw</b>- и <b>Io</b>- функций на <b>Flt</b>-функции. 
-У меня использовались операция создания файла и, при наступлении определенных 
-условий, операция переименование файла. Описание функции 
+РђРєС‚СѓР°Р»РёР·РёСЂСѓСЏ РѕРґРёРЅ СЃРІРѕР№ СЃС‚Р°СЂС‹Р№ РґСЂР°Р№РІРµСЂ С„РёР»СЊС‚СЂР° С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј, СЏ СЃС‚Р°Р» РїРѕСЂС‚РёСЂРѕРІР°С‚СЊ 
+Р»РѕРіРёРєСѓ СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»Р°РјРё СЃ <b>Zw</b>- Рё <b>Io</b>- С„СѓРЅРєС†РёР№ РЅР° <b>Flt</b>-С„СѓРЅРєС†РёРё. 
+РЈ РјРµРЅСЏ РёСЃРїРѕР»СЊР·РѕРІР°Р»РёСЃСЊ РѕРїРµСЂР°С†РёСЏ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р° Рё, РїСЂРё РЅР°СЃС‚СѓРїР»РµРЅРёРё РѕРїСЂРµРґРµР»РµРЅРЅС‹С… 
+СѓСЃР»РѕРІРёР№, РѕРїРµСЂР°С†РёСЏ РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёРµ С„Р°Р№Р»Р°. РћРїРёСЃР°РЅРёРµ С„СѓРЅРєС†РёРё 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff541935(v=vs.85).aspx">FltCreateFile(...)</a> 
-достаточно однозначно указывает на то, что для переименования нужно использовать 
+РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РѕРґРЅРѕР·РЅР°С‡РЅРѕ СѓРєР°Р·С‹РІР°РµС‚ РЅР° С‚Рѕ, С‡С‚Рѕ РґР»СЏ РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёСЏ РЅСѓР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff544516(v=vs.85).aspx">FltSetInformationFile(...)</a>:
                 </p>
             <br />
@@ -62,14 +62,14 @@ Minifilter drivers must use FltSetInformationFile, not ZwSetInformationFile, to 
                 </div>
             <br />
                 <p>
-Замена используемого API заняла не так много времени. Но после непродолжительного 
-тестирования выяснилось, что операция переименования стала возвращать ошибку 
-<b>STATUS_ACCESS_DENIED</b>. Обычно этот статус ошибки возвращается там, где идет 
-создание описателя или reference объекта по уже созданному описателю. Именно по 
-этому меня удивил такой статус, возвращенный из функции, работающей с объектом 
-файла. Оказалось, что при переименовании драйвер NTFS сам активно работает с 
-Se-функциями. Для WinXP SP3 захват subject-контекста происходит при следующем 
-стеке вызовов:
+Р—Р°РјРµРЅР° РёСЃРїРѕР»СЊР·СѓРµРјРѕРіРѕ API Р·Р°РЅСЏР»Р° РЅРµ С‚Р°Рє РјРЅРѕРіРѕ РІСЂРµРјРµРЅРё. РќРѕ РїРѕСЃР»Рµ РЅРµРїСЂРѕРґРѕР»Р¶РёС‚РµР»СЊРЅРѕРіРѕ 
+С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ РІС‹СЏСЃРЅРёР»РѕСЃСЊ, С‡С‚Рѕ РѕРїРµСЂР°С†РёСЏ РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёСЏ СЃС‚Р°Р»Р° РІРѕР·РІСЂР°С‰Р°С‚СЊ РѕС€РёР±РєСѓ 
+<b>STATUS_ACCESS_DENIED</b>. РћР±С‹С‡РЅРѕ СЌС‚РѕС‚ СЃС‚Р°С‚СѓСЃ РѕС€РёР±РєРё РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ С‚Р°Рј, РіРґРµ РёРґРµС‚ 
+СЃРѕР·РґР°РЅРёРµ РѕРїРёСЃР°С‚РµР»СЏ РёР»Рё reference РѕР±СЉРµРєС‚Р° РїРѕ СѓР¶Рµ СЃРѕР·РґР°РЅРЅРѕРјСѓ РѕРїРёСЃР°С‚РµР»СЋ. РРјРµРЅРЅРѕ РїРѕ 
+СЌС‚РѕРјСѓ РјРµРЅСЏ СѓРґРёРІРёР» С‚Р°РєРѕР№ СЃС‚Р°С‚СѓСЃ, РІРѕР·РІСЂР°С‰РµРЅРЅС‹Р№ РёР· С„СѓРЅРєС†РёРё, СЂР°Р±РѕС‚Р°СЋС‰РµР№ СЃ РѕР±СЉРµРєС‚РѕРј 
+С„Р°Р№Р»Р°. РћРєР°Р·Р°Р»РѕСЃСЊ, С‡С‚Рѕ РїСЂРё РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёРё РґСЂР°Р№РІРµСЂ NTFS СЃР°Рј Р°РєС‚РёРІРЅРѕ СЂР°Р±РѕС‚Р°РµС‚ СЃ 
+Se-С„СѓРЅРєС†РёСЏРјРё. Р”Р»СЏ WinXP SP3 Р·Р°С…РІР°С‚ subject-РєРѕРЅС‚РµРєСЃС‚Р° РїСЂРѕРёСЃС…РѕРґРёС‚ РїСЂРё СЃР»РµРґСѓСЋС‰РµРј 
+СЃС‚РµРєРµ РІС‹Р·РѕРІРѕРІ:
                 </p>
             <br />
                 <div class="code">
@@ -81,7 +81,7 @@ b217cb58 804ef1f9 Ntfs!NtfsFsdSetInformation+0xa3
                 </div>
             <br />
                 <p>
-Сама проверка, вызов 
+РЎР°РјР° РїСЂРѕРІРµСЂРєР°, РІС‹Р·РѕРІ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff563674(v=vs.85).aspx">SeAccessCheck(...)</a>:
                 </p>
             <br />
@@ -110,14 +110,14 @@ b217c858  b217c86c
                 </div>
             <br />
                 <p>
-То есть для приведенного выше примера видно, что драйвер NTFS проверяет 
-DesiredAccess == 0x0002 (FILE_WRITE_ACCESS) для AccessMode == 1 (UserMode).
+РўРѕ РµСЃС‚СЊ РґР»СЏ РїСЂРёРІРµРґРµРЅРЅРѕРіРѕ РІС‹С€Рµ РїСЂРёРјРµСЂР° РІРёРґРЅРѕ, С‡С‚Рѕ РґСЂР°Р№РІРµСЂ NTFS РїСЂРѕРІРµСЂСЏРµС‚ 
+DesiredAccess == 0x0002 (FILE_WRITE_ACCESS) РґР»СЏ AccessMode == 1 (UserMode).
                 </p>
             <br />
                 <p>
-Следовательно при переходе на использование FltSetInformationFile(...) для 
-переименования необходимо обеспечить себе PreviousMode == KernelMode, если 
-операция не должна зависеть от контекста текущей нити.
+РЎР»РµРґРѕРІР°С‚РµР»СЊРЅРѕ РїСЂРё РїРµСЂРµС…РѕРґРµ РЅР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ FltSetInformationFile(...) РґР»СЏ 
+РїРµСЂРµРёРјРµРЅРѕРІР°РЅРёСЏ РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РµСЃРїРµС‡РёС‚СЊ СЃРµР±Рµ PreviousMode == KernelMode, РµСЃР»Рё 
+РѕРїРµСЂР°С†РёСЏ РЅРµ РґРѕР»Р¶РЅР° Р·Р°РІРёСЃРµС‚СЊ РѕС‚ РєРѕРЅС‚РµРєСЃС‚Р° С‚РµРєСѓС‰РµР№ РЅРёС‚Рё.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

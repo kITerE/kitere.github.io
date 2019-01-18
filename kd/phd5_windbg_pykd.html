@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; [PHDays] Автоматизация отладки в WinDbg </title>
+<title>EreTIk's Box &raquo; [PHDays] РђРІС‚РѕРјР°С‚РёР·Р°С†РёСЏ РѕС‚Р»Р°РґРєРё РІ WinDbg </title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, debugger, kd, WinDbg, pykd" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; [PHDays] Автоматизация отладки в WinDbg 
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a> &raquo; [PHDays] РђРІС‚РѕРјР°С‚РёР·Р°С†РёСЏ РѕС‚Р»Р°РґРєРё РІ WinDbg 
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -49,38 +49,38 @@
         <br />
             <br />
                 <p>
-Предлагаю вашему вниманию минутку само-образования 
-<a href="http://www.phdays.ru/program/40602/" target="_blank">PHDays: Автоматизация отладки в WinDbg</a>.
+РџСЂРµРґР»Р°РіР°СЋ РІР°С€РµРјСѓ РІРЅРёРјР°РЅРёСЋ РјРёРЅСѓС‚РєСѓ СЃР°РјРѕ-РѕР±СЂР°Р·РѕРІР°РЅРёСЏ 
+<a href="http://www.phdays.ru/program/40602/" target="_blank">PHDays: РђРІС‚РѕРјР°С‚РёР·Р°С†РёСЏ РѕС‚Р»Р°РґРєРё РІ WinDbg</a>.
                 </p>
             <br />
                 <div class="quote">
-Ведущий: Александр Тарасенко
+Р’РµРґСѓС‰РёР№: РђР»РµРєСЃР°РЅРґСЂ РўР°СЂР°СЃРµРЅРєРѕ
                 </div>
                 <div class="quote">
-Вас ждет практическая демонстрация автоматизации трудоемких задач при работе с 
-отладчиком WinDbg. Слушатели получат практические навыки разработки скриптов с 
-помощью встроенного движка WinDbg, а также использования Python и расширения 
-PyKd (для этого необходимо установить WinDbg, Python 2.7 и скачать заранее 
-предоставленные дампы). Предполагается, что данный доклад может быть интересен 
-специалистам по обратной разработке, а также разработчикам ПО, требующего 
-нетривиальных отладочных средств.
+Р’Р°СЃ Р¶РґРµС‚ РїСЂР°РєС‚РёС‡РµСЃРєР°СЏ РґРµРјРѕРЅСЃС‚СЂР°С†РёСЏ Р°РІС‚РѕРјР°С‚РёР·Р°С†РёРё С‚СЂСѓРґРѕРµРјРєРёС… Р·Р°РґР°С‡ РїСЂРё СЂР°Р±РѕС‚Рµ СЃ 
+РѕС‚Р»Р°РґС‡РёРєРѕРј WinDbg. РЎР»СѓС€Р°С‚РµР»Рё РїРѕР»СѓС‡Р°С‚ РїСЂР°РєС‚РёС‡РµСЃРєРёРµ РЅР°РІС‹РєРё СЂР°Р·СЂР°Р±РѕС‚РєРё СЃРєСЂРёРїС‚РѕРІ СЃ 
+РїРѕРјРѕС‰СЊСЋ РІСЃС‚СЂРѕРµРЅРЅРѕРіРѕ РґРІРёР¶РєР° WinDbg, Р° С‚Р°РєР¶Рµ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Python Рё СЂР°СЃС€РёСЂРµРЅРёСЏ 
+PyKd (РґР»СЏ СЌС‚РѕРіРѕ РЅРµРѕР±С…РѕРґРёРјРѕ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ WinDbg, Python 2.7 Рё СЃРєР°С‡Р°С‚СЊ Р·Р°СЂР°РЅРµРµ 
+РїСЂРµРґРѕСЃС‚Р°РІР»РµРЅРЅС‹Рµ РґР°РјРїС‹). РџСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ, С‡С‚Рѕ РґР°РЅРЅС‹Р№ РґРѕРєР»Р°Рґ РјРѕР¶РµС‚ Р±С‹С‚СЊ РёРЅС‚РµСЂРµСЃРµРЅ 
+СЃРїРµС†РёР°Р»РёСЃС‚Р°Рј РїРѕ РѕР±СЂР°С‚РЅРѕР№ СЂР°Р·СЂР°Р±РѕС‚РєРµ, Р° С‚Р°РєР¶Рµ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР°Рј РџРћ, С‚СЂРµР±СѓСЋС‰РµРіРѕ 
+РЅРµС‚СЂРёРІРёР°Р»СЊРЅС‹С… РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃСЂРµРґСЃС‚РІ.
                 </div>
             <br />
                 <p>
-Видео можно посмотреть на 
-<a href="http://www.phdays.ru/broadcast/" target="_blank">phdays.ru -&gt; Трансляция</a>, 
-справа в списке выбираем нужную запись (она ближе к концу).
+Р’РёРґРµРѕ РјРѕР¶РЅРѕ РїРѕСЃРјРѕС‚СЂРµС‚СЊ РЅР° 
+<a href="http://www.phdays.ru/broadcast/" target="_blank">phdays.ru -&gt; РўСЂР°РЅСЃР»СЏС†РёСЏ</a>, 
+СЃРїСЂР°РІР° РІ СЃРїРёСЃРєРµ РІС‹Р±РёСЂР°РµРј РЅСѓР¶РЅСѓСЋ Р·Р°РїРёСЃСЊ (РѕРЅР° Р±Р»РёР¶Рµ Рє РєРѕРЅС†Сѓ).
                 </p>
             <br />
                 <p>
-Для тех, у кого (как и у меня) online-трансляция не заработала, есть 
-<a href="../download/phd5_windbg_pykd.ts" target="_blank">ts-файл с выступлением</a> 
-(да простят меня организаторы PHD за наглое копирование). Файл не маленький: 
-размер — 795 мегабайт, длительность — 1:53:21.
+Р”Р»СЏ С‚РµС…, Сѓ РєРѕРіРѕ (РєР°Рє Рё Сѓ РјРµРЅСЏ) online-С‚СЂР°РЅСЃР»СЏС†РёСЏ РЅРµ Р·Р°СЂР°Р±РѕС‚Р°Р»Р°, РµСЃС‚СЊ 
+<a href="../download/phd5_windbg_pykd.ts" target="_blank">ts-С„Р°Р№Р» СЃ РІС‹СЃС‚СѓРїР»РµРЅРёРµРј</a> 
+(РґР° РїСЂРѕСЃС‚СЏС‚ РјРµРЅСЏ РѕСЂРіР°РЅРёР·Р°С‚РѕСЂС‹ PHD Р·Р° РЅР°РіР»РѕРµ РєРѕРїРёСЂРѕРІР°РЅРёРµ). Р¤Р°Р№Р» РЅРµ РјР°Р»РµРЅСЊРєРёР№: 
+СЂР°Р·РјРµСЂ вЂ” 795 РјРµРіР°Р±Р°Р№С‚, РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ вЂ” 1:53:21.
                 </p>
             <br />
                 <p>
-<a href="http://1drv.ms/1JYsqSt" target="_blank">Материалы к выступлению</a>
+<a href="http://1drv.ms/1JYsqSt" target="_blank">РњР°С‚РµСЂРёР°Р»С‹ Рє РІС‹СЃС‚СѓРїР»РµРЅРёСЋ</a>
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

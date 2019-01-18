@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Полный дамп падения с Windows 8 Developer Preview - повод обновить WinDbg</title>
+<title>EreTIk's Box &raquo; РџРѕР»РЅС‹Р№ РґР°РјРї РїР°РґРµРЅРёСЏ СЃ Windows 8 Developer Preview - РїРѕРІРѕРґ РѕР±РЅРѕРІРёС‚СЊ WinDbg</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg, Windows 8 Development Preview, Full memory dump " />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Полный дамп падения с Windows 8 Developer Preview - повод обновить WinDbg
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a> &raquo; РџРѕР»РЅС‹Р№ РґР°РјРї РїР°РґРµРЅРёСЏ СЃ Windows 8 Developer Preview - РїРѕРІРѕРґ РѕР±РЅРѕРІРёС‚СЊ WinDbg
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,10 +48,10 @@
         <div id="content">
               <br />
                 <p>
-Не так давно нужно было разобраться с падением одного драйвера на 
-Windows 8 Developer Preview AMD64. Исходные данные на первый взгляд хорошие - 
-полный дамп памяти при падении. Но при попытке открытия отладчик WinDbg крепко 
-задумался на несколько секунд, после чего выдал многозначительное окно:
+РќРµ С‚Р°Рє РґР°РІРЅРѕ РЅСѓР¶РЅРѕ Р±С‹Р»Рѕ СЂР°Р·РѕР±СЂР°С‚СЊСЃСЏ СЃ РїР°РґРµРЅРёРµРј РѕРґРЅРѕРіРѕ РґСЂР°Р№РІРµСЂР° РЅР° 
+Windows 8 Developer Preview AMD64. РСЃС…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ РЅР° РїРµСЂРІС‹Р№ РІР·РіР»СЏРґ С…РѕСЂРѕС€РёРµ - 
+РїРѕР»РЅС‹Р№ РґР°РјРї РїР°РјСЏС‚Рё РїСЂРё РїР°РґРµРЅРёРё. РќРѕ РїСЂРё РїРѕРїС‹С‚РєРµ РѕС‚РєСЂС‹С‚РёСЏ РѕС‚Р»Р°РґС‡РёРє WinDbg РєСЂРµРїРєРѕ 
+Р·Р°РґСѓРјР°Р»СЃСЏ РЅР° РЅРµСЃРєРѕР»СЊРєРѕ СЃРµРєСѓРЅРґ, РїРѕСЃР»Рµ С‡РµРіРѕ РІС‹РґР°Р» РјРЅРѕРіРѕР·РЅР°С‡РёС‚РµР»СЊРЅРѕРµ РѕРєРЅРѕ:
                 </p>
               <br />
                 <div class="quote">
@@ -61,44 +61,44 @@ The parameter is incorrect.
                 </div>
               <br />
                 <p>
-Хотя отладчик у меня не самый старый (WinDbg:6.12.0002.633 AMD64), решил 
-попробовать WinDbg из WDK для Windows 8 Developer Preview. Результат - дамп 
-замечательно открылся.
+РҐРѕС‚СЏ РѕС‚Р»Р°РґС‡РёРє Сѓ РјРµРЅСЏ РЅРµ СЃР°РјС‹Р№ СЃС‚Р°СЂС‹Р№ (WinDbg:6.12.0002.633 AMD64), СЂРµС€РёР» 
+РїРѕРїСЂРѕР±РѕРІР°С‚СЊ WinDbg РёР· WDK РґР»СЏ Windows 8 Developer Preview. Р РµР·СѓР»СЊС‚Р°С‚ - РґР°РјРї 
+Р·Р°РјРµС‡Р°С‚РµР»СЊРЅРѕ РѕС‚РєСЂС‹Р»СЃСЏ.
                 </p>
               <br />
                 <p>
-Так что, видимо, пришло время снова обновлять WinDbg даже не из-за новых 
-возможностей (возможно напишу о нововведениях в 
+РўР°Рє С‡С‚Рѕ, РІРёРґРёРјРѕ, РїСЂРёС€Р»Рѕ РІСЂРµРјСЏ СЃРЅРѕРІР° РѕР±РЅРѕРІР»СЏС‚СЊ WinDbg РґР°Р¶Рµ РЅРµ РёР·-Р·Р° РЅРѕРІС‹С… 
+РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ (РІРѕР·РјРѕР¶РЅРѕ РЅР°РїРёС€Сѓ Рѕ РЅРѕРІРѕРІРІРµРґРµРЅРёСЏС… РІ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff540540%28VS.85%29.aspx">Debug Engine</a> 
-чуть позже, отдельной статьей), а из-за банальной работоспособности: для анализа 
-новых дампов.
+С‡СѓС‚СЊ РїРѕР·Р¶Рµ, РѕС‚РґРµР»СЊРЅРѕР№ СЃС‚Р°С‚СЊРµР№), Р° РёР·-Р·Р° Р±Р°РЅР°Р»СЊРЅРѕР№ СЂР°Р±РѕС‚РѕСЃРїРѕСЃРѕР±РЅРѕСЃС‚Рё: РґР»СЏ Р°РЅР°Р»РёР·Р° 
+РЅРѕРІС‹С… РґР°РјРїРѕРІ.
                 </p>
             <br />
                 <a name="UPD_10_02_2012"></a>
                 <h2>Updated (10.02.2012)</h2>
             <br />
                 <p>
-Как оказалось, о нововведения не надо писать, про них уже есть пост в блоге 
-Microsoft'а: 
+РљР°Рє РѕРєР°Р·Р°Р»РѕСЃСЊ, Рѕ РЅРѕРІРѕРІРІРµРґРµРЅРёСЏ РЅРµ РЅР°РґРѕ РїРёСЃР°С‚СЊ, РїСЂРѕ РЅРёС… СѓР¶Рµ РµСЃС‚СЊ РїРѕСЃС‚ РІ Р±Р»РѕРіРµ 
+Microsoft'Р°: 
 <a target="_blank" href="http://blogs.msdn.com/b/andrew_richards/archive/2011/09/24/debugger-engine-dbgeng-updates-in-windows-8-developer-preview.aspx">Debugger Engine (DbgEng) updates in the Windows 8 Developer Preview</a>. 
-А вот официальная документация в MSDN пока не обновлена.
+Рђ РІРѕС‚ РѕС„РёС†РёР°Р»СЊРЅР°СЏ РґРѕРєСѓРјРµРЅС‚Р°С†РёСЏ РІ MSDN РїРѕРєР° РЅРµ РѕР±РЅРѕРІР»РµРЅР°.
                 </p>
             <br />
                 <p>
-От себя скажу, что мне нравится введение привязки в точке останова к GUID'у: 
-<b>IDebugBreakpoint3::GetGuid</b> и <b>IDebugControl5::GetBreakpointByGuid</b>. 
-Раньше точку останова можно было идентифицировать по 
-<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff545617(VS.85).aspx">численному идентификатору (IDebugControl::GetBreakpointById)</a>
-и <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff545639(VS.85).aspx">порядковому номеру (IDebugControl::GetBreakpointByIndex)</a>. 
-Но оба эти параметра могут идентифицировать точку останова в конкретный момент 
-времени, а работать с break-point'ами приходится из обратных вызовов, после 
-трассировки и тому подобное. И тут никто не даст гарантии что за это время 
-пользователь через команды не изменил точки останова.
+РћС‚ СЃРµР±СЏ СЃРєР°Р¶Сѓ, С‡С‚Рѕ РјРЅРµ РЅСЂР°РІРёС‚СЃСЏ РІРІРµРґРµРЅРёРµ РїСЂРёРІСЏР·РєРё РІ С‚РѕС‡РєРµ РѕСЃС‚Р°РЅРѕРІР° Рє GUID'Сѓ: 
+<b>IDebugBreakpoint3::GetGuid</b> Рё <b>IDebugControl5::GetBreakpointByGuid</b>. 
+Р Р°РЅСЊС€Рµ С‚РѕС‡РєСѓ РѕСЃС‚Р°РЅРѕРІР° РјРѕР¶РЅРѕ Р±С‹Р»Рѕ РёРґРµРЅС‚РёС„РёС†РёСЂРѕРІР°С‚СЊ РїРѕ 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff545617(VS.85).aspx">С‡РёСЃР»РµРЅРЅРѕРјСѓ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂСѓ (IDebugControl::GetBreakpointById)</a>
+Рё <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff545639(VS.85).aspx">РїРѕСЂСЏРґРєРѕРІРѕРјСѓ РЅРѕРјРµСЂСѓ (IDebugControl::GetBreakpointByIndex)</a>. 
+РќРѕ РѕР±Р° СЌС‚Рё РїР°СЂР°РјРµС‚СЂР° РјРѕРіСѓС‚ РёРґРµРЅС‚РёС„РёС†РёСЂРѕРІР°С‚СЊ С‚РѕС‡РєСѓ РѕСЃС‚Р°РЅРѕРІР° РІ РєРѕРЅРєСЂРµС‚РЅС‹Р№ РјРѕРјРµРЅС‚ 
+РІСЂРµРјРµРЅРё, Р° СЂР°Р±РѕС‚Р°С‚СЊ СЃ break-point'Р°РјРё РїСЂРёС…РѕРґРёС‚СЃСЏ РёР· РѕР±СЂР°С‚РЅС‹С… РІС‹Р·РѕРІРѕРІ, РїРѕСЃР»Рµ 
+С‚СЂР°СЃСЃРёСЂРѕРІРєРё Рё С‚РѕРјСѓ РїРѕРґРѕР±РЅРѕРµ. Р С‚СѓС‚ РЅРёРєС‚Рѕ РЅРµ РґР°СЃС‚ РіР°СЂР°РЅС‚РёРё С‡С‚Рѕ Р·Р° СЌС‚Рѕ РІСЂРµРјСЏ 
+РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ С‡РµСЂРµР· РєРѕРјР°РЅРґС‹ РЅРµ РёР·РјРµРЅРёР» С‚РѕС‡РєРё РѕСЃС‚Р°РЅРѕРІР°.
                 </p>
             <br />
                 <p>
-Остальные изменения нужно будет <i>пощупать руками</i>. Возможно что-то из 
-нового в скором времени попадет в 
+РћСЃС‚Р°Р»СЊРЅС‹Рµ РёР·РјРµРЅРµРЅРёСЏ РЅСѓР¶РЅРѕ Р±СѓРґРµС‚ <i>РїРѕС‰СѓРїР°С‚СЊ СЂСѓРєР°РјРё</i>. Р’РѕР·РјРѕР¶РЅРѕ С‡С‚Рѕ-С‚Рѕ РёР· 
+РЅРѕРІРѕРіРѕ РІ СЃРєРѕСЂРѕРј РІСЂРµРјРµРЅРё РїРѕРїР°РґРµС‚ РІ 
 <a target="_blank" href="http://pykd.codeplex.com/">PyKd</a> :)
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>

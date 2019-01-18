@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Функция PathAppend и реализация ATL::CPathT&lt;...&gt;::Append в Microsoft Visual Studio 9.0</title>
+<title>EreTIk's Box &raquo; Р¤СѓРЅРєС†РёСЏ PathAppend Рё СЂРµР°Р»РёР·Р°С†РёСЏ ATL::CPathT&lt;...&gt;::Append РІ Microsoft Visual Studio 9.0</title>
 <meta name="keywords" content="EreTIk, ATL::CPathT, ATL::CPath, PathAppendW, Windows 7, Windows Checked Build" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Функция PathAppend и реализация ATL::CPathT&lt;...&gt;::Append в Microsoft Visual Studio 9.0
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; Р¤СѓРЅРєС†РёСЏ PathAppend Рё СЂРµР°Р»РёР·Р°С†РёСЏ ATL::CPathT&lt;...&gt;::Append РІ Microsoft Visual Studio 9.0
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,17 +48,17 @@
         <div id="content">
             <br />
                 <p>
-На днях мне на глаза попался странный дамп, в котором произошло 
-падение в функции ntdll!memmove, которая была вызвана 
+РќР° РґРЅСЏС… РјРЅРµ РЅР° РіР»Р°Р·Р° РїРѕРїР°Р»СЃСЏ СЃС‚СЂР°РЅРЅС‹Р№ РґР°РјРї, РІ РєРѕС‚РѕСЂРѕРј РїСЂРѕРёР·РѕС€Р»Рѕ 
+РїР°РґРµРЅРёРµ РІ С„СѓРЅРєС†РёРё ntdll!memmove, РєРѕС‚РѕСЂР°СЏ Р±С‹Р»Р° РІС‹Р·РІР°РЅР° 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/bb773565(v=vs.85).aspx">shlwapi!PathAppendW</a>. 
-Функцию PathAppend вызывал код, который использовал метод 
+Р¤СѓРЅРєС†РёСЋ PathAppend РІС‹Р·С‹РІР°Р» РєРѕРґ, РєРѕС‚РѕСЂС‹Р№ РёСЃРїРѕР»СЊР·РѕРІР°Р» РјРµС‚РѕРґ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/z1beh949.aspx">ATL::CPathT&lt;...&gt;::Append</a>. 
-Быстрый осмотр конкатенируемых строк показал, что они расположены в доступной 
-памяти и заканчиваются 0-символом.
+Р‘С‹СЃС‚СЂС‹Р№ РѕСЃРјРѕС‚СЂ РєРѕРЅРєР°С‚РµРЅРёСЂСѓРµРјС‹С… СЃС‚СЂРѕРє РїРѕРєР°Р·Р°Р», С‡С‚Рѕ РѕРЅРё СЂР°СЃРїРѕР»РѕР¶РµРЅС‹ РІ РґРѕСЃС‚СѓРїРЅРѕР№ 
+РїР°РјСЏС‚Рё Рё Р·Р°РєР°РЅС‡РёРІР°СЋС‚СЃСЏ 0-СЃРёРјРІРѕР»РѕРј.
                 </p>
             <br />
                 <p>
-А вот листинг начала функции shlwapi!PathAppendW меня удивил:
+Рђ РІРѕС‚ Р»РёСЃС‚РёРЅРі РЅР°С‡Р°Р»Р° С„СѓРЅРєС†РёРё shlwapi!PathAppendW РјРµРЅСЏ СѓРґРёРІРёР»:
                 </p>
                 <pre class="brush: asm;">
 mov          rax,rsp
@@ -88,12 +88,12 @@ call         memmove
                 </pre>
             <br />
                 <p>
-В частности, удивил вызовов memmove, с указателем на первый аргумент функции 
-как в качестве памяти-источника, так и в качестве памяти-приемника с 
-фиксированной длинной 0x208 байт. То есть функция <i>потрогала</i> входной 
-буфер на чтение/запись. При этом функция не принимает размер строки в первом 
-аргументе. Вот что про это говорит моя старая локальная копия MSDN'а от 2008-й 
-студии (Microsoft Visual Studio 9.0):
+Р’ С‡Р°СЃС‚РЅРѕСЃС‚Рё, СѓРґРёРІРёР» РІС‹Р·РѕРІРѕРІ memmove, СЃ СѓРєР°Р·Р°С‚РµР»РµРј РЅР° РїРµСЂРІС‹Р№ Р°СЂРіСѓРјРµРЅС‚ С„СѓРЅРєС†РёРё 
+РєР°Рє РІ РєР°С‡РµСЃС‚РІРµ РїР°РјСЏС‚Рё-РёСЃС‚РѕС‡РЅРёРєР°, С‚Р°Рє Рё РІ РєР°С‡РµСЃС‚РІРµ РїР°РјСЏС‚Рё-РїСЂРёРµРјРЅРёРєР° СЃ 
+С„РёРєСЃРёСЂРѕРІР°РЅРЅРѕР№ РґР»РёРЅРЅРѕР№ 0x208 Р±Р°Р№С‚. РўРѕ РµСЃС‚СЊ С„СѓРЅРєС†РёСЏ <i>РїРѕС‚СЂРѕРіР°Р»Р°</i> РІС…РѕРґРЅРѕР№ 
+Р±СѓС„РµСЂ РЅР° С‡С‚РµРЅРёРµ/Р·Р°РїРёСЃСЊ. РџСЂРё СЌС‚РѕРј С„СѓРЅРєС†РёСЏ РЅРµ РїСЂРёРЅРёРјР°РµС‚ СЂР°Р·РјРµСЂ СЃС‚СЂРѕРєРё РІ РїРµСЂРІРѕРј 
+Р°СЂРіСѓРјРµРЅС‚Рµ. Р’РѕС‚ С‡С‚Рѕ РїСЂРѕ СЌС‚Рѕ РіРѕРІРѕСЂРёС‚ РјРѕСЏ СЃС‚Р°СЂР°СЏ Р»РѕРєР°Р»СЊРЅР°СЏ РєРѕРїРёСЏ MSDN'Р° РѕС‚ 2008-Р№ 
+СЃС‚СѓРґРёРё (Microsoft Visual Studio 9.0):
                 </p>
             <br />
                 <div class="quote">
@@ -101,7 +101,7 @@ You <b>should set</b> the size of this buffer to MAX_PATH to ensure that it is l
                 </div>
             <br />
                 <p>
-Современная online версия более категорична (
+РЎРѕРІСЂРµРјРµРЅРЅР°СЏ online РІРµСЂСЃРёСЏ Р±РѕР»РµРµ РєР°С‚РµРіРѕСЂРёС‡РЅР° (
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/bb773565(v=vs.85).aspx">PathAppend</a>):
                 </p>
             <br />
@@ -110,9 +110,9 @@ You <b>must set</b> the size of this buffer to MAX_PATH to ensure that it is lar
                 </div>
             <br />
                 <p>
-Исходный exe-файл был скомпилирован с использованием 2008-й студии 
-(Microsoft Visual Studio 9.0), в которой метод ATL::CPathT&lt;...&gt;::Append 
-выглядит так:
+РСЃС…РѕРґРЅС‹Р№ exe-С„Р°Р№Р» Р±С‹Р» СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅ СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј 2008-Р№ СЃС‚СѓРґРёРё 
+(Microsoft Visual Studio 9.0), РІ РєРѕС‚РѕСЂРѕР№ РјРµС‚РѕРґ ATL::CPathT&lt;...&gt;::Append 
+РІС‹РіР»СЏРґРёС‚ С‚Р°Рє:
                 </p>
             <br />
                 <pre class="brush: cpp;">
@@ -128,22 +128,22 @@ You <b>must set</b> the size of this buffer to MAX_PATH to ensure that it is lar
                 </pre>
             <br />
                 <p>
-Что идет в полный разрез с документацией. Вместо того, что бы выделить честных 
-MAX_PATH-символов, реализация из Microsoft Visual Studio 9.0 выделяет разумный 
-(по ее мнению) максимум: сумму длин двух строки и одного символа-разделителя.
+Р§С‚Рѕ РёРґРµС‚ РІ РїРѕР»РЅС‹Р№ СЂР°Р·СЂРµР· СЃ РґРѕРєСѓРјРµРЅС‚Р°С†РёРµР№. Р’РјРµСЃС‚Рѕ С‚РѕРіРѕ, С‡С‚Рѕ Р±С‹ РІС‹РґРµР»РёС‚СЊ С‡РµСЃС‚РЅС‹С… 
+MAX_PATH-СЃРёРјРІРѕР»РѕРІ, СЂРµР°Р»РёР·Р°С†РёСЏ РёР· Microsoft Visual Studio 9.0 РІС‹РґРµР»СЏРµС‚ СЂР°Р·СѓРјРЅС‹Р№ 
+(РїРѕ РµРµ РјРЅРµРЅРёСЋ) РјР°РєСЃРёРјСѓРј: СЃСѓРјРјСѓ РґР»РёРЅ РґРІСѓС… СЃС‚СЂРѕРєРё Рё РѕРґРЅРѕРіРѕ СЃРёРјРІРѕР»Р°-СЂР°Р·РґРµР»РёС‚РµР»СЏ.
                 </p>
             <br />
                 <p>
-И такой экономный подход работает в большинстве случаев. Пока... пока собранный 
-файл не запустили на <b>checked</b>-сборке Windows 7. Да, именно в 
-<b>checked</b>-сборке есть приведенная выше проверка буфера на чтение/запись 
-вызовом memmove. И, в какой-то момент, когда буфер строки попал на конец 
-страницы, за которой памяти не было, процесс упал.
+Р С‚Р°РєРѕР№ СЌРєРѕРЅРѕРјРЅС‹Р№ РїРѕРґС…РѕРґ СЂР°Р±РѕС‚Р°РµС‚ РІ Р±РѕР»СЊС€РёРЅСЃС‚РІРµ СЃР»СѓС‡Р°РµРІ. РџРѕРєР°... РїРѕРєР° СЃРѕР±СЂР°РЅРЅС‹Р№ 
+С„Р°Р№Р» РЅРµ Р·Р°РїСѓСЃС‚РёР»Рё РЅР° <b>checked</b>-СЃР±РѕСЂРєРµ Windows 7. Р”Р°, РёРјРµРЅРЅРѕ РІ 
+<b>checked</b>-СЃР±РѕСЂРєРµ РµСЃС‚СЊ РїСЂРёРІРµРґРµРЅРЅР°СЏ РІС‹С€Рµ РїСЂРѕРІРµСЂРєР° Р±СѓС„РµСЂР° РЅР° С‡С‚РµРЅРёРµ/Р·Р°РїРёСЃСЊ 
+РІС‹Р·РѕРІРѕРј memmove. Р, РІ РєР°РєРѕР№-С‚Рѕ РјРѕРјРµРЅС‚, РєРѕРіРґР° Р±СѓС„РµСЂ СЃС‚СЂРѕРєРё РїРѕРїР°Р» РЅР° РєРѕРЅРµС† 
+СЃС‚СЂР°РЅРёС†С‹, Р·Р° РєРѕС‚РѕСЂРѕР№ РїР°РјСЏС‚Рё РЅРµ Р±С‹Р»Рѕ, РїСЂРѕС†РµСЃСЃ СѓРїР°Р».
                 </p>
             <br />
                 <p>
-У меня нет установленной Microsoft Visual Studio 10.0, но в 
-Microsoft Visual Studio 11.0 такой проблемы уже нет:
+РЈ РјРµРЅСЏ РЅРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕР№ Microsoft Visual Studio 10.0, РЅРѕ РІ 
+Microsoft Visual Studio 11.0 С‚Р°РєРѕР№ РїСЂРѕР±Р»РµРјС‹ СѓР¶Рµ РЅРµС‚:
                 </p>
             <br />
                 <pre class="brush: cpp;">
@@ -157,8 +157,8 @@ Microsoft Visual Studio 11.0 такой проблемы уже нет:
                 </pre>
             <br />
                 <p>
-Кстати, проблема касается не только PathAppend, но и множества других функций, 
-семейства PathXxx (и, соответственно, методах ATL::CPathT).
+РљСЃС‚Р°С‚Рё, РїСЂРѕР±Р»РµРјР° РєР°СЃР°РµС‚СЃСЏ РЅРµ С‚РѕР»СЊРєРѕ PathAppend, РЅРѕ Рё РјРЅРѕР¶РµСЃС‚РІР° РґСЂСѓРіРёС… С„СѓРЅРєС†РёР№, 
+СЃРµРјРµР№СЃС‚РІР° PathXxx (Рё, СЃРѕРѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕ, РјРµС‚РѕРґР°С… ATL::CPathT).
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Сюрпризы от Windows 10 build 17133: ObQueryNameString для ключей реестра перестала выдавать ошибку STATUS_INFO_LENGTH_MISMATCH</title>
+<title>EreTIk's Box &raquo; РЎСЋСЂРїСЂРёР·С‹ РѕС‚ Windows 10 build 17133: ObQueryNameString РґР»СЏ РєР»СЋС‡РµР№ СЂРµРµСЃС‚СЂР° РїРµСЂРµСЃС‚Р°Р»Р° РІС‹РґР°РІР°С‚СЊ РѕС€РёР±РєСѓ STATUS_INFO_LENGTH_MISMATCH</title>
 <meta name="keywords" content="EreTIk, kernel, Windows Windows 10, Windows 10 build 17133, Registry, ObQueryNameString, STATUS_INFO_LENGTH_MISMATCH" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Сюрпризы от Windows 10 build 17133: ObQueryNameString для ключей реестра перестала выдавать ошибку STATUS_INFO_LENGTH_MISMATCH
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РЎСЋСЂРїСЂРёР·С‹ РѕС‚ Windows 10 build 17133: ObQueryNameString РґР»СЏ РєР»СЋС‡РµР№ СЂРµРµСЃС‚СЂР° РїРµСЂРµСЃС‚Р°Р»Р° РІС‹РґР°РІР°С‚СЊ РѕС€РёР±РєСѓ STATUS_INFO_LENGTH_MISMATCH
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,36 +48,36 @@
         <div id="content">
             <br />
                 <p>
-Завершающим сюрпризом (
-<a target="_blank" href="29.html">первый</a>, 
-<a target="_blank" href="2A.html">второй</a>
-) стало то, что функциия 
+Р—Р°РІРµСЂС€Р°СЋС‰РёРј СЃСЋСЂРїСЂРёР·РѕРј (
+<a target="_blank" href="29.html">РїРµСЂРІС‹Р№</a>, 
+<a target="_blank" href="2A.html">РІС‚РѕСЂРѕР№</a>
+) СЃС‚Р°Р»Рѕ С‚Рѕ, С‡С‚Рѕ С„СѓРЅРєС†РёРёСЏ 
 <a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/ntifs/nf-ntifs-obquerynamestring">ObQueryNameString</a> 
-перестала выдавать ошибку <b>STATUS_INFO_LENGTH_MISMATCH</b> для объектов ключей реестра при нехватке выходного буфера.
+РїРµСЂРµСЃС‚Р°Р»Р° РІС‹РґР°РІР°С‚СЊ РѕС€РёР±РєСѓ <b>STATUS_INFO_LENGTH_MISMATCH</b> РґР»СЏ РѕР±СЉРµРєС‚РѕРІ РєР»СЋС‡РµР№ СЂРµРµСЃС‚СЂР° РїСЂРё РЅРµС…РІР°С‚РєРµ РІС‹С…РѕРґРЅРѕРіРѕ Р±СѓС„РµСЂР°.
                 </p>
             <br />
                 <p>
-То есть для ситуации, когда размер выходного буфера больше структуры 
-OBJECT_NAME_INFORMATION, но заведомо меньше полного имени ключа, раньше (до 
-Windows 10 build 17133) функция возвращала статус ошибки 
-<b>STATUS_INFO_LENGTH_MISMATCH</b>. А сейчас функция стала возвращать 
-<b>STATUS_SUCCESS</b>, заполнять <i>огрызок</i> имени в структуре UNICODE_STRING 
-(сколько уместилось в буфере), а факт нехватки памяти сигнализируется лишь тем, 
-что последним выходным параметром ReturnLength функция возвращает больший размер, 
-чем мы указывали во входном параметре Length.
+РўРѕ РµСЃС‚СЊ РґР»СЏ СЃРёС‚СѓР°С†РёРё, РєРѕРіРґР° СЂР°Р·РјРµСЂ РІС‹С…РѕРґРЅРѕРіРѕ Р±СѓС„РµСЂР° Р±РѕР»СЊС€Рµ СЃС‚СЂСѓРєС‚СѓСЂС‹ 
+OBJECT_NAME_INFORMATION, РЅРѕ Р·Р°РІРµРґРѕРјРѕ РјРµРЅСЊС€Рµ РїРѕР»РЅРѕРіРѕ РёРјРµРЅРё РєР»СЋС‡Р°, СЂР°РЅСЊС€Рµ (РґРѕ 
+Windows 10 build 17133) С„СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‰Р°Р»Р° СЃС‚Р°С‚СѓСЃ РѕС€РёР±РєРё 
+<b>STATUS_INFO_LENGTH_MISMATCH</b>. Рђ СЃРµР№С‡Р°СЃ С„СѓРЅРєС†РёСЏ СЃС‚Р°Р»Р° РІРѕР·РІСЂР°С‰Р°С‚СЊ 
+<b>STATUS_SUCCESS</b>, Р·Р°РїРѕР»РЅСЏС‚СЊ <i>РѕРіСЂС‹Р·РѕРє</i> РёРјРµРЅРё РІ СЃС‚СЂСѓРєС‚СѓСЂРµ UNICODE_STRING 
+(СЃРєРѕР»СЊРєРѕ СѓРјРµСЃС‚РёР»РѕСЃСЊ РІ Р±СѓС„РµСЂРµ), Р° С„Р°РєС‚ РЅРµС…РІР°С‚РєРё РїР°РјСЏС‚Рё СЃРёРіРЅР°Р»РёР·РёСЂСѓРµС‚СЃСЏ Р»РёС€СЊ С‚РµРј, 
+С‡С‚Рѕ РїРѕСЃР»РµРґРЅРёРј РІС‹С…РѕРґРЅС‹Рј РїР°СЂР°РјРµС‚СЂРѕРј ReturnLength С„СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ Р±РѕР»СЊС€РёР№ СЂР°Р·РјРµСЂ, 
+С‡РµРј РјС‹ СѓРєР°Р·С‹РІР°Р»Рё РІРѕ РІС…РѕРґРЅРѕРј РїР°СЂР°РјРµС‚СЂРµ Length.
                 </p>
             <br />
                 <p>
-Как это выглядит в отладчике (продублировано c 
+РљР°Рє СЌС‚Рѕ РІС‹РіР»СЏРґРёС‚ РІ РѕС‚Р»Р°РґС‡РёРєРµ (РїСЂРѕРґСѓР±Р»РёСЂРѕРІР°РЅРѕ c 
 <a target="_blank" href="https://github.com/MicrosoftDocs/windows-driver-docs-ddi/issues/36">https://github.com/MicrosoftDocs/windows-driver-docs-ddi/issues/36</a>).
-Для вызова:
+Р”Р»СЏ РІС‹Р·РѕРІР°:
                 </p>
                 <div class="code">
     Status = ObQueryNameString(pObject, pObjInfo, uBufSize, &amp;uResLen);
                 </div>
             <br />
                 <p>
-Было:
+Р‘С‹Р»Рѕ:
                 </p>
                 <div class="code">
 0: kd&gt; dv
@@ -85,7 +85,7 @@ Windows 10 build 17133) функция возвращала статус ошибки
                 </div>
             <br />
                 <p>
-Стало:
+РЎС‚Р°Р»Рѕ:
                 </p>
                 <div class="code">
 1: kd&gt; dv
@@ -105,7 +105,7 @@ Object: 86a00420  Type: (869169d0) Key
                 </div>
             <br />
                 <p>
-Текущая проблемная версия ядра:
+РўРµРєСѓС‰Р°СЏ РїСЂРѕР±Р»РµРјРЅР°СЏ РІРµСЂСЃРёСЏ СЏРґСЂР°:
                 </p>
                 <div class="code">
 Windows 10 Kernel Version 17133 MP (2 procs) Free x86 compatible

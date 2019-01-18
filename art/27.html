@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; &quot;Закат&quot; Legacy-фильтров файловых систем: что под капотом?</title>
+<title>EreTIk's Box &raquo; &quot;Р—Р°РєР°С‚&quot; Legacy-С„РёР»СЊС‚СЂРѕРІ С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј: С‡С‚Рѕ РїРѕРґ РєР°РїРѕС‚РѕРј?</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver, IoBlockLegacyFsFilters, IopBlockLegacyFsFilters, IopAttachDeviceToDeviceStackSafe, IoRegisterFsRegistrationChangeMountAware, legacy file system filter" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; &quot;Закат&quot; Legacy-фильтров файловых систем: что под капотом?
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; &quot;Р—Р°РєР°С‚&quot; Legacy-С„РёР»СЊС‚СЂРѕРІ С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј: С‡С‚Рѕ РїРѕРґ РєР°РїРѕС‚РѕРј?
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,19 +48,19 @@
         <div id="content">
             <br />
                 <p>
-Если вдруг кто-то не знает, то Microsoft уже сделала (в Windows 10 версии 1607) 
-твердый шаг в сторону запрета Legacy-фильтров файловых систем: 
+Р•СЃР»Рё РІРґСЂСѓРі РєС‚Рѕ-С‚Рѕ РЅРµ Р·РЅР°РµС‚, С‚Рѕ Microsoft СѓР¶Рµ СЃРґРµР»Р°Р»Р° (РІ Windows 10 РІРµСЂСЃРёРё 1607) 
+С‚РІРµСЂРґС‹Р№ С€Р°Рі РІ СЃС‚РѕСЂРѕРЅСѓ Р·Р°РїСЂРµС‚Р° Legacy-С„РёР»СЊС‚СЂРѕРІ С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј: 
 <a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ifs/blocking-file-system-filter-drivers">Blocking legacy file system filter drivers</a>.
                 </p>
                 <p>
-Так как же реализован этот запрет? В качестве целевой системы рассмотрим 32-х 
-разрядную Windows 10 с номером сборки 16299.
+РўР°Рє РєР°Рє Р¶Рµ СЂРµР°Р»РёР·РѕРІР°РЅ СЌС‚РѕС‚ Р·Р°РїСЂРµС‚? Р’ РєР°С‡РµСЃС‚РІРµ С†РµР»РµРІРѕР№ СЃРёСЃС‚РµРјС‹ СЂР°СЃСЃРјРѕС‚СЂРёРј 32-С… 
+СЂР°Р·СЂСЏРґРЅСѓСЋ Windows 10 СЃ РЅРѕРјРµСЂРѕРј СЃР±РѕСЂРєРё 16299.
                 </p>
             <br />
                 <p>
-Для начала найдем перемененную, в которую читается значение IoBlockLegacyFsFilters 
-ключа реестра HKLM\SYSTEM\CurrentControlSet\Control\SessionManager\I/O System. 
-Это глобальная переменная <b>IopBlockLegacyFsFilters</b>:
+Р”Р»СЏ РЅР°С‡Р°Р»Р° РЅР°Р№РґРµРј РїРµСЂРµРјРµРЅРµРЅРЅСѓСЋ, РІ РєРѕС‚РѕСЂСѓСЋ С‡РёС‚Р°РµС‚СЃСЏ Р·РЅР°С‡РµРЅРёРµ IoBlockLegacyFsFilters 
+РєР»СЋС‡Р° СЂРµРµСЃС‚СЂР° HKLM\SYSTEM\CurrentControlSet\Control\SessionManager\I/O System. 
+Р­С‚Рѕ РіР»РѕР±Р°Р»СЊРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ <b>IopBlockLegacyFsFilters</b>:
                 </p>
                 <div class="code">
 INIT:00A0826C dd offset aSessionMana_12 ; &quot;Session Manager\\I/O System&quot;
@@ -69,7 +69,7 @@ INIT:00A08274 dd offset _IopBlockLegacyFsFilters
                 </div>
             <br />
                 <p>
-Затем взглянем на использование <b>IopBlockLegacyFsFilters</b>:
+Р—Р°С‚РµРј РІР·РіР»СЏРЅРµРј РЅР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ <b>IopBlockLegacyFsFilters</b>:
                 </p>
                 <div class="code">
 .data:00665FB4 _IopBlockLegacyFsFilters dd ? ; DATA XREF: IopAttachDeviceToDeviceStackSafe(x,x,x)+8B
@@ -79,10 +79,10 @@ INIT:00A08274 dd offset _IopBlockLegacyFsFilters
                 </div>
             <br />
                 <p>
-Рассмотрим в начале функцию IoRegisterFsRegistrationChangeMountAware, которая 
-является реализацией экспортируемой функции
+Р Р°СЃСЃРјРѕС‚СЂРёРј РІ РЅР°С‡Р°Р»Рµ С„СѓРЅРєС†РёСЋ IoRegisterFsRegistrationChangeMountAware, РєРѕС‚РѕСЂР°СЏ 
+СЏРІР»СЏРµС‚СЃСЏ СЂРµР°Р»РёР·Р°С†РёРµР№ СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјРѕР№ С„СѓРЅРєС†РёРё
 <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff548499(v=vs.85).aspx">IoRegisterFsRegistrationChange(...)</a>.
-В ней мы обнаружим следующий псевдо-код:
+Р’ РЅРµР№ РјС‹ РѕР±РЅР°СЂСѓР¶РёРј СЃР»РµРґСѓСЋС‰РёР№ РїСЃРµРІРґРѕ-РєРѕРґ:
                 </p>
                 <pre class="brush: cpp;">
   if ( IopBlockLegacyFsFilters &amp;&amp; !IopIsKnownGoodLegacyFsFilter(&amp;DriverObject-&gt;DriverName) )
@@ -90,8 +90,8 @@ INIT:00A08274 dd offset _IopBlockLegacyFsFilters
                 </pre>
             <br />
                 <p>
-То есть для &quot;встроенных&quot; Legacy-фильтров файловых систем оставлено старое API. 
-И, как видно из листинга, <b><i>хороший</i></b> драйвер распознается по имени:
+РўРѕ РµСЃС‚СЊ РґР»СЏ &quot;РІСЃС‚СЂРѕРµРЅРЅС‹С…&quot; Legacy-С„РёР»СЊС‚СЂРѕРІ С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј РѕСЃС‚Р°РІР»РµРЅРѕ СЃС‚Р°СЂРѕРµ API. 
+Р, РєР°Рє РІРёРґРЅРѕ РёР· Р»РёСЃС‚РёРЅРіР°, <b><i>С…РѕСЂРѕС€РёР№</i></b> РґСЂР°Р№РІРµСЂ СЂР°СЃРїРѕР·РЅР°РµС‚СЃСЏ РїРѕ РёРјРµРЅРё:
                 </p>
                 <pre class="brush: cpp;">
 bool IopIsKnownGoodLegacyFsFilter(_UNICODE_STRING *DriverObjectName)
@@ -114,7 +114,7 @@ bool IopIsKnownGoodLegacyFsFilter(_UNICODE_STRING *DriverObjectName)
                 </pre>
             <br />
                 <p>
-Глобальный массив, названный мной g_KnownGoodLegacyFsFilter:
+Р“Р»РѕР±Р°Р»СЊРЅС‹Р№ РјР°СЃСЃРёРІ, РЅР°Р·РІР°РЅРЅС‹Р№ РјРЅРѕР№ g_KnownGoodLegacyFsFilter:
                 </p>
                 <div class="code">
 .text:004043F8 ; UNICODE_STRING g_KnownGoodLegacyFsFilter[3]
@@ -135,15 +135,15 @@ bool IopIsKnownGoodLegacyFsFilter(_UNICODE_STRING *DriverObjectName)
                 </div>
             <br />
                 <p>
-То есть банальный белый список по имени обьекта драйвера.
+РўРѕ РµСЃС‚СЊ Р±Р°РЅР°Р»СЊРЅС‹Р№ Р±РµР»С‹Р№ СЃРїРёСЃРѕРє РїРѕ РёРјРµРЅРё РѕР±СЊРµРєС‚Р° РґСЂР°Р№РІРµСЂР°.
                 </p>
             <br />
                 <p>
-Microsoft не ограничилась контролем функции IoRegisterFsRegistrationChange:
-еще одна проверка была вставлена в код функциии <b>IopAttachDeviceToDeviceStackSafe</b>,
-которая является реализацией 
+Microsoft РЅРµ РѕРіСЂР°РЅРёС‡РёР»Р°СЃСЊ РєРѕРЅС‚СЂРѕР»РµРј С„СѓРЅРєС†РёРё IoRegisterFsRegistrationChange:
+РµС‰Рµ РѕРґРЅР° РїСЂРѕРІРµСЂРєР° Р±С‹Р»Р° РІСЃС‚Р°РІР»РµРЅР° РІ РєРѕРґ С„СѓРЅРєС†РёРёРё <b>IopAttachDeviceToDeviceStackSafe</b>,
+РєРѕС‚РѕСЂР°СЏ СЏРІР»СЏРµС‚СЃСЏ СЂРµР°Р»РёР·Р°С†РёРµР№ 
 <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff548236(v=vs.85).aspx">IoAttachDeviceToDeviceStackSafe(...)</a>.
-Взглянем на псевдо-код:
+Р’Р·РіР»СЏРЅРµРј РЅР° РїСЃРµРІРґРѕ-РєРѕРґ:
                 </p>
                 <pre class="brush: cpp;">
   TargetDeviceAttachmentBase = IopGetDeviceAttachmentBase(TargetDevice);
@@ -160,16 +160,16 @@ Microsoft не ограничилась контролем функции IoRegisterFsRegistrationChange:
                 </pre>
             <br />
                 <p>
-Тут мы видим реализацию уточнения по DAX-томам, которое содержится в 
+РўСѓС‚ РјС‹ РІРёРґРёРј СЂРµР°Р»РёР·Р°С†РёСЋ СѓС‚РѕС‡РЅРµРЅРёСЏ РїРѕ DAX-С‚РѕРјР°Рј, РєРѕС‚РѕСЂРѕРµ СЃРѕРґРµСЂР¶РёС‚СЃСЏ РІ 
 <a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ifs/blocking-file-system-filter-drivers">Blocking legacy file system filter drivers</a>:
                 </p>
                 <div class="quote">
-Also, legacy file system filter drivers can’t attach to direct access (DAX) volumes.
+Also, legacy file system filter drivers canвЂ™t attach to direct access (DAX) volumes.
                 </div>
                 <p>
-Стоит отметить, что в <b>IopAttachDeviceToDeviceStackSafe</b> Legacy-фильтрами 
-файловых систем считаются все, кто пытается при-attach'иться к устройствам с типом 
-файловой системы.
+РЎС‚РѕРёС‚ РѕС‚РјРµС‚РёС‚СЊ, С‡С‚Рѕ РІ <b>IopAttachDeviceToDeviceStackSafe</b> Legacy-С„РёР»СЊС‚СЂР°РјРё 
+С„Р°Р№Р»РѕРІС‹С… СЃРёСЃС‚РµРј СЃС‡РёС‚Р°СЋС‚СЃСЏ РІСЃРµ, РєС‚Рѕ РїС‹С‚Р°РµС‚СЃСЏ РїСЂРё-attach'РёС‚СЊСЃСЏ Рє СѓСЃС‚СЂРѕР№СЃС‚РІР°Рј СЃ С‚РёРїРѕРј 
+С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјС‹.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

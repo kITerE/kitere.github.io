@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Аппаратная точка останова на запись и инструкция CMPXCHG</title>
+<title>EreTIk's Box &raquo; РђРїРїР°СЂР°С‚РЅР°СЏ С‚РѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР° РЅР° Р·Р°РїРёСЃСЊ Рё РёРЅСЃС‚СЂСѓРєС†РёСЏ CMPXCHG</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, InterlockedCompareExchange, cmpxchg, dr0, dr7, break on write, break on access" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Аппаратная точка останова на запись и инструкция CMPXCHG
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РђРїРїР°СЂР°С‚РЅР°СЏ С‚РѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР° РЅР° Р·Р°РїРёСЃСЊ Рё РёРЅСЃС‚СЂСѓРєС†РёСЏ CMPXCHG
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,10 +48,10 @@
         <div id="content">
             <br />
                 <p>
-Часто возникает ситуация, когда необходимо мониторить и логировать обращения к 
-некоторому значению памяти. Используя WinDbg, я часто использую 
-<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff538165(v=vs.85).aspx">аппаратную точку останова</a> 
-вида:
+Р§Р°СЃС‚Рѕ РІРѕР·РЅРёРєР°РµС‚ СЃРёС‚СѓР°С†РёСЏ, РєРѕРіРґР° РЅРµРѕР±С…РѕРґРёРјРѕ РјРѕРЅРёС‚РѕСЂРёС‚СЊ Рё Р»РѕРіРёСЂРѕРІР°С‚СЊ РѕР±СЂР°С‰РµРЅРёСЏ Рє 
+РЅРµРєРѕС‚РѕСЂРѕРјСѓ Р·РЅР°С‡РµРЅРёСЋ РїР°РјСЏС‚Рё. РСЃРїРѕР»СЊР·СѓСЏ WinDbg, СЏ С‡Р°СЃС‚Рѕ РёСЃРїРѕР»СЊР·СѓСЋ 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/ff538165(v=vs.85).aspx">Р°РїРїР°СЂР°С‚РЅСѓСЋ С‚РѕС‡РєСѓ РѕСЃС‚Р°РЅРѕРІР°</a> 
+РІРёРґР°:
                 </p>
             <br />
                 <div class="code">
@@ -59,13 +59,13 @@ ba w 4 ADDR "?dwo(ADDR);?@$thread;kb;gc;"
                 </div>
             <br />
                 <p>
-В результате получаем какая нить какое значение записывала по целевому адресу. 
-Плюс полезным подспорьем выступает стек вызовов.
+Р’ СЂРµР·СѓР»СЊС‚Р°С‚Рµ РїРѕР»СѓС‡Р°РµРј РєР°РєР°СЏ РЅРёС‚СЊ РєР°РєРѕРµ Р·РЅР°С‡РµРЅРёРµ Р·Р°РїРёСЃС‹РІР°Р»Р° РїРѕ С†РµР»РµРІРѕРјСѓ Р°РґСЂРµСЃСѓ. 
+РџР»СЋСЃ РїРѕР»РµР·РЅС‹Рј РїРѕРґСЃРїРѕСЂСЊРµРј РІС‹СЃС‚СѓРїР°РµС‚ СЃС‚РµРє РІС‹Р·РѕРІРѕРІ.
                 </p>
             <br />
                 <p>
-Совсем недавно я разгребал подобные логи, целевой код для которых выглядел 
-примерно следующим образом:
+РЎРѕРІСЃРµРј РЅРµРґР°РІРЅРѕ СЏ СЂР°Р·РіСЂРµР±Р°Р» РїРѕРґРѕР±РЅС‹Рµ Р»РѕРіРё, С†РµР»РµРІРѕР№ РєРѕРґ РґР»СЏ РєРѕС‚РѕСЂС‹С… РІС‹РіР»СЏРґРµР» 
+РїСЂРёРјРµСЂРЅРѕ СЃР»РµРґСѓСЋС‰РёРј РѕР±СЂР°Р·РѕРј:
                 </p>
             <br />
                 <pre class="brush: cpp;">
@@ -83,20 +83,20 @@ ba w 4 ADDR "?dwo(ADDR);?@$thread;kb;gc;"
                 </pre>
             <br />
                 <p>
-Не секрет, что 
+РќРµ СЃРµРєСЂРµС‚, С‡С‚Рѕ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms683560(v=vs.85).aspx">InterlockedCompareExchange(...)</a> 
-реализуется процессорной инструкцией CMPXCHG с префиксом LOCK. Соответсвенно, 
-для правильной интерпретации логов, возник вопрос: будет ли срабатывать 
-аппаратная точка останова, если после выполнения CMPXCHG значение памяти не 
-меняется (было TRUE).
+СЂРµР°Р»РёР·СѓРµС‚СЃСЏ РїСЂРѕС†РµСЃСЃРѕСЂРЅРѕР№ РёРЅСЃС‚СЂСѓРєС†РёРµР№ CMPXCHG СЃ РїСЂРµС„РёРєСЃРѕРј LOCK. РЎРѕРѕС‚РІРµС‚СЃРІРµРЅРЅРѕ, 
+РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕР№ РёРЅС‚РµСЂРїСЂРµС‚Р°С†РёРё Р»РѕРіРѕРІ, РІРѕР·РЅРёРє РІРѕРїСЂРѕСЃ: Р±СѓРґРµС‚ Р»Рё СЃСЂР°Р±Р°С‚С‹РІР°С‚СЊ 
+Р°РїРїР°СЂР°С‚РЅР°СЏ С‚РѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР°, РµСЃР»Рё РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ CMPXCHG Р·РЅР°С‡РµРЅРёРµ РїР°РјСЏС‚Рё РЅРµ 
+РјРµРЅСЏРµС‚СЃСЏ (Р±С‹Р»Рѕ TRUE).
                 </p>
             <br />
                 <p>
-Если прочесть документацию от Intel, то там есть интересная ремарка:
+Р•СЃР»Рё РїСЂРѕС‡РµСЃС‚СЊ РґРѕРєСѓРјРµРЅС‚Р°С†РёСЋ РѕС‚ Intel, С‚Рѕ С‚Р°Рј РµСЃС‚СЊ РёРЅС‚РµСЂРµСЃРЅР°СЏ СЂРµРјР°СЂРєР°:
                 </p>
             <br />
                 <div class="quote">
-To simplify the interface to the processor’s bus, the destination operand 
+To simplify the interface to the processorвЂ™s bus, the destination operand 
 receives a write cycle without regard to the result of the comparison. The 
 destination operand is written back if the comparison fails; otherwise, the 
 source operand is written into the destination. (The processor never produces a 
@@ -104,8 +104,8 @@ locked read without also producing a locked write.)
                 </div>
             <br />
                 <p>
-Получается, что запись происходит всегда. Что бы это проверить, набросаем 
-небольшой тест:
+РџРѕР»СѓС‡Р°РµС‚СЃСЏ, С‡С‚Рѕ Р·Р°РїРёСЃСЊ РїСЂРѕРёСЃС…РѕРґРёС‚ РІСЃРµРіРґР°. Р§С‚Рѕ Р±С‹ СЌС‚Рѕ РїСЂРѕРІРµСЂРёС‚СЊ, РЅР°Р±СЂРѕСЃР°РµРј 
+РЅРµР±РѕР»СЊС€РѕР№ С‚РµСЃС‚:
                 </p>
             <br />
                 <pre class="brush: cpp;">
@@ -216,10 +216,10 @@ INT _tmain(
                 </pre>
             <br />
                 <p>
-Тест  использует механизм аппаратных точек останова, манипулируя DR-регистрами. 
-Отладочные исключения в обрабатываются механизмом 
-<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms680657(v=vs.85).aspx">SEH'а</a>.
-Запустим собранный код теста, получим результаты:
+РўРµСЃС‚  РёСЃРїРѕР»СЊР·СѓРµС‚ РјРµС…Р°РЅРёР·Рј Р°РїРїР°СЂР°С‚РЅС‹С… С‚РѕС‡РµРє РѕСЃС‚Р°РЅРѕРІР°, РјР°РЅРёРїСѓР»РёСЂСѓСЏ DR-СЂРµРіРёСЃС‚СЂР°РјРё. 
+РћС‚Р»Р°РґРѕС‡РЅС‹Рµ РёСЃРєР»СЋС‡РµРЅРёСЏ РІ РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‚СЃСЏ РјРµС…Р°РЅРёР·РјРѕРј 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms680657(v=vs.85).aspx">SEH'Р°</a>.
+Р—Р°РїСѓСЃС‚РёРј СЃРѕР±СЂР°РЅРЅС‹Р№ РєРѕРґ С‚РµСЃС‚Р°, РїРѕР»СѓС‡РёРј СЂРµР·СѓР»СЊС‚Р°С‚С‹:
                 </p>
             <br />
                 <div class="code">
@@ -230,10 +230,10 @@ lock cmpxchg 1 &lt;- 1
                 </div>
             <br />
                 <p>
-Результаты недвусмысленно подтверждают, что даже если по результату выполнения 
-CMPXCHG память не изменила своего значения, происходит отладочное исключение на 
-запись по целевому адресу. Соответственно, в случае с логами, нужно при анализе 
-отличать первую запись значения от повторной попытки записи.
+Р РµР·СѓР»СЊС‚Р°С‚С‹ РЅРµРґРІСѓСЃРјС‹СЃР»РµРЅРЅРѕ РїРѕРґС‚РІРµСЂР¶РґР°СЋС‚, С‡С‚Рѕ РґР°Р¶Рµ РµСЃР»Рё РїРѕ СЂРµР·СѓР»СЊС‚Р°С‚Сѓ РІС‹РїРѕР»РЅРµРЅРёСЏ 
+CMPXCHG РїР°РјСЏС‚СЊ РЅРµ РёР·РјРµРЅРёР»Р° СЃРІРѕРµРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РїСЂРѕРёСЃС…РѕРґРёС‚ РѕС‚Р»Р°РґРѕС‡РЅРѕРµ РёСЃРєР»СЋС‡РµРЅРёРµ РЅР° 
+Р·Р°РїРёСЃСЊ РїРѕ С†РµР»РµРІРѕРјСѓ Р°РґСЂРµСЃСѓ. РЎРѕРѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕ, РІ СЃР»СѓС‡Р°Рµ СЃ Р»РѕРіР°РјРё, РЅСѓР¶РЅРѕ РїСЂРё Р°РЅР°Р»РёР·Рµ 
+РѕС‚Р»РёС‡Р°С‚СЊ РїРµСЂРІСѓСЋ Р·Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёСЏ РѕС‚ РїРѕРІС‚РѕСЂРЅРѕР№ РїРѕРїС‹С‚РєРё Р·Р°РїРёСЃРё.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

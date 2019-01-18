@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Отсутствие DACL'а у security descriptor'а и Lowbox-процессы (AppContainer)</title>
+<title>EreTIk's Box &raquo; РћС‚СЃСѓС‚СЃС‚РІРёРµ DACL'Р° Сѓ security descriptor'Р° Рё Lowbox-РїСЂРѕС†РµСЃСЃС‹ (AppContainer)</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver, TOKEN_LOWBOX, Lowbox, AppContainer, SE_DACL_PRESENT" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Отсутствие DACL'а у security descriptor'а и Lowbox-процессы (AppContainer)
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РћС‚СЃСѓС‚СЃС‚РІРёРµ DACL'Р° Сѓ security descriptor'Р° Рё Lowbox-РїСЂРѕС†РµСЃСЃС‹ (AppContainer)
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,11 +48,11 @@
         <div id="content">
             <br />
                 <p>
-Для одной повседневной задачи мне понадобилось дать весь доступ любому процессу 
-к созданному мной объекту ядра. Самый простой способ это сделать - повесить на 
-этот объект security descriptor, у которого будет отсутствовать DACL. О таком 
-поведении, в частности, написано в описании 
-<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff562781(v=vs.85).aspx">функции RtlSetDaclSecurityDescriptor(...)</a>:
+Р”Р»СЏ РѕРґРЅРѕР№ РїРѕРІСЃРµРґРЅРµРІРЅРѕР№ Р·Р°РґР°С‡Рё РјРЅРµ РїРѕРЅР°РґРѕР±РёР»РѕСЃСЊ РґР°С‚СЊ РІРµСЃСЊ РґРѕСЃС‚СѓРї Р»СЋР±РѕРјСѓ РїСЂРѕС†РµСЃСЃСѓ 
+Рє СЃРѕР·РґР°РЅРЅРѕРјСѓ РјРЅРѕР№ РѕР±СЉРµРєС‚Сѓ СЏРґСЂР°. РЎР°РјС‹Р№ РїСЂРѕСЃС‚РѕР№ СЃРїРѕСЃРѕР± СЌС‚Рѕ СЃРґРµР»Р°С‚СЊ - РїРѕРІРµСЃРёС‚СЊ РЅР° 
+СЌС‚РѕС‚ РѕР±СЉРµРєС‚ security descriptor, Сѓ РєРѕС‚РѕСЂРѕРіРѕ Р±СѓРґРµС‚ РѕС‚СЃСѓС‚СЃС‚РІРѕРІР°С‚СЊ DACL. Рћ С‚Р°РєРѕРј 
+РїРѕРІРµРґРµРЅРёРё, РІ С‡Р°СЃС‚РЅРѕСЃС‚Рё, РЅР°РїРёСЃР°РЅРѕ РІ РѕРїРёСЃР°РЅРёРё 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff562781(v=vs.85).aspx">С„СѓРЅРєС†РёРё RtlSetDaclSecurityDescriptor(...)</a>:
                 </p>
             <br />
                 <div class="quote">
@@ -61,22 +61,22 @@ the same as an empty DACL. An empty DACL denies all access to an object
                 </div>
             <br />
                 <p>
-Сказано-сделано. Но начались жалобы с машин Windows 8/8.1/10. При расследовании 
-оказалось, что некоторые процессы не могут получить доступ к объектам ядра, на 
-который назначен security descriptor без DACL'а. Первый процесс, на котором мне 
-удалось воспроизвести это поведение - Metro-версия IE. После трассировки 
-не-экспортируемой функции  nt!SepAccessCheck выяснилось, что в ветке, где 
-проверяется отсутствие DACL'а у security descriptor'а, появился новое условие: 
-если у токена во флагах (nt!_TOKEN::TokenFlags) есть флаг <b>TOKEN_LOWBOX</b> (0x4000), 
-то безусловно возвращается STATUS_ACCESS_DENIED. Процессы с флагом 
-<b>TOKEN_LOWBOX</b> так же называются AppContainer и используются как 
-<a target="_blank" href="http://blogs.msdn.com/b/ieinternals/archive/2012/03/23/understanding-ie10-enhanced-protected-mode-network-security-addons-cookies-metro-desktop.aspx">новый механизм изоляции, в том числе для IE</a>.
+РЎРєР°Р·Р°РЅРѕ-СЃРґРµР»Р°РЅРѕ. РќРѕ РЅР°С‡Р°Р»РёСЃСЊ Р¶Р°Р»РѕР±С‹ СЃ РјР°С€РёРЅ Windows 8/8.1/10. РџСЂРё СЂР°СЃСЃР»РµРґРѕРІР°РЅРёРё 
+РѕРєР°Р·Р°Р»РѕСЃСЊ, С‡С‚Рѕ РЅРµРєРѕС‚РѕСЂС‹Рµ РїСЂРѕС†РµСЃСЃС‹ РЅРµ РјРѕРіСѓС‚ РїРѕР»СѓС‡РёС‚СЊ РґРѕСЃС‚СѓРї Рє РѕР±СЉРµРєС‚Р°Рј СЏРґСЂР°, РЅР° 
+РєРѕС‚РѕСЂС‹Р№ РЅР°Р·РЅР°С‡РµРЅ security descriptor Р±РµР· DACL'Р°. РџРµСЂРІС‹Р№ РїСЂРѕС†РµСЃСЃ, РЅР° РєРѕС‚РѕСЂРѕРј РјРЅРµ 
+СѓРґР°Р»РѕСЃСЊ РІРѕСЃРїСЂРѕРёР·РІРµСЃС‚Рё СЌС‚Рѕ РїРѕРІРµРґРµРЅРёРµ - Metro-РІРµСЂСЃРёСЏ IE. РџРѕСЃР»Рµ С‚СЂР°СЃСЃРёСЂРѕРІРєРё 
+РЅРµ-СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјРѕР№ С„СѓРЅРєС†РёРё  nt!SepAccessCheck РІС‹СЏСЃРЅРёР»РѕСЃСЊ, С‡С‚Рѕ РІ РІРµС‚РєРµ, РіРґРµ 
+РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ РѕС‚СЃСѓС‚СЃС‚РІРёРµ DACL'Р° Сѓ security descriptor'Р°, РїРѕСЏРІРёР»СЃСЏ РЅРѕРІРѕРµ СѓСЃР»РѕРІРёРµ: 
+РµСЃР»Рё Сѓ С‚РѕРєРµРЅР° РІРѕ С„Р»Р°РіР°С… (nt!_TOKEN::TokenFlags) РµСЃС‚СЊ С„Р»Р°Рі <b>TOKEN_LOWBOX</b> (0x4000), 
+С‚Рѕ Р±РµР·СѓСЃР»РѕРІРЅРѕ РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ STATUS_ACCESS_DENIED. РџСЂРѕС†РµСЃСЃС‹ СЃ С„Р»Р°РіРѕРј 
+<b>TOKEN_LOWBOX</b> С‚Р°Рє Р¶Рµ РЅР°Р·С‹РІР°СЋС‚СЃСЏ AppContainer Рё РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РєР°Рє 
+<a target="_blank" href="http://blogs.msdn.com/b/ieinternals/archive/2012/03/23/understanding-ie10-enhanced-protected-mode-network-security-addons-cookies-metro-desktop.aspx">РЅРѕРІС‹Р№ РјРµС…Р°РЅРёР·Рј РёР·РѕР»СЏС†РёРё, РІ С‚РѕРј С‡РёСЃР»Рµ РґР»СЏ IE</a>.
                 </p>
             <br />
                 <p>
-Как мотивировано изменение логики применения security descriptor'ов без DACL'а 
-я не нашел. Как не нашел и упоминания изменения самой логики, что и послужило 
-причиной написания это небольшой заметки.
+РљР°Рє РјРѕС‚РёРІРёСЂРѕРІР°РЅРѕ РёР·РјРµРЅРµРЅРёРµ Р»РѕРіРёРєРё РїСЂРёРјРµРЅРµРЅРёСЏ security descriptor'РѕРІ Р±РµР· DACL'Р° 
+СЏ РЅРµ РЅР°С€РµР». РљР°Рє РЅРµ РЅР°С€РµР» Рё СѓРїРѕРјРёРЅР°РЅРёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃР°РјРѕР№ Р»РѕРіРёРєРё, С‡С‚Рѕ Рё РїРѕСЃР»СѓР¶РёР»Рѕ 
+РїСЂРёС‡РёРЅРѕР№ РЅР°РїРёСЃР°РЅРёСЏ СЌС‚Рѕ РЅРµР±РѕР»СЊС€РѕР№ Р·Р°РјРµС‚РєРё.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

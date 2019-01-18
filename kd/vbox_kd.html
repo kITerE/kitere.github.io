@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; vbox_kd - небольшой набор скриптов для автоматизации запуска отладчика WinDbg при работе с VirtualBox</title>
+<title>EreTIk's Box &raquo; vbox_kd - РЅРµР±РѕР»СЊС€РѕР№ РЅР°Р±РѕСЂ СЃРєСЂРёРїС‚РѕРІ РґР»СЏ Р°РІС‚РѕРјР°С‚РёР·Р°С†РёРё Р·Р°РїСѓСЃРєР° РѕС‚Р»Р°РґС‡РёРєР° WinDbg РїСЂРё СЂР°Р±РѕС‚Рµ СЃ VirtualBox</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg, kd, VirtualBox, VirtualKD" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; vbox_kd - небольшой набор скриптов для автоматизации запуска отладчика WinDbg при работе с VirtualBox
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a> &raquo; vbox_kd - РЅРµР±РѕР»СЊС€РѕР№ РЅР°Р±РѕСЂ СЃРєСЂРёРїС‚РѕРІ РґР»СЏ Р°РІС‚РѕРјР°С‚РёР·Р°С†РёРё Р·Р°РїСѓСЃРєР° РѕС‚Р»Р°РґС‡РёРєР° WinDbg РїСЂРё СЂР°Р±РѕС‚Рµ СЃ VirtualBox
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,64 +48,64 @@
         <div id="content">
             <br />
                 <p>
-За последнее время я практически полностью перешел на VirtualBox в качестве 
-гипервизора. Этому, в числе прочего, сильно поспособствовали:
+Р—Р° РїРѕСЃР»РµРґРЅРµРµ РІСЂРµРјСЏ СЏ РїСЂР°РєС‚РёС‡РµСЃРєРё РїРѕР»РЅРѕСЃС‚СЊСЋ РїРµСЂРµС€РµР» РЅР° VirtualBox РІ РєР°С‡РµСЃС‚РІРµ 
+РіРёРїРµСЂРІРёР·РѕСЂР°. Р­С‚РѕРјСѓ, РІ С‡РёСЃР»Рµ РїСЂРѕС‡РµРіРѕ, СЃРёР»СЊРЅРѕ РїРѕСЃРїРѕСЃРѕР±СЃС‚РІРѕРІР°Р»Рё:
                 </p>
 <ul>
-    <li><a target="_blank" href="http://virtualkd.sysprogs.org/tutorials/install/manualvm">вливание кода интеграции с VirtualKD в основной репозиторий</a></li>
-    <li>сносная работоспособность <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/hh439346(v=vs.85).aspx">отладки Windows через сеть</a> на современных версиях ОС Windows (8 и старше)</li>
+    <li><a target="_blank" href="http://virtualkd.sysprogs.org/tutorials/install/manualvm">РІР»РёРІР°РЅРёРµ РєРѕРґР° РёРЅС‚РµРіСЂР°С†РёРё СЃ VirtualKD РІ РѕСЃРЅРѕРІРЅРѕР№ СЂРµРїРѕР·РёС‚РѕСЂРёР№</a></li>
+    <li>СЃРЅРѕСЃРЅР°СЏ СЂР°Р±РѕС‚РѕСЃРїРѕСЃРѕР±РЅРѕСЃС‚СЊ <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/hh439346(v=vs.85).aspx">РѕС‚Р»Р°РґРєРё Windows С‡РµСЂРµР· СЃРµС‚СЊ</a> РЅР° СЃРѕРІСЂРµРјРµРЅРЅС‹С… РІРµСЂСЃРёСЏС… РћРЎ Windows (8 Рё СЃС‚Р°СЂС€Рµ)</li>
 </ul>
             <br />
                 <p>
-Отладку Windows через сеть я использую, что бы не 
-<a target="_blank" href="http://virtualkd.sysprogs.org/tutorials/install/">нажимать F8 при каждой загрузке систем Win8 и старше</a>. 
-И чем дальше, тем больше в качестве гостевой ОС используется Win8+. А vmmon.exe 
-не автоматизирует запуск/останов отладчиков для машин без VirtualKD.
+РћС‚Р»Р°РґРєСѓ Windows С‡РµСЂРµР· СЃРµС‚СЊ СЏ РёСЃРїРѕР»СЊР·СѓСЋ, С‡С‚Рѕ Р±С‹ РЅРµ 
+<a target="_blank" href="http://virtualkd.sysprogs.org/tutorials/install/">РЅР°Р¶РёРјР°С‚СЊ F8 РїСЂРё РєР°Р¶РґРѕР№ Р·Р°РіСЂСѓР·РєРµ СЃРёСЃС‚РµРј Win8 Рё СЃС‚Р°СЂС€Рµ</a>. 
+Р С‡РµРј РґР°Р»СЊС€Рµ, С‚РµРј Р±РѕР»СЊС€Рµ РІ РєР°С‡РµСЃС‚РІРµ РіРѕСЃС‚РµРІРѕР№ РћРЎ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ Win8+. Рђ vmmon.exe 
+РЅРµ Р°РІС‚РѕРјР°С‚РёР·РёСЂСѓРµС‚ Р·Р°РїСѓСЃРє/РѕСЃС‚Р°РЅРѕРІ РѕС‚Р»Р°РґС‡РёРєРѕРІ РґР»СЏ РјР°С€РёРЅ Р±РµР· VirtualKD.
                 </p>
             <br />
                 <p>
-Это и подтолкнуло к созданию набора из двух скриптов - 
+Р­С‚Рѕ Рё РїРѕРґС‚РѕР»РєРЅСѓР»Рѕ Рє СЃРѕР·РґР°РЅРёСЋ РЅР°Р±РѕСЂР° РёР· РґРІСѓС… СЃРєСЂРёРїС‚РѕРІ - 
 <a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd">vbox_kd</a>. 
-Первый 
+РџРµСЂРІС‹Р№ 
 <a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd/blob/master/vbox_kd_set_VM_connect_options.cmd">vbox_kd_set_VM_connect_options.cmd</a> 
-- подготовительный, он сохраняет информацию о том, с какой командной строкой нужно запускать WinDbg.
+- РїРѕРґРіРѕС‚РѕРІРёС‚РµР»СЊРЅС‹Р№, РѕРЅ СЃРѕС…СЂР°РЅСЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ С‚РѕРј, СЃ РєР°РєРѕР№ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРѕР№ РЅСѓР¶РЅРѕ Р·Р°РїСѓСЃРєР°С‚СЊ WinDbg.
                 </p>
                 <p>
-Например для машины "Windows 8.1 x64", которая будет отлаживаться через сеть, нужно выполнить следующую команду:
+РќР°РїСЂРёРјРµСЂ РґР»СЏ РјР°С€РёРЅС‹ "Windows 8.1 x64", РєРѕС‚РѕСЂР°СЏ Р±СѓРґРµС‚ РѕС‚Р»Р°Р¶РёРІР°С‚СЊСЃСЏ С‡РµСЂРµР· СЃРµС‚СЊ, РЅСѓР¶РЅРѕ РІС‹РїРѕР»РЅРёС‚СЊ СЃР»РµРґСѓСЋС‰СѓСЋ РєРѕРјР°РЅРґСѓ:
                 </p>
                 <div class="code">
 vbox_kd_set_VM_connect_options.cmd "Windows 8.1 x64" "net:port=50004,key=aaa.bbb.ccc.ddd"
                 </div>
                 <p>
-А для машины "Windows 7", которая будет отлаживаться с использованием VirtualKD:
+Рђ РґР»СЏ РјР°С€РёРЅС‹ "Windows 7", РєРѕС‚РѕСЂР°СЏ Р±СѓРґРµС‚ РѕС‚Р»Р°Р¶РёРІР°С‚СЊСЃСЏ СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј VirtualKD:
                 </p>
                 <div class="code">
 vbox_kd_set_VM_connect_options.cmd "Windows 7" "com:pipe,resets=0,reconnect,port=$(pipename)"
                 </div>
             <br />
                 <p>
-Второй скрипт 
+Р’С‚РѕСЂРѕР№ СЃРєСЂРёРїС‚ 
 <a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd/blob/master/vbox_kd_monitor.pyw">vbox_kd_monitor.pyw</a> 
-запускает VirtualBox.exe и следит за состояниями виртуальных машин. 
-Если запускается машина, для которой был предварительно вызван 
+Р·Р°РїСѓСЃРєР°РµС‚ VirtualBox.exe Рё СЃР»РµРґРёС‚ Р·Р° СЃРѕСЃС‚РѕСЏРЅРёСЏРјРё РІРёСЂС‚СѓР°Р»СЊРЅС‹С… РјР°С€РёРЅ. 
+Р•СЃР»Рё Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ РјР°С€РёРЅР°, РґР»СЏ РєРѕС‚РѕСЂРѕР№ Р±С‹Р» РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ РІС‹Р·РІР°РЅ 
 <a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd/blob/master/vbox_kd_set_VM_connect_options.cmd">vbox_kd_set_VM_connect_options.cmd</a>, 
-то будет запущен WinDbg. При завершении сеанса виртуальной машины будет 
-завершен и WinDbg.
+С‚Рѕ Р±СѓРґРµС‚ Р·Р°РїСѓС‰РµРЅ WinDbg. РџСЂРё Р·Р°РІРµСЂС€РµРЅРёРё СЃРµР°РЅСЃР° РІРёСЂС‚СѓР°Р»СЊРЅРѕР№ РјР°С€РёРЅС‹ Р±СѓРґРµС‚ 
+Р·Р°РІРµСЂС€РµРЅ Рё WinDbg.
                 </p>
             <br />
                 <p>
-Для корректной работы скриптов нужно исправить пути в 
+Р”Р»СЏ РєРѕСЂСЂРµРєС‚РЅРѕР№ СЂР°Р±РѕС‚С‹ СЃРєСЂРёРїС‚РѕРІ РЅСѓР¶РЅРѕ РёСЃРїСЂР°РІРёС‚СЊ РїСѓС‚Рё РІ 
 <a target="_blank" href="https://githomelab.ru/EreTIk/vbox_kd/blob/master/vbox_kd.ini">vbox_kd.ini</a>, 
-если VirtualBox или WinDbg установлены не по стандартному пути. 
-А так же VirtualBox должен быть установлен с поддержкой скриптинга Python 
-(по умолчанию ставится инсталлятором).
+РµСЃР»Рё VirtualBox РёР»Рё WinDbg СѓСЃС‚Р°РЅРѕРІР»РµРЅС‹ РЅРµ РїРѕ СЃС‚Р°РЅРґР°СЂС‚РЅРѕРјСѓ РїСѓС‚Рё. 
+Рђ С‚Р°Рє Р¶Рµ VirtualBox РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СѓСЃС‚Р°РЅРѕРІР»РµРЅ СЃ РїРѕРґРґРµСЂР¶РєРѕР№ СЃРєСЂРёРїС‚РёРЅРіР° Python 
+(РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СЃС‚Р°РІРёС‚СЃСЏ РёРЅСЃС‚Р°Р»Р»СЏС‚РѕСЂРѕРј).
                 </p>
             <br />
                 <a name="UPD_11_05_2018"></a>
                 <h2>Updated (11.05.2018)</h2>
 <ul>
-<li>Проект перенесен на githomelab.ru</li>
-<li>Добавлена поддержка VirtualBox API версии 5.2</li>
+<li>РџСЂРѕРµРєС‚ РїРµСЂРµРЅРµСЃРµРЅ РЅР° githomelab.ru</li>
+<li>Р”РѕР±Р°РІР»РµРЅР° РїРѕРґРґРµСЂР¶РєР° VirtualBox API РІРµСЂСЃРёРё 5.2</li>
 </ul>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

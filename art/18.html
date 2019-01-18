@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Создание процесса из драйвера режима ядра: Windows 8</title>
+<title>EreTIk's Box &raquo; РЎРѕР·РґР°РЅРёРµ РїСЂРѕС†РµСЃСЃР° РёР· РґСЂР°Р№РІРµСЂР° СЂРµР¶РёРјР° СЏРґСЂР°: Windows 8</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, Windows 8, PsCaptureUserProcessParameters, _PsCaptureUserProcessParameters@8, ZwCreateUserProcess, _ZwCreateUserProcess@44, condrv.sys" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Создание процесса из драйвера режима ядра: Windows 8
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РЎРѕР·РґР°РЅРёРµ РїСЂРѕС†РµСЃСЃР° РёР· РґСЂР°Р№РІРµСЂР° СЂРµР¶РёРјР° СЏРґСЂР°: Windows 8
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,14 +48,14 @@
         <div id="content">
             <br />
                 <p>
-Думаю, бывало и не раз у многих, что при написании драйвера режима ядра 
-возникало желание создать настоящий процесс и делегировать часть задач ему. Но 
-до недавнего момента это было табуировано MS'ом: нужные функции просто не 
-экспортировались для драйверов из ядра ОС, оставались "грязные хаки"... И вот 
-вышла Windows 8, в линейке которой (x86/AMD64-сборки 8102, 8250, 8400 и, 
- 9200) у ntoskrnl.exe появились пара "секретных" экспортов: безымянные 
-экспорты с ординалами 1 и 2. Но при наличии символов ядро охотно раскроет свой 
-секрет (ниже приведен отрывок из вывода команды "dumpbin /EXPORTS ntoskrnl.exe"):
+Р”СѓРјР°СЋ, Р±С‹РІР°Р»Рѕ Рё РЅРµ СЂР°Р· Сѓ РјРЅРѕРіРёС…, С‡С‚Рѕ РїСЂРё РЅР°РїРёСЃР°РЅРёРё РґСЂР°Р№РІРµСЂР° СЂРµР¶РёРјР° СЏРґСЂР° 
+РІРѕР·РЅРёРєР°Р»Рѕ Р¶РµР»Р°РЅРёРµ СЃРѕР·РґР°С‚СЊ РЅР°СЃС‚РѕСЏС‰РёР№ РїСЂРѕС†РµСЃСЃ Рё РґРµР»РµРіРёСЂРѕРІР°С‚СЊ С‡Р°СЃС‚СЊ Р·Р°РґР°С‡ РµРјСѓ. РќРѕ 
+РґРѕ РЅРµРґР°РІРЅРµРіРѕ РјРѕРјРµРЅС‚Р° СЌС‚Рѕ Р±С‹Р»Рѕ С‚Р°Р±СѓРёСЂРѕРІР°РЅРѕ MS'РѕРј: РЅСѓР¶РЅС‹Рµ С„СѓРЅРєС†РёРё РїСЂРѕСЃС‚Рѕ РЅРµ 
+СЌРєСЃРїРѕСЂС‚РёСЂРѕРІР°Р»РёСЃСЊ РґР»СЏ РґСЂР°Р№РІРµСЂРѕРІ РёР· СЏРґСЂР° РћРЎ, РѕСЃС‚Р°РІР°Р»РёСЃСЊ "РіСЂСЏР·РЅС‹Рµ С…Р°РєРё"... Р РІРѕС‚ 
+РІС‹С€Р»Р° Windows 8, РІ Р»РёРЅРµР№РєРµ РєРѕС‚РѕСЂРѕР№ (x86/AMD64-СЃР±РѕСЂРєРё 8102, 8250, 8400 Рё, 
+ 9200) Сѓ ntoskrnl.exe РїРѕСЏРІРёР»РёСЃСЊ РїР°СЂР° "СЃРµРєСЂРµС‚РЅС‹С…" СЌРєСЃРїРѕСЂС‚РѕРІ: Р±РµР·С‹РјСЏРЅРЅС‹Рµ 
+СЌРєСЃРїРѕСЂС‚С‹ СЃ РѕСЂРґРёРЅР°Р»Р°РјРё 1 Рё 2. РќРѕ РїСЂРё РЅР°Р»РёС‡РёРё СЃРёРјРІРѕР»РѕРІ СЏРґСЂРѕ РѕС…РѕС‚РЅРѕ СЂР°СЃРєСЂРѕРµС‚ СЃРІРѕР№ 
+СЃРµРєСЂРµС‚ (РЅРёР¶Рµ РїСЂРёРІРµРґРµРЅ РѕС‚СЂС‹РІРѕРє РёР· РІС‹РІРѕРґР° РєРѕРјР°РЅРґС‹ "dumpbin /EXPORTS ntoskrnl.exe"):
                 </p>
                 <div class="code">
 ...
@@ -65,11 +65,11 @@
                 </div>
             <br />
                 <p>
-Набросав несложный скрипт, легко ищется виновник этого торжества: 
-<b>condrv.sys</b>: "Console Driver". Заглянув внутрь PE-файла можно найти 
-использование этих функций: запуск процесса 
-"\SystemRoot\System32\Conhost.exe" с нужными параметрами. Поймать его работу в 
-динамике тоже достаточно просто, достаточно просто запустить cmd.exe:
+РќР°Р±СЂРѕСЃР°РІ РЅРµСЃР»РѕР¶РЅС‹Р№ СЃРєСЂРёРїС‚, Р»РµРіРєРѕ РёС‰РµС‚СЃСЏ РІРёРЅРѕРІРЅРёРє СЌС‚РѕРіРѕ С‚РѕСЂР¶РµСЃС‚РІР°: 
+<b>condrv.sys</b>: "Console Driver". Р—Р°РіР»СЏРЅСѓРІ РІРЅСѓС‚СЂСЊ PE-С„Р°Р№Р»Р° РјРѕР¶РЅРѕ РЅР°Р№С‚Рё 
+РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ СЌС‚РёС… С„СѓРЅРєС†РёР№: Р·Р°РїСѓСЃРє РїСЂРѕС†РµСЃСЃР° 
+"\SystemRoot\System32\Conhost.exe" СЃ РЅСѓР¶РЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё. РџРѕР№РјР°С‚СЊ РµРіРѕ СЂР°Р±РѕС‚Сѓ РІ 
+РґРёРЅР°РјРёРєРµ С‚РѕР¶Рµ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїСЂРѕСЃС‚Рѕ, РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїСЂРѕСЃС‚Рѕ Р·Р°РїСѓСЃС‚РёС‚СЊ cmd.exe:
                 </p>
                 <div class="code">
 1: kd&gt; !thread
@@ -116,9 +116,9 @@ ChildEBP RetAddr  Args to Child
                 </div>
             <br />
                 <p>
-Параметры этих функций уже давно можно найти в интернете, ntoskrnl.lib из DDK 
-для Windows 8 содержит эти функции. Теперь дело за малым: будем ждать описание 
-функций в MSDN =))
+РџР°СЂР°РјРµС‚СЂС‹ СЌС‚РёС… С„СѓРЅРєС†РёР№ СѓР¶Рµ РґР°РІРЅРѕ РјРѕР¶РЅРѕ РЅР°Р№С‚Рё РІ РёРЅС‚РµСЂРЅРµС‚Рµ, ntoskrnl.lib РёР· DDK 
+РґР»СЏ Windows 8 СЃРѕРґРµСЂР¶РёС‚ СЌС‚Рё С„СѓРЅРєС†РёРё. РўРµРїРµСЂСЊ РґРµР»Рѕ Р·Р° РјР°Р»С‹Рј: Р±СѓРґРµРј Р¶РґР°С‚СЊ РѕРїРёСЃР°РЅРёРµ 
+С„СѓРЅРєС†РёР№ РІ MSDN =))
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

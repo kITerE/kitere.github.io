@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; WinDbg 10.0.10075 получил поддержку .NatVis-файлов</title>
+<title>EreTIk's Box &raquo; WinDbg 10.0.10075 РїРѕР»СѓС‡РёР» РїРѕРґРґРµСЂР¶РєСѓ .NatVis-С„Р°Р№Р»РѕРІ</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, WinDbg 10.0.10075, NatVis, .natvis" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; WinDbg 10.0.10075 получил поддержку .NatVis-файлов
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a> &raquo; WinDbg 10.0.10075 РїРѕР»СѓС‡РёР» РїРѕРґРґРµСЂР¶РєСѓ .NatVis-С„Р°Р№Р»РѕРІ
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,15 +48,15 @@
         <div id="content">
             <br />
                 <p>
-Наряду с <a href="win10074_windbg10041_kdnic.html">поддержкой ethernet-отладки Windows 10 10074</a>, 
-в <a href="WinDBG_Download.html#v10.0.10075">WinDbg 10.0.10075</a> наконец-то 
-появилась поддержка .NatVis-файлов. Если кто вдруг кто не знает, то это файлы 
-для custom-представления переменных 
-сложных типов.
+РќР°СЂСЏРґСѓ СЃ <a href="win10074_windbg10041_kdnic.html">РїРѕРґРґРµСЂР¶РєРѕР№ ethernet-РѕС‚Р»Р°РґРєРё Windows 10 10074</a>, 
+РІ <a href="WinDBG_Download.html#v10.0.10075">WinDbg 10.0.10075</a> РЅР°РєРѕРЅРµС†-С‚Рѕ 
+РїРѕСЏРІРёР»Р°СЃСЊ РїРѕРґРґРµСЂР¶РєР° .NatVis-С„Р°Р№Р»РѕРІ. Р•СЃР»Рё РєС‚Рѕ РІРґСЂСѓРі РєС‚Рѕ РЅРµ Р·РЅР°РµС‚, С‚Рѕ СЌС‚Рѕ С„Р°Р№Р»С‹ 
+РґР»СЏ custom-РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С… 
+СЃР»РѕР¶РЅС‹С… С‚РёРїРѕРІ.
                 </p>
             <br />
                 <p>
-Набросаем и соберем в Visual Studio 2013 простой тест:
+РќР°Р±СЂРѕСЃР°РµРј Рё СЃРѕР±РµСЂРµРј РІ Visual Studio 2013 РїСЂРѕСЃС‚РѕР№ С‚РµСЃС‚:
                 </p>
             <br />
                 <div class="code">
@@ -73,9 +73,9 @@ int _tmain(int argc, _TCHAR* argv[])
                 </div>
             <br />
                 <p>
-В директории WinDbg (C:\Program Files (x86)\Windows Kits\10\Debuggers\x64) 
-создаем символическую ссылку Visualizers на директорию Visualizers в
-Visual Studio 2013. Результат должен быть таким:
+Р’ РґРёСЂРµРєС‚РѕСЂРёРё WinDbg (C:\Program Files (x86)\Windows Kits\10\Debuggers\x64) 
+СЃРѕР·РґР°РµРј СЃРёРјРІРѕР»РёС‡РµСЃРєСѓСЋ СЃСЃС‹Р»РєСѓ Visualizers РЅР° РґРёСЂРµРєС‚РѕСЂРёСЋ Visualizers РІ
+Visual Studio 2013. Р РµР·СѓР»СЊС‚Р°С‚ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ С‚Р°РєРёРј:
                 </p>
             <br />
                 <div class="code">
@@ -93,7 +93,7 @@ Print Name:            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Commo
                 </div>
             <br />
                 <p>
-Запускам тест в WinDbg, ждем отладочное исключение в wmain. Наслаждаемся:
+Р—Р°РїСѓСЃРєР°Рј С‚РµСЃС‚ РІ WinDbg, Р¶РґРµРј РѕС‚Р»Р°РґРѕС‡РЅРѕРµ РёСЃРєР»СЋС‡РµРЅРёРµ РІ wmain. РќР°СЃР»Р°Р¶РґР°РµРјСЃСЏ:
                 </p>
             <br />
                 <div class="code">
@@ -105,7 +105,7 @@ Print Name:            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Commo
                 </div>
             <br />
                 <p>
-Кликаем по TestString:
+РљР»РёРєР°РµРј РїРѕ TestString:
                 </p>
             <br />
                 <div class="code">
@@ -118,7 +118,7 @@ Print Name:            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Commo
                 </div>
             <br />
                 <p>
-Кликаем по TestVector:
+РљР»РёРєР°РµРј РїРѕ TestVector:
                 </p>
             <br />
                 <div class="code">
@@ -133,9 +133,9 @@ Print Name:            C:\Program Files (x86)\Microsoft Visual Studio 12.0\Commo
                 </div>
             <br />
                 <p>
-Как видно выше, используется новая команда <b>dx</b>. В лучших традициях эта команда 
-не описана в приложенной к отладчику справке. Но разработчики не поленились и 
-добавили обработку соответствующего параметра командной строки:
+РљР°Рє РІРёРґРЅРѕ РІС‹С€Рµ, РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РЅРѕРІР°СЏ РєРѕРјР°РЅРґР° <b>dx</b>. Р’ Р»СѓС‡С€РёС… С‚СЂР°РґРёС†РёСЏС… СЌС‚Р° РєРѕРјР°РЅРґР° 
+РЅРµ РѕРїРёСЃР°РЅР° РІ РїСЂРёР»РѕР¶РµРЅРЅРѕР№ Рє РѕС‚Р»Р°РґС‡РёРєСѓ СЃРїСЂР°РІРєРµ. РќРѕ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєРё РЅРµ РїРѕР»РµРЅРёР»РёСЃСЊ Рё 
+РґРѕР±Р°РІРёР»Рё РѕР±СЂР°Р±РѕС‚РєСѓ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РїР°СЂР°РјРµС‚СЂР° РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё:
                 </p>
             <br />
                 <div class="code">
@@ -172,7 +172,7 @@ Format Specifiers:
                 <h2>Updated (11.11.2015)</h2>
             <br />
                 <p>
-После выпуска релизной версии отладчика (10.0) поддержка NatVis'ов задокументирована
+РџРѕСЃР»Рµ РІС‹РїСѓСЃРєР° СЂРµР»РёР·РЅРѕР№ РІРµСЂСЃРёРё РѕС‚Р»Р°РґС‡РёРєР° (10.0) РїРѕРґРґРµСЂР¶РєР° NatVis'РѕРІ Р·Р°РґРѕРєСѓРјРµРЅС‚РёСЂРѕРІР°РЅР°
                 </p>
 <ul>
     <li><a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/mt219728%28v=vs.85%29.aspx">Debugging Tools for Windows: New for Windows 10.0</a></li>

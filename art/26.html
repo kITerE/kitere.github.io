@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Рассылка IRP о завершении работы системы (IRP_MJ_SHUTDOWN)</title>
+<title>EreTIk's Box &raquo; Р Р°СЃСЃС‹Р»РєР° IRP Рѕ Р·Р°РІРµСЂС€РµРЅРёРё СЂР°Р±РѕС‚С‹ СЃРёСЃС‚РµРјС‹ (IRP_MJ_SHUTDOWN)</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver, SHUTDOWN_PACKET, _SHUTDOWN_PACKET, IRP_MJ_SHUTDOWN, CmShutdownSystem, HvShutdownComplete, IoShutdownSystem, STATUS_TOO_LATE, IopDiskFileSystemQueueHead, IopCdRomFileSystemQueueHead, IopTapeFileSystemQueueHead, IoRegisterShutdownNotification, IoRegisterLastChanceShutdownNotification" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Рассылка IRP о завершении работы системы (IRP_MJ_SHUTDOWN)
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; Р Р°СЃСЃС‹Р»РєР° IRP Рѕ Р·Р°РІРµСЂС€РµРЅРёРё СЂР°Р±РѕС‚С‹ СЃРёСЃС‚РµРјС‹ (IRP_MJ_SHUTDOWN)
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,15 +48,15 @@
         <div id="content">
             <br />
                 <p>
-Отлаживал рассылку IO-менеджером IRP_MJ_SHUTDOWN, в процессе набросал 
-несколько скриптов для перечисления зарегистрированных устройств. Для работы 
-скриптов потребуется <a target="_blank" href="https://pykd.codeplex.com/">pykd</a>.
-Результаты работы скриптов сняты с Windows 10 AMD64 (build 10240), 
+РћС‚Р»Р°Р¶РёРІР°Р» СЂР°СЃСЃС‹Р»РєСѓ IO-РјРµРЅРµРґР¶РµСЂРѕРј IRP_MJ_SHUTDOWN, РІ РїСЂРѕС†РµСЃСЃРµ РЅР°Р±СЂРѕСЃР°Р» 
+РЅРµСЃРєРѕР»СЊРєРѕ СЃРєСЂРёРїС‚РѕРІ РґР»СЏ РїРµСЂРµС‡РёСЃР»РµРЅРёСЏ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ. Р”Р»СЏ СЂР°Р±РѕС‚С‹ 
+СЃРєСЂРёРїС‚РѕРІ РїРѕС‚СЂРµР±СѓРµС‚СЃСЏ <a target="_blank" href="https://pykd.codeplex.com/">pykd</a>.
+Р РµР·СѓР»СЊС‚Р°С‚С‹ СЂР°Р±РѕС‚С‹ СЃРєСЂРёРїС‚РѕРІ СЃРЅСЏС‚С‹ СЃ Windows 10 AMD64 (build 10240), 
 <a target="_blank" href="https://pykd.codeplex.com/releases/view/620817">pykd 0.3.1.1</a>.
                 </p>
             <br />
                 <p>
-Получение устройств, зарегистрированных вызовом 
+РџРѕР»СѓС‡РµРЅРёРµ СѓСЃС‚СЂРѕР№СЃС‚РІ, Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… РІС‹Р·РѕРІРѕРј 
 <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff549541(v=vs.85).aspx">IoRegisterShutdownNotification(...)</a>:
                 </p>
             <br />
@@ -130,8 +130,8 @@ Device queue is not busy.
                 </div>
             <br />
                 <p>
-Если IopNotifyShutdownQueueHead заменить на IopNotifyLastChanceShutdownQueueHead, 
-то получим устройства, зарегистрированные вызовом 
+Р•СЃР»Рё IopNotifyShutdownQueueHead Р·Р°РјРµРЅРёС‚СЊ РЅР° IopNotifyLastChanceShutdownQueueHead, 
+С‚Рѕ РїРѕР»СѓС‡РёРј СѓСЃС‚СЂРѕР№СЃС‚РІР°, Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РІС‹Р·РѕРІРѕРј 
 <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff549518(v=vs.85).aspx">IoRegisterLastChanceShutdownNotification(...)</a>:
                 </p>
             <br />
@@ -156,10 +156,10 @@ Device queue is not busy.
                 </div>
             <br />
                 <p>
-Кроме этого, IRP_MJ_SHUTDOWN (без дополнительной регистрации) получают драйвера 
-файловый систем, зарегистрированные вызовом 
+РљСЂРѕРјРµ СЌС‚РѕРіРѕ, IRP_MJ_SHUTDOWN (Р±РµР· РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕР№ СЂРµРіРёСЃС‚СЂР°С†РёРё) РїРѕР»СѓС‡Р°СЋС‚ РґСЂР°Р№РІРµСЂР° 
+С„Р°Р№Р»РѕРІС‹Р№ СЃРёСЃС‚РµРј, Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РІС‹Р·РѕРІРѕРј 
 <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff548494(v=vs.85).aspx">IoRegisterFileSystem(...)</a>
- (три списка, в зависимости от типа устройства):
+ (С‚СЂРё СЃРїРёСЃРєР°, РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РёРїР° СѓСЃС‚СЂРѕР№СЃС‚РІР°):
                 </p>
             <br />
                 <pre class="brush: py;">
@@ -288,19 +288,19 @@ Device queue is not busy.
                 </div>
             <br />
                 <p>
-Очередность рассылки IRP IO-менеджером:
+РћС‡РµСЂРµРґРЅРѕСЃС‚СЊ СЂР°СЃСЃС‹Р»РєРё IRP IO-РјРµРЅРµРґР¶РµСЂРѕРј:
                 </p>
                 <ol type="1">
-<li>Устройства, зарегистрированные вызовом <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff549541(v=vs.85).aspx">IoRegisterShutdownNotification(...)</a></li>
-<li>Устройства из списка IopDiskFileSystemQueueHead</li>
-<li>Устройства из списка IopCdRomFileSystemQueueHead</li>
-<li>Устройства из списка IopTapeFileSystemQueueHead</li>
-<li>Устройства, зарегистрированные вызовом <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff549518(v=vs.85).aspx">IoRegisterLastChanceShutdownNotification(...)</a></li>
+<li>РЈСЃС‚СЂРѕР№СЃС‚РІР°, Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РІС‹Р·РѕРІРѕРј <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff549541(v=vs.85).aspx">IoRegisterShutdownNotification(...)</a></li>
+<li>РЈСЃС‚СЂРѕР№СЃС‚РІР° РёР· СЃРїРёСЃРєР° IopDiskFileSystemQueueHead</li>
+<li>РЈСЃС‚СЂРѕР№СЃС‚РІР° РёР· СЃРїРёСЃРєР° IopCdRomFileSystemQueueHead</li>
+<li>РЈСЃС‚СЂРѕР№СЃС‚РІР° РёР· СЃРїРёСЃРєР° IopTapeFileSystemQueueHead</li>
+<li>РЈСЃС‚СЂРѕР№СЃС‚РІР°, Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РІС‹Р·РѕРІРѕРј <a target="_blank" href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff549518(v=vs.85).aspx">IoRegisterLastChanceShutdownNotification(...)</a></li>
                 </ol>
                 <p>
-Между пунктами 1 и 2 происходит вызов функции nt!CmShutdownSystem(), которая в 
-конце взводит признак HvShutdownComplete в TRUE. А, опираясь на взведенный 
-признак HvShutdownComplete, многие реестровые функции возвращают <b>STATUS_TOO_LATE</b>.
+РњРµР¶РґСѓ РїСѓРЅРєС‚Р°РјРё 1 Рё 2 РїСЂРѕРёСЃС…РѕРґРёС‚ РІС‹Р·РѕРІ С„СѓРЅРєС†РёРё nt!CmShutdownSystem(), РєРѕС‚РѕСЂР°СЏ РІ 
+РєРѕРЅС†Рµ РІР·РІРѕРґРёС‚ РїСЂРёР·РЅР°Рє HvShutdownComplete РІ TRUE. Рђ, РѕРїРёСЂР°СЏСЃСЊ РЅР° РІР·РІРµРґРµРЅРЅС‹Р№ 
+РїСЂРёР·РЅР°Рє HvShutdownComplete, РјРЅРѕРіРёРµ СЂРµРµСЃС‚СЂРѕРІС‹Рµ С„СѓРЅРєС†РёРё РІРѕР·РІСЂР°С‰Р°СЋС‚ <b>STATUS_TOO_LATE</b>.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

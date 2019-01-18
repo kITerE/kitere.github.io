@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; О подписи исполняемых файлов... в очередной раз</title>
+<title>EreTIk's Box &raquo; Рћ РїРѕРґРїРёСЃРё РёСЃРїРѕР»РЅСЏРµРјС‹С… С„Р°Р№Р»РѕРІ... РІ РѕС‡РµСЂРµРґРЅРѕР№ СЂР°Р·</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, signtool, IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY, code signing" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; О подписи исполняемых файлов... в очередной раз
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; Рћ РїРѕРґРїРёСЃРё РёСЃРїРѕР»РЅСЏРµРјС‹С… С„Р°Р№Р»РѕРІ... РІ РѕС‡РµСЂРµРґРЅРѕР№ СЂР°Р·
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,18 +48,18 @@
         <div id="content">
             <br />
                 <p>
-Тема embedded-подписи драйверов Windows не нова. Есть достаточно подробное описание 
+РўРµРјР° embedded-РїРѕРґРїРёСЃРё РґСЂР°Р№РІРµСЂРѕРІ Windows РЅРµ РЅРѕРІР°. Р•СЃС‚СЊ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїРѕРґСЂРѕР±РЅРѕРµ РѕРїРёСЃР°РЅРёРµ 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/gg487332.aspx">Digital Signatures for Kernel Modules on Windows</a>. 
-Документ большой: прочел, написал cmd-файлы и забыл.
+Р”РѕРєСѓРјРµРЅС‚ Р±РѕР»СЊС€РѕР№: РїСЂРѕС‡РµР», РЅР°РїРёСЃР°Р» cmd-С„Р°Р№Р»С‹ Рё Р·Р°Р±С‹Р».
                 </p>
             <br />
                 <p>
-Но недавно мне понадобилось собирать исполняемые файлы пользовательского режима 
-с флагом <b>IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY</b> и, естественно, 
-цифровой подписью. Решение было простым: с использованием cmd-файлов для 
-подписи драйверов были успешно подписаны и файлы пользовательского режима. 
-Smoke-тесты дали отличные результаты. А вот запуск на Windows Vista дал 
-ошибку 577 (ERROR_INVALID_IMAGE_HASH):
+РќРѕ РЅРµРґР°РІРЅРѕ РјРЅРµ РїРѕРЅР°РґРѕР±РёР»РѕСЃСЊ СЃРѕР±РёСЂР°С‚СЊ РёСЃРїРѕР»РЅСЏРµРјС‹Рµ С„Р°Р№Р»С‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ СЂРµР¶РёРјР° 
+СЃ С„Р»Р°РіРѕРј <b>IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY</b> Рё, РµСЃС‚РµСЃС‚РІРµРЅРЅРѕ, 
+С†РёС„СЂРѕРІРѕР№ РїРѕРґРїРёСЃСЊСЋ. Р РµС€РµРЅРёРµ Р±С‹Р»Рѕ РїСЂРѕСЃС‚С‹Рј: СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј cmd-С„Р°Р№Р»РѕРІ РґР»СЏ 
+РїРѕРґРїРёСЃРё РґСЂР°Р№РІРµСЂРѕРІ Р±С‹Р»Рё СѓСЃРїРµС€РЅРѕ РїРѕРґРїРёСЃР°РЅС‹ Рё С„Р°Р№Р»С‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ СЂРµР¶РёРјР°. 
+Smoke-С‚РµСЃС‚С‹ РґР°Р»Рё РѕС‚Р»РёС‡РЅС‹Рµ СЂРµР·СѓР»СЊС‚Р°С‚С‹. Рђ РІРѕС‚ Р·Р°РїСѓСЃРє РЅР° Windows Vista РґР°Р» 
+РѕС€РёР±РєСѓ 577 (ERROR_INVALID_IMAGE_HASH):
                 </p>
             <br />
                 <div class="quote">
@@ -69,11 +69,11 @@ damaged, or that might be malicious software from an unknown source.
                 </div>
             <br />
                 <p>
-Проведя несколько тестов и поискав на просторах MSDN было найдено много рекомендаций 
-<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx">подписывать user mod'ные модули с ключем /ph</a>. 
-Это и стало решением проблемы. А о том, что проблемными платформами являются 
-Windows Vista и 2008 Server, говорит 
-<a target="_blank" href="http://social.technet.microsoft.com/wiki/contents/articles/255.forced-integrity-signing-of-portable-executable-pe-files.aspx#Use_the_ph_option_with_SignTool">статься Forced Integrity Signing of Portable Executable (PE) files: Use the /ph option with SignTool</a>:
+РџСЂРѕРІРµРґСЏ РЅРµСЃРєРѕР»СЊРєРѕ С‚РµСЃС‚РѕРІ Рё РїРѕРёСЃРєР°РІ РЅР° РїСЂРѕСЃС‚РѕСЂР°С… MSDN Р±С‹Р»Рѕ РЅР°Р№РґРµРЅРѕ РјРЅРѕРіРѕ СЂРµРєРѕРјРµРЅРґР°С†РёР№ 
+<a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa387764(v=vs.85).aspx">РїРѕРґРїРёСЃС‹РІР°С‚СЊ user mod'РЅС‹Рµ РјРѕРґСѓР»Рё СЃ РєР»СЋС‡РµРј /ph</a>. 
+Р­С‚Рѕ Рё СЃС‚Р°Р»Рѕ СЂРµС€РµРЅРёРµРј РїСЂРѕР±Р»РµРјС‹. Рђ Рѕ С‚РѕРј, С‡С‚Рѕ РїСЂРѕР±Р»РµРјРЅС‹РјРё РїР»Р°С‚С„РѕСЂРјР°РјРё СЏРІР»СЏСЋС‚СЃСЏ 
+Windows Vista Рё 2008 Server, РіРѕРІРѕСЂРёС‚ 
+<a target="_blank" href="http://social.technet.microsoft.com/wiki/contents/articles/255.forced-integrity-signing-of-portable-executable-pe-files.aspx#Use_the_ph_option_with_SignTool">СЃС‚Р°С‚СЊСЃСЏ Forced Integrity Signing of Portable Executable (PE) files: Use the /ph option with SignTool</a>:
                 </p>
             <br />
                 <div class="quote">

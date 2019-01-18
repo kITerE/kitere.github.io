@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Часто используемые команды отладчика</title>
-<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, команды Windbg" />
+<title>EreTIk's Box &raquo; Р§Р°СЃС‚Рѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РєРѕРјР°РЅРґС‹ РѕС‚Р»Р°РґС‡РёРєР°</title>
+<meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, leak tests, РєРѕРјР°РЅРґС‹ Windbg" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
 <script type="text/javascript" src="../js/syntax_hl/shCore.js"></script>
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Часто используемые команды отладчика
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a> &raquo; Р§Р°СЃС‚Рѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РєРѕРјР°РЅРґС‹ РѕС‚Р»Р°РґС‡РёРєР°
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,84 +48,84 @@
         <div id="content">
             <br />
                 <p>
-Ниже приведены часто используемые мной команды отладчика:
+РќРёР¶Рµ РїСЂРёРІРµРґРµРЅС‹ С‡Р°СЃС‚Рѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РјРЅРѕР№ РєРѕРјР°РЅРґС‹ РѕС‚Р»Р°РґС‡РёРєР°:
                 </p>
             <br />
                 <table border="1">
                     <tr> 
-                        <td>Установка точки останова на создание именованного устройства</td>
+                        <td>РЈСЃС‚Р°РЅРѕРІРєР° С‚РѕС‡РєРё РѕСЃС‚Р°РЅРѕРІР° РЅР° СЃРѕР·РґР°РЅРёРµ РёРјРµРЅРѕРІР°РЅРЅРѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР°</td>
                         <td>bp nt!IoCreateDevice "j (poi(@esp + (3 * @$ptrsize) )) '!ustr poi(@esp + (3 * @$ptrsize) )'; 'gc' "</td>
                         <td></td>
                     </tr>
                     <tr> 
-                        <td>Установка точки останова на уничтожение процесса 0xaabbccdd</td>
+                        <td>РЈСЃС‚Р°РЅРѕРІРєР° С‚РѕС‡РєРё РѕСЃС‚Р°РЅРѕРІР° РЅР° СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РїСЂРѕС†РµСЃСЃР° 0xaabbccdd</td>
                         <td>bp nt!PspProcessDelete "j(poi(@esp + (1 * @$ptrsize) )!=0xaabbccdd) 'gc';'kb'"</td>
                         <td></td>
                     </tr>
                     <tr> 
-                        <td>Вывод в отладчик стека вызовов (трассировка отладочной печатью) при исполнении инструкции по адресу 0xaabbccdd </td>
+                        <td>Р’С‹РІРѕРґ РІ РѕС‚Р»Р°РґС‡РёРє СЃС‚РµРєР° РІС‹Р·РѕРІРѕРІ (С‚СЂР°СЃСЃРёСЂРѕРІРєР° РѕС‚Р»Р°РґРѕС‡РЅРѕР№ РїРµС‡Р°С‚СЊСЋ) РїСЂРё РёСЃРїРѕР»РЅРµРЅРёРё РёРЅСЃС‚СЂСѓРєС†РёРё РїРѕ Р°РґСЂРµСЃСѓ 0xaabbccdd </td>
                         <td>ba e 1 0xaabbccdd ".reload /user; kb 100; gc"</td>
                         <td></td>
                     </tr>
                     <tr>
-                        <td>Точка останова для трассировки вызова создания/открытия файла с выводом структуры  атрибутов объекта</td>
+                        <td>РўРѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР° РґР»СЏ С‚СЂР°СЃСЃРёСЂРѕРІРєРё РІС‹Р·РѕРІР° СЃРѕР·РґР°РЅРёСЏ/РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° СЃ РІС‹РІРѕРґРѕРј СЃС‚СЂСѓРєС‚СѓСЂС‹  Р°С‚СЂРёР±СѓС‚РѕРІ РѕР±СЉРµРєС‚Р°</td>
                         <td>bp nt!NtCreateFile "!obja poi(@esp + (3 * @$ptrsize) )";bp nt!NtOpenFile "!obja poi(@esp + (3 * @$ptrsize) )"</td>
                         <td></td>
                     </tr>
                     <tr>
-                        <td>Точка останова для трассировки соединения с [A]LPC-портом</td>
+                        <td>РўРѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР° РґР»СЏ С‚СЂР°СЃСЃРёСЂРѕРІРєРё СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ [A]LPC-РїРѕСЂС‚РѕРј</td>
                         <td>bp nt!NtSecureConnectPort "!ustr poi(@esp + (2 * @$ptrsize) )";bp nt!NtAlpcConnectPort "!ustr poi(@esp + (2 * @$ptrsize) )"</td>
-                        <td>Функция nt!NtAlpcConnectPort(...) присутствует на системах Vista+</td>
+                        <td>Р¤СѓРЅРєС†РёСЏ nt!NtAlpcConnectPort(...) РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ РЅР° СЃРёСЃС‚РµРјР°С… Vista+</td>
                     </tr>
                     <tr>
-                        <td>Точка останова для трассировки создания серверного [A]LPC-порта</td>
+                        <td>РўРѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР° РґР»СЏ С‚СЂР°СЃСЃРёСЂРѕРІРєРё СЃРѕР·РґР°РЅРёСЏ СЃРµСЂРІРµСЂРЅРѕРіРѕ [A]LPC-РїРѕСЂС‚Р°</td>
                         <td>bp nt!NtCreateWaitablePort "!obja poi(@esp + (2 * @$ptrsize) )";bp nt!NtCreatePort "!obja poi(@esp + (2 * @$ptrsize) )";bp nt!NtAlpcCreatePort "!obja poi(@esp + (2 * @$ptrsize) )"</td>
-                        <td>Функция nt!NtAlpcCreatePort(...) присутствует на системах Vista+</td>
+                        <td>Р¤СѓРЅРєС†РёСЏ nt!NtAlpcCreatePort(...) РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ РЅР° СЃРёСЃС‚РµРјР°С… Vista+</td>
                     </tr>
                     <tr>
-                        <td>Забыл точку останова в коде (int 3)? Выкашиваем одной командой :)</td>
+                        <td>Р—Р°Р±С‹Р» С‚РѕС‡РєСѓ РѕСЃС‚Р°РЅРѕРІР° РІ РєРѕРґРµ (int 3)? Р’С‹РєР°С€РёРІР°РµРј РѕРґРЅРѕР№ РєРѕРјР°РЅРґРѕР№ :)</td>
                         <td>eb @eip 0x90</td>
-                        <td>Команда вписывает по текущему значению регистра EIP инструкцию "nop"</td>
+                        <td>РљРѕРјР°РЅРґР° РІРїРёСЃС‹РІР°РµС‚ РїРѕ С‚РµРєСѓС‰РµРјСѓ Р·РЅР°С‡РµРЅРёСЋ СЂРµРіРёСЃС‚СЂР° EIP РёРЅСЃС‚СЂСѓРєС†РёСЋ "nop"</td>
                     </tr>
                     <tr>
-                        <td>Включение режима остановки отладчика при возникновении исключения в пользовательском режиме</td>
+                        <td>Р’РєР»СЋС‡РµРЅРёРµ СЂРµР¶РёРјР° РѕСЃС‚Р°РЅРѕРІРєРё РѕС‚Р»Р°РґС‡РёРєР° РїСЂРё РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РёСЃРєР»СЋС‡РµРЅРёСЏ РІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРј СЂРµР¶РёРјРµ</td>
                         <td>!gflag +soe</td>
-                        <td>Выключение: !gflag -soe</td>
+                        <td>Р’С‹РєР»СЋС‡РµРЅРёРµ: !gflag -soe</td>
                     </tr>
                     <tr>
-                        <td>Удаленная отладка через TCP</td>
+                        <td>РЈРґР°Р»РµРЅРЅР°СЏ РѕС‚Р»Р°РґРєР° С‡РµСЂРµР· TCP</td>
                         <td>
-На удаленной машине (которую хотим отлаживать) запускаем и подготавливаем отладчик, затем набираем:
+РќР° СѓРґР°Р»РµРЅРЅРѕР№ РјР°С€РёРЅРµ (РєРѕС‚РѕСЂСѓСЋ С…РѕС‚РёРј РѕС‚Р»Р°Р¶РёРІР°С‚СЊ) Р·Р°РїСѓСЃРєР°РµРј Рё РїРѕРґРіРѕС‚Р°РІР»РёРІР°РµРј РѕС‚Р»Р°РґС‡РёРє, Р·Р°С‚РµРј РЅР°Р±РёСЂР°РµРј:
 <br />
 .server tcp:port=<b><i>PORT_NUM</i></b>
 <hr />
-На основной машине (с которой хотим отлаживать) запускаем WinDbg, выбираем "File"-&gt;"Connect To Remote Session…" (Ctrl+R). 
-В "Connection String" набираем:
+РќР° РѕСЃРЅРѕРІРЅРѕР№ РјР°С€РёРЅРµ (СЃ РєРѕС‚РѕСЂРѕР№ С…РѕС‚РёРј РѕС‚Р»Р°Р¶РёРІР°С‚СЊ) Р·Р°РїСѓСЃРєР°РµРј WinDbg, РІС‹Р±РёСЂР°РµРј "File"-&gt;"Connect To Remote SessionвЂ¦" (Ctrl+R). 
+Р’ "Connection String" РЅР°Р±РёСЂР°РµРј:
 <br />
 tcp:Port=<b><i>PORT_NUM</i></b>,Server=<b><i>HOST_NAME</i></b>
                         </td>
                         <td>
-<b><i>PORT_NUM</i></b> - номер TCP порта, по которому будет проходить отладка
+<b><i>PORT_NUM</i></b> - РЅРѕРјРµСЂ TCP РїРѕСЂС‚Р°, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ Р±СѓРґРµС‚ РїСЂРѕС…РѕРґРёС‚СЊ РѕС‚Р»Р°РґРєР°
 <br />
-<b><i>HOST_NAME</i></b> - имя отлаживаемого хоста или его IP-адрес
+<b><i>HOST_NAME</i></b> - РёРјСЏ РѕС‚Р»Р°Р¶РёРІР°РµРјРѕРіРѕ С…РѕСЃС‚Р° РёР»Рё РµРіРѕ IP-Р°РґСЂРµСЃ
                         </td>
                     </tr>
                 </table>
                 <br /><hr /><br />
                 <a name="kd_dr_bug00"></a><p>
-Проблемы после команд трассировки исполнения отладочными регистрами, вида:
+РџСЂРѕР±Р»РµРјС‹ РїРѕСЃР»Рµ РєРѕРјР°РЅРґ С‚СЂР°СЃСЃРёСЂРѕРІРєРё РёСЃРїРѕР»РЅРµРЅРёСЏ РѕС‚Р»Р°РґРѕС‡РЅС‹РјРё СЂРµРіРёСЃС‚СЂР°РјРё, РІРёРґР°:
 </p><div class="code">ba e 1 ADDR</div><p>
-Даже когда точка останова снята командой 
+Р”Р°Р¶Рµ РєРѕРіРґР° С‚РѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР° СЃРЅСЏС‚Р° РєРѕРјР°РЅРґРѕР№ 
 </p><div class="code">bc*</div><p>
-у WinDbg появляются "фантомные боли". Он останавливается в другом 
-процессе на этом адресе и не хочет продолжать исполнение кода. 
-Лечится очисткой контрольного отладочного регистра dr7:
+Сѓ WinDbg РїРѕСЏРІР»СЏСЋС‚СЃСЏ "С„Р°РЅС‚РѕРјРЅС‹Рµ Р±РѕР»Рё". РћРЅ РѕСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РІ РґСЂСѓРіРѕРј 
+РїСЂРѕС†РµСЃСЃРµ РЅР° СЌС‚РѕРј Р°РґСЂРµСЃРµ Рё РЅРµ С…РѕС‡РµС‚ РїСЂРѕРґРѕР»Р¶Р°С‚СЊ РёСЃРїРѕР»РЅРµРЅРёРµ РєРѕРґР°. 
+Р›РµС‡РёС‚СЃСЏ РѕС‡РёСЃС‚РєРѕР№ РєРѕРЅС‚СЂРѕР»СЊРЅРѕРіРѕ РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ СЂРµРіРёСЃС‚СЂР° dr7:
 </p><div class="code">r dr7=0</div>
                 <br /><hr /><br />
                 <a name="debug_ninja_s_twitter_debug_tips"></a><p>
-Отличная подборка команд для WinDbg с кратким описанием:
-<a target="_blank" href="http://blogs.msdn.com/b/ntdebugging/archive/2011/07/20/updated-archive-of-the-debug-ninja-s-twitter-debug-tips.aspx">Updated Archive of the Debug Ninja’s Twitter Debug Tips</a>.
-Некоторые приемы неочевидны и не описаны в документации, в общем - спасибо автору.
+РћС‚Р»РёС‡РЅР°СЏ РїРѕРґР±РѕСЂРєР° РєРѕРјР°РЅРґ РґР»СЏ WinDbg СЃ РєСЂР°С‚РєРёРј РѕРїРёСЃР°РЅРёРµРј:
+<a target="_blank" href="http://blogs.msdn.com/b/ntdebugging/archive/2011/07/20/updated-archive-of-the-debug-ninja-s-twitter-debug-tips.aspx">Updated Archive of the Debug NinjaвЂ™s Twitter Debug Tips</a>.
+РќРµРєРѕС‚РѕСЂС‹Рµ РїСЂРёРµРјС‹ РЅРµРѕС‡РµРІРёРґРЅС‹ Рё РЅРµ РѕРїРёСЃР°РЅС‹ РІ РґРѕРєСѓРјРµРЅС‚Р°С†РёРё, РІ РѕР±С‰РµРј - СЃРїР°СЃРёР±Рѕ Р°РІС‚РѕСЂСѓ.
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

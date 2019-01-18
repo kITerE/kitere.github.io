@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Визуализация графа вызовов на основе лога команды wt</title>
+<title>EreTIk's Box &raquo; Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ РіСЂР°С„Р° РІС‹Р·РѕРІРѕРІ РЅР° РѕСЃРЅРѕРІРµ Р»РѕРіР° РєРѕРјР°РЅРґС‹ wt</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, rootkit, wt, trace, debugger, kd, WinDbg" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Заметки о WinDbg</a> &raquo; Визуализация графа вызовов на основе лога команды wt
+<b>EreTIk's Box </b> &raquo; <a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a> &raquo; Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ РіСЂР°С„Р° РІС‹Р·РѕРІРѕРІ РЅР° РѕСЃРЅРѕРІРµ Р»РѕРіР° РєРѕРјР°РЅРґС‹ wt
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,27 +48,27 @@
         <div id="content">
             <br />
                 <p>
-У отладчика WinDbg есть замечательная команда 
+РЈ РѕС‚Р»Р°РґС‡РёРєР° WinDbg РµСЃС‚СЊ Р·Р°РјРµС‡Р°С‚РµР»СЊРЅР°СЏ РєРѕРјР°РЅРґР° 
 <a target="_blank" href="http://msdn.microsoft.com/en-us/library/windows/hardware/ff561497(v=vs.85).aspx">wt (Trace and Watch Data)</a>, 
-которая позволяет трассировать исполнение кода. Но ее лог достаточно перегружен, 
-так как там (в числе прочего) отображается не только каждый вызов, но и каждый 
-возврат. Это удобно для детального анализа, но для быстрой визуализации графа 
-вызовов я написал небольшой скрипт на python - 
+РєРѕС‚РѕСЂР°СЏ РїРѕР·РІРѕР»СЏРµС‚ С‚СЂР°СЃСЃРёСЂРѕРІР°С‚СЊ РёСЃРїРѕР»РЅРµРЅРёРµ РєРѕРґР°. РќРѕ РµРµ Р»РѕРі РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїРµСЂРµРіСЂСѓР¶РµРЅ, 
+С‚Р°Рє РєР°Рє С‚Р°Рј (РІ С‡РёСЃР»Рµ РїСЂРѕС‡РµРіРѕ) РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ РЅРµ С‚РѕР»СЊРєРѕ РєР°Р¶РґС‹Р№ РІС‹Р·РѕРІ, РЅРѕ Рё РєР°Р¶РґС‹Р№ 
+РІРѕР·РІСЂР°С‚. Р­С‚Рѕ СѓРґРѕР±РЅРѕ РґР»СЏ РґРµС‚Р°Р»СЊРЅРѕРіРѕ Р°РЅР°Р»РёР·Р°, РЅРѕ РґР»СЏ Р±С‹СЃС‚СЂРѕР№ РІРёР·СѓР°Р»РёР·Р°С†РёРё РіСЂР°С„Р° 
+РІС‹Р·РѕРІРѕРІ СЏ РЅР°РїРёСЃР°Р» РЅРµР±РѕР»СЊС€РѕР№ СЃРєСЂРёРїС‚ РЅР° python - 
 <a href="../download/wtTree.py">wtTree.py</a>.
                 </p>
             <br />
                 <p>
-Скрипту первым и единственным параметром можно скормить log-файл, содержащий 
-результат выполнения одной <b>wt</b>-команды. Разобрав входной файл, скрипт 
-визуализирует его содержимое средствами <b>PySide</b>. Например так выглядит 
-вызов CreateFileW:
+РЎРєСЂРёРїС‚Сѓ РїРµСЂРІС‹Рј Рё РµРґРёРЅСЃС‚РІРµРЅРЅС‹Рј РїР°СЂР°РјРµС‚СЂРѕРј РјРѕР¶РЅРѕ СЃРєРѕСЂРјРёС‚СЊ log-С„Р°Р№Р», СЃРѕРґРµСЂР¶Р°С‰РёР№ 
+СЂРµР·СѓР»СЊС‚Р°С‚ РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРґРЅРѕР№ <b>wt</b>-РєРѕРјР°РЅРґС‹. Р Р°Р·РѕР±СЂР°РІ РІС…РѕРґРЅРѕР№ С„Р°Р№Р», СЃРєСЂРёРїС‚ 
+РІРёР·СѓР°Р»РёР·РёСЂСѓРµС‚ РµРіРѕ СЃРѕРґРµСЂР¶РёРјРѕРµ СЃСЂРµРґСЃС‚РІР°РјРё <b>PySide</b>. РќР°РїСЂРёРјРµСЂ С‚Р°Рє РІС‹РіР»СЏРґРёС‚ 
+РІС‹Р·РѕРІ CreateFileW:
                 </p>
 <br />
 <table align="center" border="0" cellpadding="0" cellspacing="0"><tr valign="top"><td>
 <p><img src="../images/wtTree_CreateFileW.png" alt="wtTree-CreateFileW" align="right" /></p>
 </td></tr></table>
 <br /><hr /><br />
-<p><a href="../download/wtTree.py"> Скачать скрипт wtTree.py </a></p>
+<p><a href="../download/wtTree.py"> РЎРєР°С‡Р°С‚СЊ СЃРєСЂРёРїС‚ wtTree.py </a></p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>
 </td></tr></table>

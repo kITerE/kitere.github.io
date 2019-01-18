@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile</title>
+<title>EreTIk's Box &raquo; РњР°СЃРєРё РґРѕСЃС‚СѓРїР° РґР»СЏ NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile Рё NtSetVolumeInformationFile</title>
 <meta name="keywords" content="EreTIk, kernel, ring0, driver development, NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile, NtSetVolumeInformationFile, IopQueryOperationAccess, IopSetOperationAccess, IopQueryFsOperationAccess, IopSetFsOperationAccess, ACCESS_MASK" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Маски доступа для NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РњР°СЃРєРё РґРѕСЃС‚СѓРїР° РґР»СЏ NtQueryInformationFile, NtSetInformationFile, NtQueryVolumeInformationFile Рё NtSetVolumeInformationFile
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -47,64 +47,64 @@
 </td><td>
         <div id="content">
             <br />
-                <h2>Таблица переехала</h2>
+                <h2>РўР°Р±Р»РёС†Р° РїРµСЂРµРµС…Р°Р»Р°</h2>
                 <p>
 <a target="_blank" href="https://githomelab.ru/EreTIk/ioam#ioam">https://githomelab.ru/EreTIk/ioam</a>
                 <p>
             <br />
             <br />
                 <p>
-Необходимые маски доступа на объект файла при вызове NtQueryInformationFile, 
-NtSetInformationFile, NtQueryVolumeInformationFile и NtSetVolumeInformationFile 
-определяются в зависимости от класса информации, который указан при вызове этих 
-функций. Поэтому я сгенерировал для себя (может кому-нибудь тоже будет полезно) 
-таблицы соответствий класса информации и требуемых масок доступа. Для сборки 
-был написан простенький скрипт 
+РќРµРѕР±С…РѕРґРёРјС‹Рµ РјР°СЃРєРё РґРѕСЃС‚СѓРїР° РЅР° РѕР±СЉРµРєС‚ С„Р°Р№Р»Р° РїСЂРё РІС‹Р·РѕРІРµ NtQueryInformationFile, 
+NtSetInformationFile, NtQueryVolumeInformationFile Рё NtSetVolumeInformationFile 
+РѕРїСЂРµРґРµР»СЏСЋС‚СЃСЏ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РєР»Р°СЃСЃР° РёРЅС„РѕСЂРјР°С†РёРё, РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·Р°РЅ РїСЂРё РІС‹Р·РѕРІРµ СЌС‚РёС… 
+С„СѓРЅРєС†РёР№. РџРѕСЌС‚РѕРјСѓ СЏ СЃРіРµРЅРµСЂРёСЂРѕРІР°Р» РґР»СЏ СЃРµР±СЏ (РјРѕР¶РµС‚ РєРѕРјСѓ-РЅРёР±СѓРґСЊ С‚РѕР¶Рµ Р±СѓРґРµС‚ РїРѕР»РµР·РЅРѕ) 
+С‚Р°Р±Р»РёС†С‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёР№ РєР»Р°СЃСЃР° РёРЅС„РѕСЂРјР°С†РёРё Рё С‚СЂРµР±СѓРµРјС‹С… РјР°СЃРѕРє РґРѕСЃС‚СѓРїР°. Р”Р»СЏ СЃР±РѕСЂРєРё 
+Р±С‹Р» РЅР°РїРёСЃР°РЅ РїСЂРѕСЃС‚РµРЅСЊРєРёР№ СЃРєСЂРёРїС‚ 
 <a target="_blank" href="https://githomelab.ru/EreTIk/ioam/blob/master/ioam.py">ioam.py</a>, 
-который использует 
+РєРѕС‚РѕСЂС‹Р№ РёСЃРїРѕР»СЊР·СѓРµС‚ 
 <a target="_blank" href="https://githomelab.ru/pykd/pykd">pykd</a>.
                 </p>
             <br />
                 <a name="UPD_01_10_2018"></a>
                 <h2>Updated (01.10.2018)</h2>
                 <p>
-Скрипт снова переработан и вместе с файлами-источниками информации (коллекцией 
-ntoskrnl.exe) выложен на GitLab. Фактически этот мини-проект (вместе со 
-сгенерирвоанной таблицей) переместился, новый адрес: 
+РЎРєСЂРёРїС‚ СЃРЅРѕРІР° РїРµСЂРµСЂР°Р±РѕС‚Р°РЅ Рё РІРјРµСЃС‚Рµ СЃ С„Р°Р№Р»Р°РјРё-РёСЃС‚РѕС‡РЅРёРєР°РјРё РёРЅС„РѕСЂРјР°С†РёРё (РєРѕР»Р»РµРєС†РёРµР№ 
+ntoskrnl.exe) РІС‹Р»РѕР¶РµРЅ РЅР° GitLab. Р¤Р°РєС‚РёС‡РµСЃРєРё СЌС‚РѕС‚ РјРёРЅРё-РїСЂРѕРµРєС‚ (РІРјРµСЃС‚Рµ СЃРѕ 
+СЃРіРµРЅРµСЂРёСЂРІРѕР°РЅРЅРѕР№ С‚Р°Р±Р»РёС†РµР№) РїРµСЂРµРјРµСЃС‚РёР»СЃСЏ, РЅРѕРІС‹Р№ Р°РґСЂРµСЃ: 
 <a target="_blank" href="https://githomelab.ru/EreTIk/ioam#ioam">https://githomelab.ru/EreTIk/ioam</a>.
                 </p>
                 <p>
-Ключевые изменения:
+РљР»СЋС‡РµРІС‹Рµ РёР·РјРµРЅРµРЅРёСЏ:
                 </p>
 <ul>
-<li>Сразу генериуется GitLab Flavored Markdown (раньше формировалась заготовка HTML-файла)</li>
-<li>Таблицы "разрезаны" по 16 строк (для увеличения удобства просмотра и скроллинга)</li>
-<li>В набор исходных файлов добавлены ядра с номерами сборок 17134 (версия 1803) и 17763 (версия 1809)</li>
+<li>РЎСЂР°Р·Сѓ РіРµРЅРµСЂРёСѓРµС‚СЃСЏ GitLab Flavored Markdown (СЂР°РЅСЊС€Рµ С„РѕСЂРјРёСЂРѕРІР°Р»Р°СЃСЊ Р·Р°РіРѕС‚РѕРІРєР° HTML-С„Р°Р№Р»Р°)</li>
+<li>РўР°Р±Р»РёС†С‹ "СЂР°Р·СЂРµР·Р°РЅС‹" РїРѕ 16 СЃС‚СЂРѕРє (РґР»СЏ СѓРІРµР»РёС‡РµРЅРёСЏ СѓРґРѕР±СЃС‚РІР° РїСЂРѕСЃРјРѕС‚СЂР° Рё СЃРєСЂРѕР»Р»РёРЅРіР°)</li>
+<li>Р’ РЅР°Р±РѕСЂ РёСЃС…РѕРґРЅС‹С… С„Р°Р№Р»РѕРІ РґРѕР±Р°РІР»РµРЅС‹ СЏРґСЂР° СЃ РЅРѕРјРµСЂР°РјРё СЃР±РѕСЂРѕРє 17134 (РІРµСЂСЃРёСЏ 1803) Рё 17763 (РІРµСЂСЃРёСЏ 1809)</li>
 </ul>
             <br />
                 <a name="UPD_01_11_2017"></a>
                 <h2>Updated (01.11.2017)</h2>
             <br />
                 <p>
-Скрипт был сильно переработан. Первым изменением стало то, что он стал 
-обрабатывать не один файл ядра, а директорию с некоторой коллекцией файлов. 
-Соответственно, таблица выросла, и в ней отражаются изменения для разных версий 
-ОС. Сама коллекция была выбрана не из всех доступных мне ядер, а только релизы и 
-только те, что отличаются между собой. Например оказалось, что service pack'и 
-Windows XP, Vist и 7 не отличаются между собой, поэтому в готовую таблицу попали 
-ядра без service pack'ов.
+РЎРєСЂРёРїС‚ Р±С‹Р» СЃРёР»СЊРЅРѕ РїРµСЂРµСЂР°Р±РѕС‚Р°РЅ. РџРµСЂРІС‹Рј РёР·РјРµРЅРµРЅРёРµРј СЃС‚Р°Р»Рѕ С‚Рѕ, С‡С‚Рѕ РѕРЅ СЃС‚Р°Р» 
+РѕР±СЂР°Р±Р°С‚С‹РІР°С‚СЊ РЅРµ РѕРґРёРЅ С„Р°Р№Р» СЏРґСЂР°, Р° РґРёСЂРµРєС‚РѕСЂРёСЋ СЃ РЅРµРєРѕС‚РѕСЂРѕР№ РєРѕР»Р»РµРєС†РёРµР№ С„Р°Р№Р»РѕРІ. 
+РЎРѕРѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕ, С‚Р°Р±Р»РёС†Р° РІС‹СЂРѕСЃР»Р°, Рё РІ РЅРµР№ РѕС‚СЂР°Р¶Р°СЋС‚СЃСЏ РёР·РјРµРЅРµРЅРёСЏ РґР»СЏ СЂР°Р·РЅС‹С… РІРµСЂСЃРёР№ 
+РћРЎ. РЎР°РјР° РєРѕР»Р»РµРєС†РёСЏ Р±С‹Р»Р° РІС‹Р±СЂР°РЅР° РЅРµ РёР· РІСЃРµС… РґРѕСЃС‚СѓРїРЅС‹С… РјРЅРµ СЏРґРµСЂ, Р° С‚РѕР»СЊРєРѕ СЂРµР»РёР·С‹ Рё 
+С‚РѕР»СЊРєРѕ С‚Рµ, С‡С‚Рѕ РѕС‚Р»РёС‡Р°СЋС‚СЃСЏ РјРµР¶РґСѓ СЃРѕР±РѕР№. РќР°РїСЂРёРјРµСЂ РѕРєР°Р·Р°Р»РѕСЃСЊ, С‡С‚Рѕ service pack'Рё 
+Windows XP, Vist Рё 7 РЅРµ РѕС‚Р»РёС‡Р°СЋС‚СЃСЏ РјРµР¶РґСѓ СЃРѕР±РѕР№, РїРѕСЌС‚РѕРјСѓ РІ РіРѕС‚РѕРІСѓСЋ С‚Р°Р±Р»РёС†Сѓ РїРѕРїР°Р»Рё 
+СЏРґСЂР° Р±РµР·В service pack'РѕРІ.
                 </p>
                 <p>
-Вторым изменением стало то, что наряду с массивом масок доступа скрипт стал 
-обрабатывать и массив минимального размера буфера. Это позволило убрать из 
-таблицы неподдерживаемые значения классов (для которых функция возвращает 
-STATUS_INVALID_INFO_CLASS). Иконка 
-<img src="../images/deny_rd_cr.png" alt="X" /> в таблице означает, что запрос 
-перестал поддерживаться.
+Р’С‚РѕСЂС‹Рј РёР·РјРµРЅРµРЅРёРµРј СЃС‚Р°Р»Рѕ С‚Рѕ, С‡С‚Рѕ РЅР°СЂСЏРґСѓ СЃ РјР°СЃСЃРёРІРѕРј РјР°СЃРѕРє РґРѕСЃС‚СѓРїР° СЃРєСЂРёРїС‚ СЃС‚Р°Р» 
+РѕР±СЂР°Р±Р°С‚С‹РІР°С‚СЊ Рё РјР°СЃСЃРёРІ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР°. Р­С‚Рѕ РїРѕР·РІРѕР»РёР»Рѕ СѓР±СЂР°С‚СЊ РёР· 
+С‚Р°Р±Р»РёС†С‹ РЅРµРїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РєР»Р°СЃСЃРѕРІ (РґР»СЏ РєРѕС‚РѕСЂС‹С… С„СѓРЅРєС†РёСЏ РІРѕР·РІСЂР°С‰Р°РµС‚ 
+STATUS_INVALID_INFO_CLASS). РРєРѕРЅРєР° 
+<img src="../images/deny_rd_cr.png" alt="X" /> РІ С‚Р°Р±Р»РёС†Рµ РѕР·РЅР°С‡Р°РµС‚, С‡С‚Рѕ Р·Р°РїСЂРѕСЃ 
+РїРµСЂРµСЃС‚Р°Р» РїРѕРґРґРµСЂР¶РёРІР°С‚СЊСЃСЏ.
                 </p>
             <br />
                 <p>
-<strike>Результат работы скрипта:</strike>
+<strike>Р РµР·СѓР»СЊС‚Р°С‚ СЂР°Р±РѕС‚С‹ СЃРєСЂРёРїС‚Р°:</strike>
                 </p>
 <br /><p align="right"><font size="+1">&#x39E;&#x3C1;&#x3B5;&#x3A4;&#x399;&#x3BA;</font></p>
         </div>

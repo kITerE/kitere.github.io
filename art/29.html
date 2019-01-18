@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="../js/ppm.js"></script>
-<title>EreTIk's Box &raquo; Сюрпризы от Windows 10 build 17133: маска для NtBuildNumber</title>
+<title>EreTIk's Box &raquo; РЎСЋСЂРїСЂРёР·С‹ РѕС‚ Windows 10 build 17133: РјР°СЃРєР° РґР»СЏ NtBuildNumber</title>
 <meta name="keywords" content="EreTIk, kernel, Windows Windows 10, Windows 10 build 17133, NtBuildNumber, 0x3FFF, 3FFF" />
 <link rel="stylesheet" type="text/css" href="../style.css" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="https://kitere.github.io/feed.xml" />
@@ -19,22 +19,22 @@
         <div id="wrapper">
             <div id="header">
                 <h1>EreTIk's Box</h1>
-                <h2>Разработка, исследование и низкоуровневое программирование</h2>
+                <h2>Р Р°Р·СЂР°Р±РѕС‚РєР°, РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Рё РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ</h2>
             </div>
         <div id="strap">
-<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">Cтатьи, исходники</a> &raquo; Сюрпризы от Windows 10 build 17133: маска для NtBuildNumber
+<b>EreTIk's Box </b> &raquo; <a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a> &raquo; РЎСЋСЂРїСЂРёР·С‹ РѕС‚ Windows 10 build 17133: РјР°СЃРєР° РґР»СЏ NtBuildNumber
         </div>
 <br /><table align="center" border="0" cellpadding="0" cellspacing="0" width="98%"><tr valign="top"><td>
         <div id="navigation">
             <ul id="menu">
-                <li><a href="../index.htm">Стартовая страница</a></li>
-                <li><a href="../Articles.html">Cтатьи, исходники</a></li>
-                <li><a href="../WinDbg.html">Заметки о WinDbg</a></li>
-                <li><a href="../Downloads.html">Скачать</a></li>
-                <li><a href="../Links.html">Внешние ссылки</a></li>
-                <li><a href="../Overview.html">Обо всем</a></li>
-                <li><a href="../Contacts.html">Контакты</a></li>
-                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">Утилиты</a>
+                <li><a href="../index.htm">РЎС‚Р°СЂС‚РѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°</a></li>
+                <li><a href="../Articles.html">CС‚Р°С‚СЊРё, РёСЃС…РѕРґРЅРёРєРё</a></li>
+                <li><a href="../WinDbg.html">Р—Р°РјРµС‚РєРё Рѕ WinDbg</a></li>
+                <li><a href="../Downloads.html">РЎРєР°С‡Р°С‚СЊ</a></li>
+                <li><a href="../Links.html">Р’РЅРµС€РЅРёРµ СЃСЃС‹Р»РєРё</a></li>
+                <li><a href="../Overview.html">РћР±Рѕ РІСЃРµРј</a></li>
+                <li><a href="../Contacts.html">РљРѕРЅС‚Р°РєС‚С‹</a></li>
+                <li><a href="../Tools.html" onmouseover="mopen('m_tools')" onmouseout="mclosetime()">РЈС‚РёР»РёС‚С‹</a>
                   <script type="text/javascript">
                   <!--
                     nav_tools("../");
@@ -48,20 +48,20 @@
         <div id="content">
             <br />
                 <p>
-Этой небольшой заметкой хочу открыть серию, которая будет описывать сюрпризы 
-Windows 10 build 17133 для Kernel- разработчика.
+Р­С‚РѕР№ РЅРµР±РѕР»СЊС€РѕР№ Р·Р°РјРµС‚РєРѕР№ С…РѕС‡Сѓ РѕС‚РєСЂС‹С‚СЊ СЃРµСЂРёСЋ, РєРѕС‚РѕСЂР°СЏ Р±СѓРґРµС‚ РѕРїРёСЃС‹РІР°С‚СЊ СЃСЋСЂРїСЂРёР·С‹ 
+Windows 10 build 17133 РґР»СЏ Kernel- СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР°.
                 </p>
 
             <br />
                 <p>
-Есть такая недокументированная (но экспортируемая) переменная ядра: NtBuildNumber. 
-Эта переменная, как нетрудно догадаться из названия, содержит номер 
-сборки ядра Windows. Засада в том, что в этой переменной старшие биты отведены 
-под флаги, а для получения номера сборки нужно на значение этой переменной 
-наложить маску. 
-<a target="_blank" href="https://books.google.com/books?id=WZdCAwAAQBAJ&pg=PT510&lpg=PT510&dq=NtBuildNumber+0x3FFF">В Windows Internals 5 Edition</a>, 
-например, предлагают производить операцию логического и с константой 0x3FFF. И 
-именно так (раньше) поступала системная функция 
+Р•СЃС‚СЊ С‚Р°РєР°СЏ РЅРµРґРѕРєСѓРјРµРЅС‚РёСЂРѕРІР°РЅРЅР°СЏ (РЅРѕ СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјР°СЏ) РїРµСЂРµРјРµРЅРЅР°СЏ СЏРґСЂР°: NtBuildNumber. 
+Р­С‚Р° РїРµСЂРµРјРµРЅРЅР°СЏ, РєР°Рє РЅРµС‚СЂСѓРґРЅРѕ РґРѕРіР°РґР°С‚СЊСЃСЏ РёР· РЅР°Р·РІР°РЅРёСЏ, СЃРѕРґРµСЂР¶РёС‚ РЅРѕРјРµСЂ 
+СЃР±РѕСЂРєРё СЏРґСЂР° Windows. Р—Р°СЃР°РґР° РІ С‚РѕРј, С‡С‚Рѕ РІ СЌС‚РѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ СЃС‚Р°СЂС€РёРµ Р±РёС‚С‹ РѕС‚РІРµРґРµРЅС‹ 
+РїРѕРґ С„Р»Р°РіРё, Р° РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РЅРѕРјРµСЂР° СЃР±РѕСЂРєРё РЅСѓР¶РЅРѕ РЅР° Р·РЅР°С‡РµРЅРёРµ СЌС‚РѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ 
+РЅР°Р»РѕР¶РёС‚СЊ РјР°СЃРєСѓ. 
+<a target="_blank" href="https://books.google.com/books?id=WZdCAwAAQBAJ&pg=PT510&lpg=PT510&dq=NtBuildNumber+0x3FFF">Р’ Windows Internals 5 Edition</a>, 
+РЅР°РїСЂРёРјРµСЂ, РїСЂРµРґР»Р°РіР°СЋС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЊ РѕРїРµСЂР°С†РёСЋ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ Рё СЃ РєРѕРЅСЃС‚Р°РЅС‚РѕР№ 0x3FFF. Р 
+РёРјРµРЅРЅРѕ С‚Р°Рє (СЂР°РЅСЊС€Рµ) РїРѕСЃС‚СѓРїР°Р»Р° СЃРёСЃС‚РµРјРЅР°СЏ С„СѓРЅРєС†РёСЏ 
 <a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-psgetversion">PsGetVersion</a>:
                 </p>
             <br />
@@ -97,17 +97,17 @@ start             end                 module name
     File date:        00000000.00000000
     Translations:     0409.04b0
     CompanyName:      Microsoft Corporation
-    ProductName:      Microsoft® Windows® Operating System
+    ProductName:      MicrosoftВ® WindowsВ® Operating System
     InternalName:     ntkrnlmp.exe
     OriginalFilename: ntkrnlmp.exe
     ProductVersion:   5.2.3790.4789
     FileVersion:      5.2.3790.4789 (srv03_sp2_gdr.101019-0340)
     FileDescription:  NT Kernel &amp; System
-    LegalCopyright:   © Microsoft Corporation. All rights reserved.
+    LegalCopyright:   В© Microsoft Corporation. All rights reserved.
                 </div>
             <br />
                 <p>
-А проблема достаточно очевидна: маска 3FFFh меньше номера сборки новой 
+Рђ РїСЂРѕР±Р»РµРјР° РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РѕС‡РµРІРёРґРЅР°: РјР°СЃРєР° 3FFFh РјРµРЅСЊС€Рµ РЅРѕРјРµСЂР° СЃР±РѕСЂРєРё РЅРѕРІРѕР№ 
 Windows 10 - 17133:
                 </p>
                 <div class="code">
@@ -116,13 +116,13 @@ Evaluate expression: 16383 = 00000000`00003fff
                 </div>
             <br />
                 <p>
-Поэтому, если у вас в закромах остался старый код, использующий 
-недокументированную nt!NtBuildNumber, то может пришла пора переписать его на 
-вызов 
+РџРѕСЌС‚РѕРјСѓ, РµСЃР»Рё Сѓ РІР°СЃ РІ Р·Р°РєСЂРѕРјР°С… РѕСЃС‚Р°Р»СЃСЏ СЃС‚Р°СЂС‹Р№ РєРѕРґ, РёСЃРїРѕР»СЊР·СѓСЋС‰РёР№ 
+РЅРµРґРѕРєСѓРјРµРЅС‚РёСЂРѕРІР°РЅРЅСѓСЋ nt!NtBuildNumber, С‚Рѕ РјРѕР¶РµС‚ РїСЂРёС€Р»Р° РїРѕСЂР° РїРµСЂРµРїРёСЃР°С‚СЊ РµРіРѕ РЅР° 
+РІС‹Р·РѕРІ 
 <a target="_blank" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/content/wdm/nf-wdm-rtlgetversion">RtlGetVersion</a>?
-Если же использование nt!NtBuildNumber для вас милее, то нужно заменить маску
-на 0xFFFFFFF. В ядре 10.0.17133, например, уже нет внутренних ссылок 
-на NtBuildNumber:
+Р•СЃР»Рё Р¶Рµ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ nt!NtBuildNumber РґР»СЏ РІР°СЃ РјРёР»РµРµ, С‚Рѕ РЅСѓР¶РЅРѕ Р·Р°РјРµРЅРёС‚СЊ РјР°СЃРєСѓ
+РЅР° 0xFFFFFFF. Р’ СЏРґСЂРµ 10.0.17133, РЅР°РїСЂРёРјРµСЂ, СѓР¶Рµ РЅРµС‚ РІРЅСѓС‚СЂРµРЅРЅРёС… СЃСЃС‹Р»РѕРє 
+РЅР° NtBuildNumber:
                 </p>
                 <div class="code">
 0:000&gt; uf PsGetVersion
